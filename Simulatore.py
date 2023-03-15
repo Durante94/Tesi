@@ -1,5 +1,6 @@
 import numpy as np
 from confluent_kafka import Producer, Consumer
+from confluent_kafka.cimpl import KafkaException, KafkaError
 import socket
 import os
 from multiprocessing import Process
@@ -9,8 +10,8 @@ import json
 def acked(err, msg):
     if err is not None:
         print("Failed to deliver message: %s: %s" % (str(msg), str(err)))
-    else:
-        print("Message produced: %s" % (str(msg)))
+    # else:
+    #     print("Message produced: %s" % (str(msg)))
 
 
 def consume_loop(conf):
@@ -59,8 +60,9 @@ frequency = float(os.getenv('frequency'))
 math_func = getattr(np, function)
 t = 1
 
-task = Process(target=consume_loop, args=(conf))
-task.start();
+# consume_loop(conf)
+task = Process(target=consume_loop, args=(conf,))
+task.start()
 
 try:
     while True:
