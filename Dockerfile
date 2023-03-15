@@ -1,8 +1,8 @@
 FROM python:3.9
-ADD requirements.txt
+COPY requirements.txt ./
 RUN pip install --upgrade pip \
     pip install -r requirements.txt
-ADD Simulatore.py
+COPY Simulatore.py ./
 ENV kafka_host=localhost:9092 \
     math_fun=sin \
     amplitude=6 \
