@@ -1,0 +1,67 @@
+
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: grafana
+  namespace: monitoring
+  labels:
+    app: strimzi
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: grafana
+  template:
+    metadata:
+      labels:
+        name: grafana
+    spec:
+      containers:
+      - name: grafana
+        image: "docker.io/grafana/grafana"
+        ports:
+        - name: grafana
+          containerPort: 3000
+          protocol: TCP
+        volumeMounts:
+        - name: grafana-config
+          mountPath: /etc/grafana/grafana.ini
+          subPath: grafana.ini
+        - mountPath: /etc/grafana/provisioning/datasources
+          name: grafana-datasources
+          readOnly: false
+        - mountPath: /var/lib/grafana/dashboards
+          name: grafana-dashboard
+          readOnly: false
+        - mountPath: /etc/grafana/provisioning/dashboards
+          name: grafana-dashboard-definition
+        readinessProbe:
+          httpGet:
+            path: /api/health
+            port: 3000
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        livenessProbe:
+          httpGet:
+            path: /api/health
+            port: 3000
+          initialDelaySeconds: 15
+          periodSeconds: 20
+      volumes:
+      - name: grafana-config
+        configMap:
+            defaultMode: 420
+            name: grafana-config
+      - name: grafana-datasources
+        configMap:
+            defaultMode: 420
+            name: grafana-datasources
+      - name: grafana-dashboard
+        configMap:
+            defaultMode: 420
+            name: grafana-dashboard
+      - name: grafana-dashboard-definition
+        configMap:
+            defaultMode: 420
+            name: grafana-dashboard-definition

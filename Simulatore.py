@@ -23,10 +23,10 @@ def consume_loop(conf):
     amplitude = float(os.getenv('amplitude'))
     frequency = float(os.getenv('frequency'))
 
-    try:
-        consumer.subscribe(['request-config'])
-        while True:
-            msg = consumer.poll(timeout=1.0)
+    consumer.subscribe(['request-config'])
+    while True:
+        try:
+            msg = consumer.poll(timeout=60.0)
             if msg is None:
                 continue
 
@@ -34,7 +34,7 @@ def consume_loop(conf):
                 if msg.error().code() == KafkaError._PARTITION_EOF:
                     # End of partition event
                     print('%% %s [%d] reached end at offset %d\n' %
-                                     (msg.topic(), msg.partition(), msg.offset()))
+                          (msg.topic(), msg.partition(), msg.offset()))
                 elif msg.error():
                     raise KafkaException(msg.error())
             else:
@@ -46,8 +46,8 @@ def consume_loop(conf):
                                      'frequency': frequency
                                  }),
                                  callback=acked)
-    finally:
-        consumer.close()
+        except:
+            continue
 
 
 conf = {'bootstrap.servers': os.getenv("kafka_host"),
@@ -66,12 +66,13 @@ task.start()
 
 try:
     while True:
+        # addormentalo
         value = np.array2string(
             amplitude * math_func(t + np.pi / frequency))
         producer.produce(os.getenv('topic'),
-                        key="simulatore",
-                        value=value.encode('utf-8'),
-                        callback=acked)
+                         key="simulatore",
+                         value=value.encode('utf-8'),
+                         callback=acked)
         producer.poll(2)
         t = t + 1
 finally:

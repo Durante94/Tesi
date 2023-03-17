@@ -1,0 +1,84 @@
+{{- $clusterName := .Values.global.internalKafkaClusterName | default .Values.kafka.clusterName -}}
+{{- $kafkaReplicas := .Values.global.kafkaReplicas | default .Values.kafka.replicas -}}
+
+apiVersion: kafka.strimzi.io/v1beta2
+kind: Kafka
+metadata:
+  name: {{ $clusterName }}
+  namespace: wams-kafka
+spec:
+  kafkaExporter: {}
+  entityOperator:
+    topicOperator: {}
+    userOperator: {}
+  kafka:
+    config:
+      auto.create.topics.enable: 'true'
+      default.replication.factor: 2
+      inter.broker.protocol.version: '3.1'
+      min.insync.replicas: 1
+      offsets.topic.replication.factor: 2
+      transaction.state.log.min.isr: 1
+      transaction.state.log.replication.factor: 2
+      delete.topic.enable: 'true'
+      log.retention.ms: 100000
+      log.segment.delete.delay.ms: 50000
+      offsets.topic.replication.factor: 2
+    listeners:
+      - name: plain
+        port: 9092
+        tls: false
+        type: internal
+      - configuration:
+          bootstrap:
+            nodePort: 30829
+          brokers:
+            {{- range  $i, $e := untilStep 30830 (int (add 30830 $kafkaReplicas)) 1 }} 
+            - broker: {{ $i }}
+              nodePort: {{ $e }}
+            {{- end }}
+        name: external
+        port: 9093
+        tls: false
+        type: nodeport
+    replicas: {{ $kafkaReplicas }}
+    storage:
+      class: {{ .Values.global.storageClassName | default .Values.kafka.storageClass }}
+      size: {{ .Values.global.kafkaStorageSize | default .Values.kafka.storageSize }}
+      type: persistent-claim
+    template:
+      pod:
+        affinity:
+          podAntiAffinity:
+            preferredDuringSchedulingIgnoredDuringExecution:
+              - weight: 100
+                podAffinityTerm:
+                  labelSelector:
+                    matchExpressions:
+                      - key: strimzi.io/name
+                        operator: In
+                        values:
+                          - {{ $clusterName }}-kafka
+                  topologyKey: kubernetes.io/hostname
+    version: 3.1.0
+  zookeeper:
+    replicas: {{ .Values.zookeeper.replicas | default .Values.zookeeper.replicas }}
+    storage:
+      class: {{ .Values.global.storageClassName | default .Values.zookeeper.storageClass }}
+      size: {{ .Values.global.zookeeperStorageSize | default .Values.zookeeper.storageSize }}
+      type: persistent-claim
+    template:
+      pod:
+        affinity:
+          podAntiAffinity:
+            preferredDuringSchedulingIgnoredDuringExecution:
+              - weight: 100
+                podAffinityTerm:
+                  labelSelector:
+                    matchExpressions:
+                      - key: strimzi.io/name
+                        operator: In
+                        values:
+                          - {{ $clusterName }}-zookeeper
+                  topologyKey: kubernetes.io/hostname
+

@@ -1,0 +1,10 @@
+
+kafka:
+  clusterName: local-cluster
+  storageClass: thin
+  storageSize: 100Gi
+  replicas: 2
+zookeeper:
+  storageClass: thin
+  storageSize: 5Gi
+  replicas: 1

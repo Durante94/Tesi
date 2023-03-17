@@ -1,0 +1,31 @@
+apiVersion: apps/v1 
+kind: Deployment
+metadata:
+  name: simulatore
+  namespace: monitoring
+spec:
+  selector:   
+    matchLabels:
+      app: simulatore
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: simulatore
+    spec:
+      containers:
+      - name: simulatore
+        image: docker.io/fabrizio/simulatore
+        # env:
+        # - name: "kafka__host"
+        #   value: ""
+        # - name: "math__fun"
+        #   value: sin
+        # - name: "amplitude"
+        #   value: 5
+        # - name: "frequency"
+        #   value: 3
+      
+
+
+

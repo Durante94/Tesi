@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: kafka-exporter-service
+  namespace: wams-kafka
+  labels:
+    app.kubernetes.io/name: kafka-exporter
+spec:
+  selector:
+    app.kubernetes.io/name: kafka-exporter
+  ports:
+    - protocol: TCP
+      name: exporter-metrics
+      port: 9404
+      targetPort: 9404

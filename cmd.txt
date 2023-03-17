@@ -1,0 +1,14 @@
+sudo apt/dnf install helm
+
+# installare k9s
+curl -sS https://webinstall.dev/k9s | bash
+
+# installare strimzi
+helm repo add strimzi https://strimzi.io/charts/
+
+#deploy di strimzi, kafka, zookeeper
+helm install -f ./wams-kafka/values.yaml -f ./dep-kafka.yaml kafka ./wams-kafka;
+helm install strimzi strimzi/strimzi-kafka-operator --version=0.31.1  -n wams-kafka
+
+# aggiornare Deployment
+helm upgrade -f ./wams-kafka/values.yaml -f ./dep-kafka.yaml kafka ./wams-kafka;
