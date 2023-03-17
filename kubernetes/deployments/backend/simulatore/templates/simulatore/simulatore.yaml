@@ -16,15 +16,15 @@ spec:
       containers:
       - name: simulatore
         image: docker.io/fabrizio/simulatore
-        # env:
-        # - name: "kafka__host"
-        #   value: ""
-        # - name: "math__fun"
-        #   value: sin
-        # - name: "amplitude"
-        #   value: 5
-        # - name: "frequency"
-        #   value: 3
+        env:
+        - name: "kafka__host"
+          value: ""
+        - name: "math__fun"
+          value: sin
+        - name: "amplitude"
+          value: 5
+        - name: "frequency"
+          value: 3
       
 
 
