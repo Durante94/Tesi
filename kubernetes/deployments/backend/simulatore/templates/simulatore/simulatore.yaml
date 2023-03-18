@@ -1,3 +1,6 @@
+{{- $simReplicas := .Values.global.simulatoreReplicas | default .Values.simulatore.replicas -}}
+
+
 apiVersion: apps/v1 
 kind: Deployment
 metadata:
@@ -14,18 +17,16 @@ spec:
         app: simulatore
     spec:
       containers:
+      {{- range  $i, $e := untilStep 0 $simReplicas 1 }} 
       - name: simulatore
-        image: docker.io/fabrizio/simulatore
+        image: docker.io/fabrizio294/simulatore:latest
         env:
         - name: "kafka__host"
-          value: ""
+          value: "dns kube kafka"
         - name: "math__fun"
-          value: sin
+          value: {{ if eq (mod $i 2) 0}} sin {{ else }} cos {{ end }}
         - name: "amplitude"
-          value: 5
+          value: add $i 1
         - name: "frequency"
-          value: 3
-      
-
-
-
+          value: add $i 1
+      {{- end }}

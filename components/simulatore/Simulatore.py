@@ -5,6 +5,7 @@ import socket
 import os
 from multiprocessing import Process
 import json
+import time
 
 
 def acked(err, msg):
@@ -24,30 +25,32 @@ def consume_loop(conf):
     frequency = float(os.getenv('frequency'))
 
     consumer.subscribe(['request-config'])
-    while True:
-        try:
-            msg = consumer.poll(timeout=60.0)
-            if msg is None:
-                continue
+    try:
+        while True:
+            try:
+                msg = consumer.poll(timeout=60.0)
+                if msg is None:
+                    continue
 
-            if msg.error():
-                if msg.error().code() == KafkaError._PARTITION_EOF:
-                    # End of partition event
-                    print('%% %s [%d] reached end at offset %d\n' %
-                          (msg.topic(), msg.partition(), msg.offset()))
-                elif msg.error():
-                    raise KafkaException(msg.error())
-            else:
-                producer.produce('request-response',
-                                 key="simulatore-conf",
-                                 value=json.dumps({
-                                     'function': function,
-                                     'amplitude': amplitude,
-                                     'frequency': frequency
-                                 }),
-                                 callback=acked)
-        except:
-            continue
+                if msg.error():
+                    if msg.error().code() == KafkaError._PARTITION_EOF:
+                        print('%% %s [%d] reached end at offset %d\n' %
+                            (msg.topic(), msg.partition(), msg.offset()))
+                    elif msg.error():
+                        raise KafkaException(msg.error())
+                else:
+                    producer.produce('request-response',
+                                    key="simulatore-conf",
+                                    value=json.dumps({
+                                        'function': function,
+                                        'amplitude': amplitude,
+                                        'frequency': frequency
+                                    }),
+                                    callback=acked)
+            except:
+                continue
+    finally:
+        consumer.close()
 
 
 conf = {'bootstrap.servers': os.getenv("kafka_host"),
@@ -66,7 +69,7 @@ task.start()
 
 try:
     while True:
-        # addormentalo
+        time.sleep(1)
         value = np.array2string(
             amplitude * math_func(t + np.pi / frequency))
         producer.produce(os.getenv('topic'),
