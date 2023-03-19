@@ -5,7 +5,7 @@ apiVersion: kafka.strimzi.io/v1beta2
 kind: Kafka
 metadata:
   name: {{ $clusterName }}
-  namespace: wams-kafka
+  namespace: kafka
 spec:
   kafkaExporter: {}
   entityOperator:

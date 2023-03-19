@@ -17,7 +17,7 @@ metadata:
   name: alertstopic
   labels:
     strimzi.io/cluster: {{ $clusterName }}
-  namespace: wams-kafka
+  namespace: kafka
 spec:
   partitions: 2
   replicas: 3
@@ -33,7 +33,7 @@ metadata:
   name: configresponse
   labels:
     strimzi.io/cluster:  {{ $clusterName }}
-  namespace: wams-kafka
+  namespace: kafka
 spec:
   partitions: 1
   replicas: 3
@@ -50,7 +50,7 @@ metadata:
   name: comtraderequest
   labels:
     strimzi.io/cluster: {{ $clusterName }}
-  namespace: wams-kafka
+  namespace: kafka
 spec:
   partitions: 1
   replicas: 3
@@ -66,7 +66,7 @@ metadata:
   name: comtraderequest-dlt
   labels:
     strimzi.io/cluster: {{ $clusterName }}
-  namespace: wams-kafka
+  namespace: kafka
 spec:
   partitions: 1
   replicas: 3
@@ -84,7 +84,7 @@ metadata:
   name: comtraderesponse
   labels:
     strimzi.io/cluster: {{ $clusterName }}
-  namespace: wams-kafka
+  namespace: kafka
 spec:
   partitions: 1
   replicas: 3
@@ -100,7 +100,7 @@ metadata:
   name: configrequest
   labels:
     strimzi.io/cluster: {{ $clusterName }}
-  namespace: wams-kafka
+  namespace: kafka
 spec:
   partitions: 1
   replicas: 3
@@ -116,7 +116,7 @@ metadata:
   name: rawtopic
   labels:
     strimzi.io/cluster: {{ $clusterName }}
-  namespace: wams-kafka
+  namespace: kafka
 spec:
   partitions: 1
   replicas: 3
@@ -132,7 +132,7 @@ metadata:
   name: wamstopic
   labels:
     strimzi.io/cluster: {{ $clusterName }}
-  namespace: wams-kafka
+  namespace: kafka
 spec:
   partitions: 10
   replicas: 3
@@ -148,7 +148,7 @@ metadata:
   name: inoutstreamc37118topic
   labels:
     strimzi.io/cluster: {{ $clusterName }}
-  namespace: wams-kafka
+  namespace: kafka
 spec:
   partitions: 10
   replicas: 3
@@ -165,7 +165,7 @@ metadata:
   name: statisticstopic 
   labels:
     strimzi.io/cluster: {{ $clusterName }}
-  namespace: wams-kafka
+  namespace: kafka
 spec:
   partitions: 2
   replicas: 3
@@ -180,7 +180,7 @@ kind: KafkaTopic
 metadata:
   labels:
     strimzi.io/cluster: {{ $clusterName }}
-  namespace: wams-kafka
+  namespace: kafka
   name: cfgtopic
 spec:
   config:
@@ -197,7 +197,7 @@ metadata:
   name: ms-message
   labels:
     strimzi.io/cluster: {{ $clusterName }}
-  namespace: wams-kafka
+  namespace: kafka
 spec:
   partitions: 1
   replicas: 3
@@ -212,7 +212,7 @@ kind: KafkaTopic
 metadata:
   labels:
     strimzi.io/cluster: {{ $clusterName }}
-  namespace: wams-kafka
+  namespace: kafka
   name: telegrafcoordinator
 spec:
   config:
@@ -229,7 +229,7 @@ metadata:
   name: inoutstreamc37118topicmpdc01
   labels:
     strimzi.io/cluster: {{ $clusterName }}
-  namespace: wams-kafka
+  namespace: kafka
 spec:
   partitions: 10
   replicas: 3
@@ -245,7 +245,7 @@ metadata:
   name: inoutstreamc37118topicmpdc02
   labels:
     strimzi.io/cluster: {{ $clusterName }}
-  namespace: wams-kafka
+  namespace: kafka
 spec:
   partitions: 10
   replicas: 3
@@ -261,7 +261,7 @@ metadata:
   name: inoutstreamc37118topicmpdc03
   labels:
     strimzi.io/cluster: {{ $clusterName }}
-  namespace: wams-kafka
+  namespace: kafka
 spec:
   partitions: 10
   replicas: 3
@@ -277,7 +277,7 @@ metadata:
   name: inoutstreamc37118topicmpdc04
   labels:
     strimzi.io/cluster: {{ $clusterName }}
-  namespace: wams-kafka
+  namespace: kafka
 spec:
   partitions: 10
   replicas: 3
@@ -293,7 +293,7 @@ metadata:
   name: inoutstreamc37118topicmpdc05
   labels:
     strimzi.io/cluster: {{ $clusterName }}
-  namespace: wams-kafka
+  namespace: kafka
 spec:
   partitions: 10
   replicas: 3
@@ -309,7 +309,7 @@ metadata:
   name: inoutstreamc37118topicmpdc06
   labels:
     strimzi.io/cluster: {{ $clusterName }}
-  namespace: wams-kafka
+  namespace: kafka
 spec:
   partitions: 10
   replicas: 3
@@ -325,7 +325,7 @@ metadata:
   name: alertstopicmpdc01
   labels:
     strimzi.io/cluster: {{ $clusterName }}
-  namespace: wams-kafka
+  namespace: kafka
 spec:
   partitions: 2
   replicas: 3
@@ -341,7 +341,7 @@ metadata:
   name: statisticstopicmpdc01
   labels:
     strimzi.io/cluster: {{ $clusterName }}
-  namespace: wams-kafka
+  namespace: kafka
 spec:
   partitions: 2
   replicas: 3
@@ -356,7 +356,7 @@ metadata:
   name: alertstopicmpdc02
   labels:
     strimzi.io/cluster: {{ $clusterName }}
-  namespace: wams-kafka
+  namespace: kafka
 spec:
   partitions: 2
   replicas: 3
@@ -372,7 +372,7 @@ metadata:
   name: statisticstopicmpdc02
   labels:
     strimzi.io/cluster: {{ $clusterName }}
-  namespace: wams-kafka
+  namespace: kafka
 spec:
   partitions: 2
   replicas: 3
@@ -387,7 +387,7 @@ metadata:
   name: alertstopicmpdc03
   labels:
     strimzi.io/cluster: {{ $clusterName }}
-  namespace: wams-kafka
+  namespace: kafka
 spec:
   partitions: 2
   replicas: 3
@@ -403,7 +403,7 @@ metadata:
   name: statisticstopicmpdc03
   labels:
     strimzi.io/cluster: {{ $clusterName }}
-  namespace: wams-kafka
+  namespace: kafka
 spec:
   partitions: 2
   replicas: 3
@@ -418,7 +418,7 @@ metadata:
   name: alertstopicmpdc04
   labels:
     strimzi.io/cluster: {{ $clusterName }}
-  namespace: wams-kafka
+  namespace: kafka
 spec:
   partitions: 2
   replicas: 3
@@ -434,7 +434,7 @@ metadata:
   name: statisticstopicmpdc04
   labels:
     strimzi.io/cluster: {{ $clusterName }}
-  namespace: wams-kafka
+  namespace: kafka
 spec:
   partitions: 2
   replicas: 3
@@ -449,7 +449,7 @@ metadata:
   name: alertstopicmpdc05
   labels:
     strimzi.io/cluster: {{ $clusterName }}
-  namespace: wams-kafka
+  namespace: kafka
 spec:
   partitions: 2
   replicas: 3
@@ -465,7 +465,7 @@ metadata:
   name: statisticstopicmpdc05
   labels:
     strimzi.io/cluster: {{ $clusterName }}
-  namespace: wams-kafka
+  namespace: kafka
 spec:
   partitions: 2
   replicas: 3
@@ -479,7 +479,7 @@ metadata:
   name: alertstopicmpdc06
   labels:
     strimzi.io/cluster: {{ $clusterName }}
-  namespace: wams-kafka
+  namespace: kafka
 spec:
   partitions: 2
   replicas: 3
@@ -495,7 +495,7 @@ metadata:
   name: statisticstopicmpdc06
   labels:
     strimzi.io/cluster: {{ $clusterName }}
-  namespace: wams-kafka
+  namespace: kafka
 spec:
   partitions: 2
   replicas: 3
