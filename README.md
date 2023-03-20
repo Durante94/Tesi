@@ -1,5 +1,9 @@
 # Tesi
 
+## Minikube start
+```
+minikube start --network-plugin=cni --cni=calico
+```
 ## Installing k9s
 k9s is a tool to monitor the the status of the deployment and pods for kubernetes objects
 ```
@@ -30,4 +34,8 @@ helm install strimzi strimzi/strimzi-kafka-operator --version=<version>  -n <na
 Use the same path file as `helm install` command
 ```
 helm upgrade -f /path/to/deploy/file1.yaml -f /path/to/deploy/file2.yaml <deploy name> /deploy/folder
+```
+## Uninstall Deployment 
+```
+helm uninstall <deploy name>
 ```
