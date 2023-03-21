@@ -17,8 +17,8 @@ spec:
         app: simulatore
     spec:
       containers:
-      {{- range  $i, $e := untilStep 0 $simReplicas 1 }} 
-      - name: simulatore
+      {{- range  $i, $e := untilStep 0 (int ($simReplicas)) 1 }} 
+      - name: "{{- printf "%s%d" "simulatore" $i -}}"
         image: docker.io/fabrizio294/simulatore:latest
         env:
         - name: "kafka__host"
