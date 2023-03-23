@@ -22,7 +22,7 @@ spec:
         image: docker.io/fabrizio294/simulatore:latest
         env:
         - name: "kafka__host"
-          value: "$(KAFKA_SERVICE_HOST):$(KAFKA_SERVICE_PORT)"
+          value: kafka-exporter-service.kafka.svc.cluster.local:9404
         - name: "math__fun"
           value: {{ if eq (mod $i 2) 0}} sin {{ else }} cos {{ end }}
         - name: "amplitude"
