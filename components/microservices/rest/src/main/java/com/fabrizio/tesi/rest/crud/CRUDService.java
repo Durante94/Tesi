@@ -1,6 +1,5 @@
 package com.fabrizio.tesi.rest.crud;
 
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +25,8 @@ public class CRUDService {
     public ResponseTable<TableResponseDTO> getList(TableRequestDTO filter) {
         Page<CRUDEntity> results = repository.findAll(null,
                 PageRequest.of(filter.getSelectedPage() - 1, filter.getPageSize()));
-        GenericAdapter<CRUDEntity, TableResponseDTO> adapter = new GenericAdapter<>();
+        GenericAdapter<CRUDEntity, TableResponseDTO> adapter = new GenericAdapter<>(CRUDEntity.class,
+                TableResponseDTO.class);
         return new ResponseTable<>(Long.valueOf(results.getTotalElements()).intValue(),
                 results.stream().map(e -> adapter.enityToDto(e)).collect(Collectors.toList()));
     }

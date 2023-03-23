@@ -1,14 +1,12 @@
 package com.fabrizio.tesi.rest.crud;
 
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.fabrizio.tesi.rest.common.dto.ResponseTable;
-import com.fabrizio.tesi.rest.crud.dto.TableDTO;
+import com.fabrizio.tesi.rest.crud.dto.TableResponseDTO;
 
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
@@ -21,7 +19,7 @@ public class CRUDController {
     CRUDService service;
 
     @GetMapping
-    public ResponseTable<TableDTO> listElem() {   
+    public ResponseTable<TableResponseDTO> listElem() {   
         return service.getList();
     }
 }
