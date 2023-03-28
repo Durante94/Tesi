@@ -6,6 +6,7 @@ import java.util.List;
 
 import lombok.AccessLevel;
 import lombok.Data;
+import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
 
 @FieldDefaults(level = AccessLevel.PRIVATE)
@@ -14,8 +15,8 @@ public class ResponseTable<T> implements Serializable {
     static final int[] defaultPageSizeOptions = new int[] { 10, 20, 50, 100 };
 
     final int total;
-    final List<T> data;
-    final List<String> pageSizeOptions;
+    final @NonNull List<T> data;
+    final @NonNull List<String> pageSizeOptions;
 
     private List<String> calculatePageSizes() {
         final List<String> newOptions = new ArrayList<>();

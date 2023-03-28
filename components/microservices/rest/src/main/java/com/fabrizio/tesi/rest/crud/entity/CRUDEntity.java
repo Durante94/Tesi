@@ -2,7 +2,17 @@ package com.fabrizio.tesi.rest.crud.entity;
 
 import javax.persistence.Entity;
 
-// @Entity
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.experimental.FieldDefaults;
+
+@Entity
+@FieldDefaults(level = AccessLevel.PRIVATE)
+@NoArgsConstructor
+@Getter
+@Setter
 public class CRUDEntity {
     long id;
     String name;

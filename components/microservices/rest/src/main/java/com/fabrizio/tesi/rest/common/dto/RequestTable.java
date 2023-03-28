@@ -10,6 +10,7 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
 
 @FieldDefaults(level = AccessLevel.PRIVATE)
@@ -20,5 +21,6 @@ import lombok.experimental.FieldDefaults;
 public class RequestTable implements Serializable {
     int selectedPage = 1;
     int pageSize = 10;
+    @NonNull
     Map<String, String> sort = new HashMap<>();
 }
