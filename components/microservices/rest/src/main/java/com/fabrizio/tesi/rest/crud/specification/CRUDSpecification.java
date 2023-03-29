@@ -39,7 +39,7 @@ public class CRUDSpecification extends SpecificationPath<CRUDEntity, TableReques
                     )
             ));
         }
-        if(filter.getAmplitude()!=0){
+        if (filter.getAmplitude() != 0) {
             p.getExpressions().add(criteriaBuilder.and(
                 criteriaBuilder.like(
                     root.get("amplitude").as(String.class),
@@ -47,7 +47,7 @@ public class CRUDSpecification extends SpecificationPath<CRUDEntity, TableReques
                 ) 
             ));
         }
-        if(filter.getFrequency()!=0){
+        if (filter.getFrequency() != 0) {
             p.getExpressions().add(criteriaBuilder.and(
                 criteriaBuilder.like(
                     root.get("frequency").as(String.class),
