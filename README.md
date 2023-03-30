@@ -1,8 +1,48 @@
 # Tesi
 
-## Minikube start
+## LOGIN AS ROOT USER!
 ```
-minikube start --network-plugin=cni --cni=calico
+su root
+```
+If you cannot acces, you must add a password for the root user:
+```
+passwd root
+```
+Then repeat the first command
+## Installing k0s
+k0s is a tool that help the user with the deploy of kubernetes objects
+```
+curl -sSLf https://get.k0s.hs | sudo sh
+```
+Create a cofniguration for k0s that use calico as a dns resolver
+```
+cd /etc/k0s/; 
+touch k0s.yaml;
+k0s config create > k0s.yaml;
+nano k0s.yaml
+```
+Then alter the following properties from the value ```kuberouter``` to ```calico```
+```
+spec.network.provider: kuberouter -> calico
+```
+Execute a clean installation of k0s
+```
+k0s stop; 
+k0s reset;
+k0s install controller --single --enable-worker;
+```
+- OPTIONAL: add alias for ```k0s kubectl``` command
+    ```
+    cd ~;
+    nano .bashrc
+    ````
+    Add the following alias as:
+    ```
+    alias kc=k0s kubectl
+    ````
+Finally
+```
+kc config view -o yaml --raw > /k0s/config.yaml
 ```
 ## Installing k9s
 k9s is a tool to monitor the the status of the deployment and pods for kubernetes objects
