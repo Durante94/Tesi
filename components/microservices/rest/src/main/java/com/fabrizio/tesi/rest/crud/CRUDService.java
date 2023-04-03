@@ -4,6 +4,7 @@ import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
@@ -68,5 +69,14 @@ public class CRUDService {
                 repository.save(toSave);
 
                 return ResponseEntity.ok().build();
+        }
+
+        public ResponseEntity<Void> delete(long id) {
+                try {
+                        repository.deleteById(id);
+                        return ResponseEntity.ok().build();
+                } catch (EmptyResultDataAccessException e) {
+                        return ResponseEntity.notFound().build();
+                }
         }
 }
