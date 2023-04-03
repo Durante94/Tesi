@@ -9,5 +9,5 @@ global:
   kafkaStorageSize: 5Gi
   zookeeperStorageSize: 1Gi
   zookeeperReplicas: 1
-  kafkaReplicas: 2
+  kafkaReplicas: 1
     
