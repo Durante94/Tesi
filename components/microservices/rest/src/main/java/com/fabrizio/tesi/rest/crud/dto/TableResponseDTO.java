@@ -1,5 +1,7 @@
 package com.fabrizio.tesi.rest.crud.dto;
 
+import com.fabrizio.tesi.rest.common.annotaiton.ToEntityIgnore;
+
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -15,5 +17,6 @@ import lombok.experimental.FieldDefaults;
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 public class TableResponseDTO extends TableRequestDTO {
+    @ToEntityIgnore
     long id;
 }

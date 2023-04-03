@@ -2,7 +2,9 @@ package com.fabrizio.tesi.rest.crud;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -43,9 +45,15 @@ public class CRUDController {
         }
     }
 
+    @GetMapping("/{id}")
+    @ResponseBody
+    public TableResponseDTO getElem(@PathVariable("id") long id) {
+        return service.get(id);
+    }
+
     @PostMapping
     @ResponseBody
-    public TableResponseDTO saveElem(@RequestBody TableResponseDTO dto) {
-        return dto;
+    public ResponseEntity<TableResponseDTO> saveElem(@RequestBody TableResponseDTO dto) {
+        return service.saveOrUpdate(dto);
     }
 }
