@@ -1,2 +1,14 @@
 global:
   simulatoreReplicas: 4
+  supplementalGroups: [1000]
+  storageClassName: openebs-hostpath
+  
+
+  internalKafkaFqdn: "local-cluster-kafka-bootstrap.kafka.svc"
+  internalKafkaPort: "9092"
+  internalKafkaClusterName: "local-cluster"
+  kafkaStorageSize: 5Gi
+  zookeeperStorageSize: 1Gi
+  zookeeperReplicas: 1
+  kafkaReplicas: 1
+    

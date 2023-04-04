@@ -1,6 +1,5 @@
 {{- $simReplicas := .Values.global.simulatoreReplicas | default .Values.simulatore.replicas -}}
 
-
 apiVersion: apps/v1 
 kind: Deployment
 metadata:
@@ -19,14 +18,14 @@ spec:
       containers:
       {{- range  $i, $e := untilStep 0 (int ($simReplicas)) 1 }} 
       - name: "{{- printf "%s%d" "simulatore" $i -}}"
-        image: docker.io/fabrizio294/simulatore:0.0.0-test
+        image: localhost:5000/fabrizio294/simulatore:0.0.1-fix
         env:
-        - name: "kafka__host"
-          value: kafka-exporter-service.kafka.svc.cluster.local:9404
-        - name: "math__fun"
+        - name: "KAFKA_HOST"
+          value: "local-cluster-kafka-bootstrap.kafka.svc:9092"
+        - name: "MATH_FUN"
           value: {{ if eq (mod $i 2) 0}} sin {{ else }} cos {{ end }}
-        - name: "amplitude"
-          value: add $i 1
-        - name: "frequency"
-          value: add $i 1
+        - name: "AMPLITUDE"
+          value: "{{ add $i 1 }}"
+        - name: "FREQUENCY"
+          value: "{{ add $i 1 }}"
       {{- end }}

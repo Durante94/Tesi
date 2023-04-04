@@ -11,7 +11,7 @@ data:
     datasources:
     - name: Prometheus-kafkaExp
       type: prometheus
-      url: http://prometheus-service.wams-monitoring.svc.cluster.local:9090
+      url: http://prometheus-service.monitoring.svc:9090
       access: proxy
       isDefault: true
       editable: true

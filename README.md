@@ -21,9 +21,14 @@ touch k0s.yaml;
 k0s config create > k0s.yaml;
 nano k0s.yaml
 ```
-Then alter the following properties from the value ```kuberouter``` to ```calico```
+Then alter the following properties
 ```
 spec.network.provider: kuberouter -> calico
+spec.extension.storage.type: standard -> openebs_local_storage
+```
+Then delete the following properties
+```
+spec.extension.storage.<others>
 ```
 Execute a clean installation of k0s
 ```

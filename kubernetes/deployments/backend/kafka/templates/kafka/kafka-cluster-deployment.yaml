@@ -1,10 +1,7 @@
-{{- $clusterName := .Values.global.internalKafkaClusterName | default .Values.kafka.clusterName -}}
-{{- $kafkaReplicas := .Values.global.kafkaReplicas | default .Values.kafka.replicas -}}
-
 apiVersion: kafka.strimzi.io/v1beta2
 kind: Kafka
 metadata:
-  name: {{ $clusterName }}
+  name: {{ .Values.global.internalKafkaClusterName }}
   namespace: kafka
 spec:
   kafkaExporter: {}
@@ -14,16 +11,16 @@ spec:
   kafka:
     config:
       auto.create.topics.enable: 'true'
-      default.replication.factor: 2
+      default.replication.factor: 1
       inter.broker.protocol.version: '3.1'
       min.insync.replicas: 1
-      offsets.topic.replication.factor: 2
+      offsets.topic.replication.factor: 1
       transaction.state.log.min.isr: 1
-      transaction.state.log.replication.factor: 2
+      transaction.state.log.replication.factor: 1
       delete.topic.enable: 'true'
       log.retention.ms: 100000
       log.segment.delete.delay.ms: 50000
-      offsets.topic.replication.factor: 2
+      offsets.topic.replication.factor: 1
     listeners:
       - name: plain
         port: 9092
@@ -33,7 +30,7 @@ spec:
           bootstrap:
             nodePort: 30829
           brokers:
-            {{- range  $i, $e := untilStep 30830 (int (add 30830 $kafkaReplicas)) 1 }} 
+            {{- range  $i, $e := untilStep 30830 (int (add 30830 (int .Values.global.kafkaReplicas))) 1 }} 
             - broker: {{ $i }}
               nodePort: {{ $e }}
             {{- end }}
@@ -41,10 +38,10 @@ spec:
         port: 9093
         tls: false
         type: nodeport
-    replicas: {{ $kafkaReplicas }}
+    replicas: {{ int .Values.global.kafkaReplicas }}
     storage:
-      class: {{ .Values.global.storageClassName | default .Values.kafka.storageClass }}
-      size: {{ .Values.global.kafkaStorageSize | default .Values.kafka.storageSize }}
+      class: {{ .Values.global.storageClassName }}
+      size: {{ .Values.global.kafkaStorageSize }}
       type: persistent-claim
     template:
       pod:
@@ -58,14 +55,14 @@ spec:
                       - key: strimzi.io/name
                         operator: In
                         values:
-                          - {{ $clusterName }}-kafka
+                          - {{ .Values.global.internalKafkaClusterName }}-kafka
                   topologyKey: kubernetes.io/hostname
     version: 3.1.0
   zookeeper:
-    replicas: {{ .Values.zookeeper.replicas | default .Values.zookeeper.replicas }}
+    replicas: {{ int .Values.global.zookeeperReplicas }}
     storage:
-      class: {{ .Values.global.storageClassName | default .Values.zookeeper.storageClass }}
-      size: {{ .Values.global.zookeeperStorageSize | default .Values.zookeeper.storageSize }}
+      class: {{ .Values.global.storageClassName }}
+      size: {{ .Values.global.zookeeperStorageSize }}
       type: persistent-claim
     template:
       pod:
@@ -79,6 +76,6 @@ spec:
                       - key: strimzi.io/name
                         operator: In
                         values:
-                          - {{ $clusterName }}-zookeeper
+                          - {{ .Values.global.internalKafkaClusterName }}-zookeeper
                   topologyKey: kubernetes.io/hostname
 
