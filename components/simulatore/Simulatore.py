@@ -19,7 +19,6 @@ def acked(err, msg):
 
 
 def producer_task(conf):
-    print(conf)
     producer = Producer(conf)
 
     function = os.getenv("MATH_FUN")
@@ -63,7 +62,6 @@ data_task = Process(target=producer_task, args=(conf,))
 heartbeat_process = Process(target=heartbeat_task, args=(conf,))
 heartbeat_process.start()
 consumer.subscribe(['config-request'])
-print(id)
 try:
     while True:
         try:
@@ -102,9 +100,10 @@ try:
                             data_task.start()
                         else:
                             data_task.terminate()
-        except Exception as e:
+        except KafkaException as e:
             print(e)
 finally:
     consumer.close()
-    data_task.terminate()
     heartbeat_process.terminate()
+    if data_task.is_alive():
+        data_task.terminate()

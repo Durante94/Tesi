@@ -2,11 +2,9 @@ from confluent_kafka import Producer, Consumer
 from confluent_kafka.cimpl import KafkaException, KafkaError
 import socket
 import os
-from multiprocessing import Process
+from multiprocessing import Process, Manager
 import json
 import time
-
-agentDict = {}
 
 
 def acked(err, msg):
@@ -16,18 +14,13 @@ def acked(err, msg):
     #     print("Message produced: %s" % (str(msg)))
 
 
-def agent_check(conf):
+def agent_check(conf, agentDict):
     while True:
         producer = Producer(conf)
         now = time.time()
         hbVal = int(os.getenv("HB_RATE"))
-        global agentDict
-        print(now, hbVal, agentDict)
         for id in agentDict.keys():
-            print(agentDict[id], hbVal+int(os.getenv("HB_RATE_TOL")),
-                  now-agentDict[id] > hbVal+int(os.getenv("HB_RATE_TOL")))
             if now-agentDict[id] > hbVal+int(os.getenv("HB_RATE_TOL")):
-                print("dio")
                 producer.produce("alarm",
                                  key=id,
                                  value=json.dumps({
@@ -44,9 +37,9 @@ conf = {'bootstrap.servers': os.getenv("KAFKA_HOST"),
 consumer = Consumer({'bootstrap.servers': os.getenv("KAFKA_HOST"),
                      'group.id': "manager",
                      'auto.offset.reset': 'smallest'})
-producer = Producer(conf)
+agentDict = Manager().dict()
 
-agent_controller_task = Process(target=agent_check, args=(conf,))
+agent_controller_task = Process(target=agent_check, args=(conf, agentDict))
 agent_controller_task.start()
 
 consumer.subscribe(['heartbeat'])
@@ -65,9 +58,8 @@ try:
                     raise KafkaException(msg.error())
             else:
                 key = msg.key().decode("utf-8").removeprefix(os.getenv("PARTIAL_KEY"))
-                print(key, agentDict)
                 agentDict[key] = time.time()
-        except Exception as e:
+        except KafkaException as e:
             print(e)
 finally:
     consumer.close()
