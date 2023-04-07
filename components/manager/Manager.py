@@ -1,10 +1,19 @@
 from confluent_kafka import Producer, Consumer
 from confluent_kafka.cimpl import KafkaException, KafkaError
+from multiprocessing import Process, Manager
 import socket
 import os
-from multiprocessing import Process, Manager
 import json
 import time
+import falcon
+
+
+class List(object):
+    def __init__(self, agentDict):
+        self.agentDict = agentDict
+
+    def on_get(self, req, resp):
+        resp.body = json.dumps(self.agentDict.keys())
 
 
 def acked(err, msg):
@@ -32,35 +41,39 @@ def agent_check(conf, agentDict):
         time.sleep(hbVal)
 
 
-conf = {'bootstrap.servers': os.getenv("KAFKA_HOST"),
-        'client.id': socket.gethostname()}
-consumer = Consumer({'bootstrap.servers': os.getenv("KAFKA_HOST"),
-                     'group.id': "manager",
-                     'auto.offset.reset': 'smallest'})
 agentDict = Manager().dict()
+app = falcon.App()
+agentsEndpoint = List(agentDict)
+app.add_route('/', agentsEndpoint)
 
-agent_controller_task = Process(target=agent_check, args=(conf, agentDict))
-agent_controller_task.start()
+# conf = {'bootstrap.servers': os.getenv("KAFKA_HOST"),
+#         'client.id': socket.gethostname()}
+# consumer = Consumer({'bootstrap.servers': os.getenv("KAFKA_HOST"),
+#                      'group.id': "manager",
+#                      'auto.offset.reset': 'smallest'})
 
-consumer.subscribe(['heartbeat'])
-try:
-    while True:
-        try:
-            msg = consumer.poll(timeout=60.0)
-            if msg is None:
-                continue
+# agent_controller_task = Process(target=agent_check, args=(conf, agentDict))
+# agent_controller_task.start()
 
-            if msg.error():
-                if msg.error().code() == KafkaError._PARTITION_EOF:
-                    print('%% %s [%d] reached end at offset %d\n' %
-                          (msg.topic(), msg.partition(), msg.offset()))
-                elif msg.error():
-                    raise KafkaException(msg.error())
-            else:
-                key = msg.key().decode("utf-8").removeprefix(os.getenv("PARTIAL_KEY"))
-                agentDict[key] = time.time()
-        except KafkaException as e:
-            print(e)
-finally:
-    consumer.close()
-    agent_controller_task.terminate()
+# consumer.subscribe(['heartbeat'])
+# try:
+#     while True:
+#         try:
+#             msg = consumer.poll(timeout=60.0)
+#             if msg is None:
+#                 continue
+
+#             if msg.error():
+#                 if msg.error().code() == KafkaError._PARTITION_EOF:
+#                     print('%% %s [%d] reached end at offset %d\n' %
+#                           (msg.topic(), msg.partition(), msg.offset()))
+#                 elif msg.error():
+#                     raise KafkaException(msg.error())
+#             else:
+#                 key = msg.key().decode("utf-8").removeprefix(os.getenv("PARTIAL_KEY"))
+#                 agentDict[key] = time.time()
+#         except KafkaException as e:
+#             print(e)
+# finally:
+#     consumer.close()
+#     agent_controller_task.terminate()
