@@ -3,7 +3,7 @@ from confluent_kafka import Producer, Consumer
 from confluent_kafka.cimpl import KafkaException, KafkaError
 import socket
 import os
-from multiprocessing import Process
+from multiprocessing import Process, Manager
 import json
 import time
 import uuid
@@ -18,7 +18,7 @@ def acked(err, msg):
     #     print("Message produced: %s" % (str(msg)))
 
 
-def producer_task(conf):
+def producer_task(conf, flag, transmit):
     producer = Producer(conf)
 
     function = os.getenv("MATH_FUN")
@@ -27,7 +27,7 @@ def producer_task(conf):
     math_func = getattr(np, function)
     t = 1
 
-    while True:
+    while flag and transmit:
         time.sleep(1)
         value = np.array2string(
             amplitude * math_func(t + np.pi / frequency))
@@ -39,27 +39,32 @@ def producer_task(conf):
         t = t + 1
 
 
-def heartbeat_task(conf):
-    producer = Producer(conf)
-    while True:
+def heartbeat_task(conf, flag):
+    producer = Producer(conf.copy())
+    while flag:
         time.sleep(int(os.getenv("HB_RATE")))
         producer.produce("heartbeat",
                          key=os.getenv("PARTIAL_KEY") + id,
                          callback=acked)
 
 
-conf = {'bootstrap.servers': os.getenv("KAFKA_HOST"),
-        'client.id': socket.gethostname()}
+manager = Manager()
+exit_flag = manager.Value('i', True)
+transmit_flag = manager.Value('i', True)
+conf = manager.dict()
+conf['bootstrap.servers'] = os.getenv("KAFKA_HOST")
+conf['client.id'] = socket.gethostname()
 consumer = Consumer({'bootstrap.servers': os.getenv("KAFKA_HOST"),
                      'group.id': "simulatore",
                      'auto.offset.reset': 'earliest'})
-producer = Producer(conf)
+producer = Producer(conf.copy())
 function = os.getenv("MATH_FUN")
 amplitude = float(os.getenv('AMPLITUDE'))
 frequency = float(os.getenv('FREQUENCY'))
 
-data_task = Process(target=producer_task, args=(conf,))
-heartbeat_process = Process(target=heartbeat_task, args=(conf,))
+data_task = Process(target=producer_task, args=(
+    conf, exit_flag, transmit_flag))
+heartbeat_process = Process(target=heartbeat_task, args=(conf, exit_flag))
 heartbeat_process.start()
 consumer.subscribe(['config-request'])
 try:
@@ -97,13 +102,17 @@ try:
                                          callback=acked)
                     case b'toggle':
                         if bool(msgValue["payload"].lower().capitalize()):
+                            transmit_flag.set(True)
                             data_task.start()
                         else:
-                            data_task.terminate()
+                            transmit_flag.set(False)
+                            # data_task.terminate()
         except KafkaException as e:
             print(e)
 finally:
     consumer.close()
-    heartbeat_process.terminate()
-    if data_task.is_alive():
-        data_task.terminate()
+    exit_flag.set(False)
+    transmit_flag.set(False)
+    # heartbeat_process.terminate()
+    # if data_task.is_alive():
+    #     data_task.terminate()

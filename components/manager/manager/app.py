@@ -25,9 +25,9 @@ def acked(err, msg):
 
 
 def agent_check(agentDict, execute):
+    producer = Producer({'bootstrap.servers': os.getenv("KAFKA_HOST"),
+                            'client.id': socket.gethostname()})
     while execute:
-        producer = Producer({'bootstrap.servers': os.getenv("KAFKA_HOST"),
-                             'client.id': socket.gethostname()})
         now = time.time()
         hbVal = int(os.getenv("HB_RATE"))
         for id in agentDict.keys():

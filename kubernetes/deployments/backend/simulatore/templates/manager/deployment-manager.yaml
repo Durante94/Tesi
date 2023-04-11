@@ -1,0 +1,21 @@
+apiVersion: apps/v1 
+kind: Deployment
+metadata:
+  name: manager
+  namespace: monitoring
+spec:
+  selector:   
+    matchLabels:
+      app: manager
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: manager
+    spec:
+      containers:
+      - name: manager
+        image: localhost:5000/fabrizio294/manager:0.0.2
+        env:
+        - name: "KAFKA_HOST"
+          value: "local-cluster-kafka-bootstrap.kafka.svc:9092"
