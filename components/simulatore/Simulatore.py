@@ -26,6 +26,7 @@ def producer_task(conf, flag, transmit):
     frequency = float(os.getenv('FREQUENCY'))
     math_func = getattr(np, function)
     t = 1
+    # print(conf, function, amplitude, frequency, math_func, sep=", ")
 
     while flag and transmit:
         time.sleep(1)
@@ -40,7 +41,8 @@ def producer_task(conf, flag, transmit):
 
 
 def heartbeat_task(conf, flag):
-    producer = Producer(conf.copy())
+    # print("Heartbeat", conf, sep=", ")
+    producer = Producer(conf)
     while flag:
         time.sleep(int(os.getenv("HB_RATE")))
         producer.produce("heartbeat",
@@ -51,24 +53,27 @@ def heartbeat_task(conf, flag):
 manager = Manager()
 exit_flag = manager.Value('i', True)
 transmit_flag = manager.Value('i', True)
-conf = manager.dict()
-conf['bootstrap.servers'] = os.getenv("KAFKA_HOST")
-conf['client.id'] = socket.gethostname()
+conf = {
+    'bootstrap.servers': os.getenv("KAFKA_HOST"),
+    'client.id': socket.gethostname()
+}
 consumer = Consumer({'bootstrap.servers': os.getenv("KAFKA_HOST"),
                      'group.id': "simulatore",
                      'auto.offset.reset': 'earliest'})
-producer = Producer(conf.copy())
+producer = Producer(conf)
 function = os.getenv("MATH_FUN")
 amplitude = float(os.getenv('AMPLITUDE'))
 frequency = float(os.getenv('FREQUENCY'))
 
 data_task = Process(target=producer_task, args=(
-    conf, exit_flag, transmit_flag))
-heartbeat_process = Process(target=heartbeat_task, args=(conf, exit_flag))
+    conf.copy(), exit_flag, transmit_flag))
+heartbeat_process = Process(target=heartbeat_task,
+                            args=(conf.copy(), exit_flag))
 heartbeat_process.start()
 consumer.subscribe(['config-request'])
 try:
     while True:
+        # print("Started")
         try:
             msg = consumer.poll(timeout=60.0)
             if msg is None:
@@ -81,6 +86,7 @@ try:
                 elif msg.error():
                     raise KafkaException(msg.error())
             else:
+                # print(msg)
                 try:
                     msgValue = json.loads(msg.value())
                 except Exception as e:
@@ -113,6 +119,6 @@ finally:
     consumer.close()
     exit_flag.set(False)
     transmit_flag.set(False)
-    # heartbeat_process.terminate()
-    # if data_task.is_alive():
-    #     data_task.terminate()
+    heartbeat_process.join()
+    if data_task.is_alive():
+        data_task.join()
