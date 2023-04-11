@@ -28,7 +28,7 @@ spec.extension.storage.type: standard -> openebs_local_storage
 ```
 Then delete the following properties
 ```
-spec.extension.storage.<others>
+spec.extension.storage.create_default_storage_class
 ```
 Execute a clean installation of k0s
 ```
