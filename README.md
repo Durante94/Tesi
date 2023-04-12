@@ -12,7 +12,7 @@ Then repeat the first command
 ## Installing k0s
 k0s is a tool that help the user with the deploy of kubernetes objects
 ```
-curl -sSLf https://get.k0s.hs | sudo sh
+curl -sSLf https://get.k0s.sh | sudo sh
 ```
 Create a cofniguration for k0s that use calico as a dns resolver
 ```
