@@ -9,12 +9,21 @@ If you cannot acces, you must add a password for the root user:
 passwd root
 ```
 Then repeat the first command
+## Kubernetes install
+- Debian OS:
+    ```
+    snap install kubectl --classic
+    ```
+- Fedora OS:
+    ```
+    sudo dnf install kubectl
+    ```
 ## Installing k0s
-k0s is a tool that help the user with the deploy of kubernetes objects
+k0s is a lightweight, certified, and all-inclusive Kubernetes distribution that help the user with the deploy of kubernetes objects
 ```
 curl -sSLf https://get.k0s.sh | sudo sh
 ```
-Create a cofniguration for k0s that use calico as a dns resolver
+Create a configuration for k0s that use calico as a dns resolver
 ```
 cd /etc/k0s/; 
 touch k0s.yaml;
@@ -54,11 +63,12 @@ export KUBECONFIG='/k0s/config.yaml'
 k9s is a tool to monitor the the status of the deployment and pods for kubernetes objects
 ```
 curl -sS https://webinstall.dev/k9s | bash
+source /root/.config/envman/PATH.env
 ```
 ## Helm install
 - Debian OS:
     ```
-    sudo apt install helm
+    snap install helm --classic
     ```
 - Fedora OS:
     ```
