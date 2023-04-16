@@ -57,7 +57,7 @@ k0s install controller --single --enable-worker;
 Finally
 ```
 kc config view -o yaml --raw > /k0s/config.yaml
-export KUBECONFIG='/k0s/config.yaml'
+export KUBECONFIG=/k0s/config.yaml
 ```
 ## Installing k9s
 k9s is a tool to monitor the the status of the deployment and pods for kubernetes objects

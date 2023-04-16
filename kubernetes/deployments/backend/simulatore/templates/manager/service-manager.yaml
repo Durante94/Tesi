@@ -8,6 +8,7 @@ spec:
   selector:
     app: manager
   ports:
-  - name: web
+  - protocol: TCP
+    name: rest
     port: 8000
     targetPort: 8000
