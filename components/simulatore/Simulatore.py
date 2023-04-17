@@ -42,7 +42,7 @@ try:
 
 
     def heartbeat_task(conf, flag):
-        # print("Heartbeat", conf, sep=", ")
+        print("Heartbeat", conf, sep=", ")
         producer = Producer(conf)
         while flag:
             time.sleep(int(os.getenv("HB_RATE")))

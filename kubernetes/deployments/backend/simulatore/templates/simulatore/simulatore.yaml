@@ -9,23 +9,21 @@ spec:
   selector:   
     matchLabels:
       app: simulatore
-  replicas: 1
+  replicas: {{ int $simReplicas }}
   template:
     metadata:
       labels:
         app: simulatore
     spec:
       containers:
-      {{- range  $i, $e := untilStep 0 (int ($simReplicas)) 1 }} 
-      - name: "{{- printf "%s%d" "simulatore" $i -}}"
-        image: fabrizio294/simulatore:0.0.1-dvdf
+      - name: "simulatore"
+        image: docker.io/fabrizio294/simulatore:0.0.1-try-fix
         env:
         - name: "KAFKA_HOST"
           value: "local-cluster-kafka-bootstrap.kafka.svc:9092"
         - name: "MATH_FUN"
-          value: {{ if eq (mod $i 2) 0}} sin {{ else }} cos {{ end }}
+          value: "sin"
         - name: "AMPLITUDE"
-          value: "{{ add $i 1 }}"
+          value: "8.6"
         - name: "FREQUENCY"
-          value: "{{ add $i 1 }}"
-      {{- end }}
+          value: "9.16"

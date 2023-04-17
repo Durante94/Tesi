@@ -95,3 +95,11 @@ helm upgrade -f /path/to/deploy/file1.yaml -f /path/to/deploy/file2.yaml <deploy
 ```
 helm uninstall <deploy name>
 ```
+## Deploy InfluxDb
+Namespace creation, if there are not deployment in the db namespace yet
+```
+kc create -f databases/templates/mysql/mysql-namespace.yaml
+```
+Follow the [official guide](https://github.com/influxdata/helm-charts/tree/master/charts/influxdb2)
+## Deploy Telegraf
+Follow the [official guide](https://github.com/influxdata/helm-charts/tree/master/charts/telegraf)
