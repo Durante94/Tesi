@@ -8,4 +8,5 @@ ENV KAFKA_HOST=localhost:9092 \
     PARTIAL_KEY=simulatore \
     HB_RATE=5 \
     HB_RATE_TOL=5
+EXPOSE 8000
 CMD ["gunicorn", "manager.app"]
