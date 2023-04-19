@@ -98,8 +98,7 @@ helm uninstall <deploy name>
 ## Deploy InfluxDb
 Namespace creation, if there are not deployment in the db namespace yet
 ```
-kc create -f databases/templates/mysql/mysql-namespace.yaml
+kc apply -f databases/templates/influxdb/influx.yaml -n influx
 ```
-Follow the [official guide](https://github.com/influxdata/helm-charts/tree/master/charts/influxdb2)
 ## Deploy Telegraf
 Follow the [official guide](https://github.com/influxdata/helm-charts/tree/master/charts/telegraf)

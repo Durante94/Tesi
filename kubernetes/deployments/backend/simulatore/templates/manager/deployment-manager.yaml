@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: manager
-        image: docker.io/fabrizio294/manager:0.0.0
+        image: docker.io/fabrizio294/manager:0.0.1
         env:
         - name: "KAFKA_HOST"
           value: "local-cluster-kafka-bootstrap.kafka.svc:9092"
