@@ -18,6 +18,9 @@ data:
       - targets:
         - kafka-exporter-service.kafka.svc:9404
     - job_name: kubernetes-nodes-cadvisor
+      static_configs:
+      -targets:
+        - cadvisor-service.monitoring.svc:8080
       scrape_interval: 10s
       scrape_timeout: 10s
       # scheme: https  # remove if you want to scrape metrics on insecure port

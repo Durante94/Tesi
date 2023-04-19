@@ -15,3 +15,15 @@ data:
       access: proxy
       isDefault: true
       editable: true
+
+    - name: InfluxDB_v2_Flux
+      type: influxdb
+      access: proxy
+      url: http://influxdb.influx.svc:8086
+      jsonData:
+        version: Flux
+        organization: organization
+        defaultBucket: bucket
+        tlsSkipVerify: true
+      secureJsonData:
+        token: token
