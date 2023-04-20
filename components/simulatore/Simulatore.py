@@ -18,7 +18,6 @@ try:
         # else:
         #     print("Message produced: %s" % (str(msg)))
 
-
     def producer_task(conf, flag, transmit):
         producer = Producer(conf)
 
@@ -34,12 +33,12 @@ try:
             value = np.array2string(
                 amplitude * math_func(t + np.pi / frequency))
             producer.produce("data",
-                            key=os.getenv("PARTIAL_KEY") + id,
-                            value=value.encode('utf-8'),
-                            callback=acked)
+                             key=os.getenv("PARTIAL_KEY") + id,
+                             value=json.dumps(
+                                 {"value": value}) .encode('utf-8'),
+                             callback=acked)
             producer.poll(2)
             t = t + 1
-
 
     def heartbeat_task(conf, flag):
         print("Heartbeat", conf, sep=", ")
@@ -47,8 +46,8 @@ try:
         while flag:
             time.sleep(int(os.getenv("HB_RATE")))
             producer.produce("heartbeat",
-                            key=os.getenv("PARTIAL_KEY") + id,
-                            callback=acked)
+                             key=os.getenv("PARTIAL_KEY") + id,
+                             callback=acked)
 
     manager = Manager()
     exit_flag = manager.Value('i', True)
@@ -59,7 +58,7 @@ try:
     }
     consumer = Consumer({'bootstrap.servers': os.getenv("KAFKA_HOST"),
                         'group.id': "simulatore",
-                        'auto.offset.reset': 'earliest'})
+                         'auto.offset.reset': 'earliest'})
     producer = Producer(conf)
     function = os.getenv("MATH_FUN")
     amplitude = float(os.getenv("AMPLITUDE"))
@@ -82,7 +81,7 @@ try:
                 if msg.error():
                     if msg.error().code() == KafkaError._PARTITION_EOF:
                         print('%% %s [%d] reached end at offset %d\n' %
-                            (msg.topic(), msg.partition(), msg.offset()))
+                              (msg.topic(), msg.partition(), msg.offset()))
                     elif msg.error():
                         raise KafkaException(msg.error())
                 else:
@@ -99,13 +98,13 @@ try:
                     match msg.key():
                         case b'request':
                             producer.produce('config-response',
-                                            key=os.getenv("PARTIAL_KEY") + id,
-                                            value=json.dumps({
-                                                'function': function,
-                                                'amplitude': amplitude,
-                                                'frequency': frequency
-                                            }).encode(),
-                                            callback=acked)
+                                             key=os.getenv("PARTIAL_KEY") + id,
+                                             value=json.dumps({
+                                                 'function': function,
+                                                 'amplitude': amplitude,
+                                                 'frequency': frequency
+                                             }).encode(),
+                                             callback=acked)
                         case b'toggle':
                             if bool(msgValue["payload"].lower().capitalize()):
                                 transmit_flag.set(True)

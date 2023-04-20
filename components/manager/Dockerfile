@@ -9,4 +9,4 @@ ENV KAFKA_HOST=localhost:9092 \
     HB_RATE=5 \
     HB_RATE_TOL=5
 EXPOSE 8000
-CMD ["gunicorn", "manager.app"]
+CMD ["gunicorn", "--bind", "0.0.0.0:8000", "manager.app"]

@@ -4,11 +4,10 @@ metadata:
   name: manager-service
   namespace: monitoring
 spec:
-  type: ClusterIP
   selector:
     app: manager
   ports:
-  - protocol: TCP
-    name: rest
-    port: 8000
-    targetPort: 8000
+    - name: http
+      port: 80
+      targetPort: 8000
+  type: ClusterIP

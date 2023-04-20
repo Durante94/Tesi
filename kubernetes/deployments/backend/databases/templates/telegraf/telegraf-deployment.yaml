@@ -1,0 +1,52 @@
+apiVersion: apps/v1  
+kind: Deployment
+metadata:
+  name: telegraf
+  namespace: influx
+spec:
+  selector:   
+    matchLabels:
+      app: telegraf
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: telegraf
+    spec:
+      initContainers:
+      - name: init-telegraf
+        image: telegraf:1.26.1
+        command: ["sh","-c"]
+        args:
+          - |
+            sed 's/"/\\"/g' /tmp/telegraf/telegraf.conf > /etc/telegraf/escaped_telegraf.conf
+            echo "$(eval "echo \"$(cat /etc/telegraf/escaped_telegraf.conf)\"")" > /etc/telegraf/telegraf.conf
+            chmod u+rw /etc/telegraf/telegraf.conf
+        env: 
+        - name: USERNAME_INFLUX
+          valueFrom:
+            secretKeyRef:
+              name: telegraf-influx-secret
+              key: usernameInflux   
+        - name: PASSWORD_INFLUX
+          valueFrom:
+            secretKeyRef:
+              name: telegraf-influx-secret
+              key: passwordInflux
+        volumeMounts:
+        - name: telegraf-config-vol
+          mountPath: /etc/telegraf/
+        - name: config-vol
+          mountPath: /tmp/telegraf/
+      containers:
+      - name: telegraf
+        image: telegraf:1.26.1
+        volumeMounts:
+        - name: telegraf-config-vol
+          mountPath: /etc/telegraf/
+      volumes:
+      - name: telegraf-config-vol
+        emptyDir: {}
+      - name: config-vol
+        configMap:
+          name: telegraf-config

@@ -102,3 +102,8 @@ kc apply -f databases/templates/influxdb/influx.yaml -n influx
 ```
 ## Deploy Telegraf
 Follow the [official guide](https://github.com/influxdata/helm-charts/tree/master/charts/telegraf)
+## Restart pod per modifiche
+Quando modifichiamo config-map o pvc, riavviamo i pod
+```
+kc delete po <pod-name> -n <namespace>
+```

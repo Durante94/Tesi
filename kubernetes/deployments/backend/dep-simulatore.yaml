@@ -12,3 +12,18 @@ global:
   zookeeperReplicas: 1
   kafkaReplicas: 1
     
+  influxUsername: fabrizio
+  influxPasswd: influxpwdCollector
+  influxOrg: tesi
+  influxBucket: monitoring
+  influxRetention: 2d
+  influxAdminToken: vI8w4uNK8I98qttj-La82gP2D6F1H7lOjnpbdD3YquCC4zGGM2g5LX6V49fFDiIgM75zRO4uOxV-Xt0n3FlATQ==
+
+  telegraf:
+    interval: "1s"
+    metricBatchSize: 1000
+    metricBufferLimit: 10000
+    collectionJitter: "0s"
+    flushInterval: "1s"
+    flushJitter: "0s"
+    precision: "1ms"

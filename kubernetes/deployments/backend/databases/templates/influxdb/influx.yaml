@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: influxdb
+  namespace: influx
 spec:
   replicas: 1
   selector:
@@ -17,6 +18,21 @@ spec:
         image: influxdb:latest
         ports:
         - containerPort: 8086
+        env:
+          - name: DOCKER_INFLUXDB_INIT_RETENTION
+            value: {{ .Values.global.influxRetention }}
+          - name: DOCKER_INFLUXDB_INIT_BUCKET
+            value: {{ .Values.global.influxBucket }}
+          - name: DOCKER_INFLUXDB_INIT_ORG
+            value: {{ .Values.global.influxOrg }}
+          - name: DOCKER_INFLUXDB_INIT_MODE
+            value: "setup"
+          - name: DOCKER_INFLUXDB_INIT_USERNAME
+            value: {{ .Values.global.influxUsername }}
+          - name: DOCKER_INFLUXDB_INIT_PASSWORD
+            value: {{ .Values.global.influxPasswd }}
+          - name: DOCKER_INFLUXDB_INIT_ADMIN_TOKEN
+            value: {{ .Values.global.influxAdminToken }}
         volumeMounts:
         - name: influxdb-data
           mountPath: /var/lib/influxdb
@@ -31,6 +47,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: influxdb
+  namespace: influx
 spec:
   selector:
     app: influxdb
@@ -44,6 +61,7 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: influxdb-pvc
+  namespace: influx
 spec:
   storageClassName: openebs-hostpath
   accessModes:
