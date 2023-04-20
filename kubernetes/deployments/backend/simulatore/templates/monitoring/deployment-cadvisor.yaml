@@ -1,18 +1,16 @@
 apiVersion: apps/v1
-kind: DaemonSet
+kind: Deployment
 metadata:
   name: cadvisor
   namespace: monitoring
-  labels:
-    k8s-app: cadvisor-monitoring
 spec:
   selector:
     matchLabels:
-      name: cadvisor
+      app: cadvisor
   template:
     metadata:
       labels:
-        name: cadvisor
+        app: cadvisor
     spec:
       tolerations:
       - key: node-role.kubernetes.io/master
@@ -34,9 +32,7 @@ spec:
           mountPath: /var/lib/docker
           readOnly: true
         ports:
-          - name: http
-            containerPort: 8080
-            protocol: TCP
+          - containerPort: 8080
         args:
           - --profiling
           - --housekeeping_interval=1s
@@ -61,11 +57,10 @@ metadata:
   name: cadvisor-service
   namespace: monitoring
 spec:
-  type: NodePort
+  type: ClusterIP
   selector:
     app: cadvisor
   ports:
   - name: web
     port: 8080
     targetPort: 8080
-    nodePort: 30097
