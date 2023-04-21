@@ -6,7 +6,8 @@ metadata:
 spec:
   type: ClusterIP
   selector:
-      app: node-exporter
+    app.kubernetes.io/component: exporter
+    app.kubernetes.io/name: node-exporter
   ports:
   - name: node-exporter
     protocol: TCP
