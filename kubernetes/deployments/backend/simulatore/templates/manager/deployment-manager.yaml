@@ -1,20 +1,20 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: manager-deployment
-  namespace: monitoring
+  name: manager-backend
+  namespace: backend
 spec:
   selector:
     matchLabels:
-      app: manager
+      app: manager-backend
   replicas: 1
   template:
     metadata:
       labels:
-        app: manager
+        app: manager-backend
     spec:
       containers:
-        - name: manager
+        - name: manager-backend
           image: docker.io/fabrizio294/manager:0.0.2
           ports:
             - containerPort: 8000
