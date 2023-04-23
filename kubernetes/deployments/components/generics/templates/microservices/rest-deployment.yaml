@@ -1,0 +1,35 @@
+apiVersion: apps/v1 
+kind: Deployment
+metadata:
+  name: rest
+  namespace: frontend
+spec:
+  selector:   
+    matchLabels:
+      app: rest
+  template:
+    metadata:
+      labels:
+        app: rest
+    spec:
+      containers:
+      - name: "rest"
+        image: docker.io/fabrizio294/rest:0.0.0
+        ports:
+        - containerPort: 8000
+        env:
+        - name: "SPRING_PROFILES_ACTIVE"
+          value: "prod"
+        - name: "SPRING_DATASOURCE_URL"
+          value: "jdbc:mysql://{{ .Values.global.mySqlHost }}:{{ .Values.global.mySqlPort }}/{{ .Values.global.mySqlDbName }}?useLegacyDatetimeCode=false&serverTimezone=Europe/Rome"
+        - name: "SPRING_DATASOURCE_USERNAME"
+          valueFrom:
+            secretKeyRef:
+              name: rest-secret
+              key: usernameSql
+        - name: "SPRING_DATASOURCE_PASSWORD"
+          valueFrom:
+            secretKeyRef:
+              name: rest-secret
+              key: passwordSql
+
