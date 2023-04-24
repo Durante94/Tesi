@@ -21,7 +21,7 @@ spec:
         - name: "SPRING_PROFILES_ACTIVE"
           value: "prod"
         - name: "SPRING_DATASOURCE_URL"
-          value: "jdbc:mysql://{{ .Values.global.mySqlHost }}:{{ .Values.global.mySqlPort }}/{{ .Values.global.mySqlDbName }}?useLegacyDatetimeCode=false&serverTimezone=Europe/Rome"
+          value: "jdbc:mysql://{{ .Values.global.mySqlHost }}:{{ .Values.global.mySqlPort }}/{{ .Values.global.mySqlDb }}?useLegacyDatetimeCode=false&serverTimezone=Europe/Rome"
         - name: "SPRING_DATASOURCE_USERNAME"
           valueFrom:
             secretKeyRef:

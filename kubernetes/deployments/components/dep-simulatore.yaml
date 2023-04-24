@@ -3,7 +3,6 @@ global:
   supplementalGroups: [1000]
   storageClassName: openebs-hostpath
   
-
   internalKafkaFqdn: "local-cluster-kafka-bootstrap.kafka.svc"
   internalKafkaPort: "9092"
   internalKafkaClusterName: "local-cluster"
@@ -18,6 +17,12 @@ global:
   influxBucket: monitoring
   influxRetention: 2d
   influxAdminToken: vI8w4uNK8I98qttj-La82gP2D6F1H7lOjnpbdD3YquCC4zGGM2g5LX6V49fFDiIgM75zRO4uOxV-Xt0n3FlATQ==
+
+  mySqlUser: fabrizio
+  mySqlPwd: mysqlPwd$3cr3t
+  mySqlDb: Tesi
+  mySqlHost: mysql.databases.svc
+  mySqlPort: 3306
 
   telegraf:
     interval: "1s"

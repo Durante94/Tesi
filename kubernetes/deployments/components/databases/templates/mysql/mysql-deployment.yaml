@@ -4,8 +4,12 @@ metadata:
   name: mysql
   namespace: databases
 spec:
+  selector:
+    matchLabels:
+      app: mysql
   ports:
-  - port: 3306
+  - port: {{ .Values.global.mySqlPort }}
+    targetPort: 3306
   selector:
     app: mysql
   clusterIP: None
@@ -30,9 +34,26 @@ spec:
       - image: mysql:5.6
         name: mysql
         env:
-          # Use secret in real usage
         - name: MYSQL_ROOT_PASSWORD
-          value: password
+          valueFrom:
+            secretKeyRef:
+              name: mysql-secret
+              key: passwordRoot
+        - name: MYSQL_DATABASE
+          valueFrom:
+            secretKeyRef:
+              name: mysql-secret
+              key: defaultDB
+        - name: MYSQL_USER
+          valueFrom:
+            secretKeyRef:
+              name: mysql-secret
+              key: usernameSql
+        - name: MYSQL_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mysql-secret
+              key: passwordSql
         ports:
         - containerPort: 3306
           name: mysql
