@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mysql-initdb-config
+  namespace: databases
+data:
+  initdb.sql: |
+    CREATE DATABASE IF NOT EXISTS Tesi;
+    USE Tesi;
+    CREATE TABLE IF NOT EXISTS input_entities (
+        Id bigint NOT NULL AUTO_INCREMENT,
+        name varchar(50) NOT NULL,
+        description varchar(100) DEFAULT NULL,
+        amplitude decimal(6,3) NOT NULL DEFAULT 0,
+        frequency decimal(6,3) NOT NULL DEFAULT 0,
+        function varchar(10) NOT NULL,
+        enable tinyint(1) NOT NULL DEFAULT 0
+    );
