@@ -48,6 +48,7 @@ public class ScheduledConfigTask {
 
             if (sendMessagge.get()) {
                 cache.put(entity.getId(), fromDB);
+                // TODO: Kafka Message
                 // entity.getAgentId();
                 // entity.isEnable();
             }
