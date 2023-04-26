@@ -28,4 +28,5 @@ public class CRUDEntity {
     double frequency;
     String function;
     boolean enable;
+    String agentId;
 }

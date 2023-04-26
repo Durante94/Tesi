@@ -63,6 +63,14 @@ public class CRUDSpecification extends SpecificationPath<CRUDEntity, TableReques
                     )
             ));
         }
+        if(StringUtils.isNotBlank(filter.getAgentId())){
+            p.getExpressions().add(criteriaBuilder.and(
+                    criteriaBuilder.like(
+                        criteriaBuilder.lower(root.get("agentId")), 
+                        "%" + filter.getAgentId().toLowerCase() + "%"
+                    )
+            ));
+        }
 
         query.orderBy(addSorter(criteriaBuilder));
 

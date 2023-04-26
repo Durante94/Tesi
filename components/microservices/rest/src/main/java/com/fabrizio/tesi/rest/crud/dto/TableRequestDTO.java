@@ -26,4 +26,5 @@ public class TableRequestDTO extends RequestTable {
     double frequency;
     String function;
     boolean enable;
+    String agentId;
 }
