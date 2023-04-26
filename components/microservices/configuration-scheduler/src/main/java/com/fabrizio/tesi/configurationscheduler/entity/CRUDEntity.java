@@ -7,9 +7,9 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 import lombok.AccessLevel;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import lombok.experimental.FieldDefaults;
 
 @Entity
@@ -17,12 +17,12 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @NoArgsConstructor
 @Getter
-@Setter
 public class CRUDEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
     String name;
+    @EqualsAndHashCode.Exclude
     String description;
     double amplitude;
     double frequency;
