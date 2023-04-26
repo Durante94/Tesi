@@ -24,6 +24,10 @@ global:
   mySqlHost: mysql.databases.svc
   mySqlPort: 3306
 
+  manager:
+    dns: manager-backend.backend.svc
+    port: 80
+
   telegraf:
     interval: "1s"
     metricBatchSize: 1000

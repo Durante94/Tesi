@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: "rest"
-        image: docker.io/fabrizio294/rest-service:0.0.3
+        image: docker.io/fabrizio294/rest-service:0.0.4
         ports:
         - containerPort: 8000
         env:
@@ -22,6 +22,8 @@ spec:
           value: "prod"
         - name: "SPRING_DATASOURCE_URL"
           value: "jdbc:mysql://{{ .Values.global.mySqlHost }}:{{ .Values.global.mySqlPort }}/{{ .Values.global.mySqlDb }}?useLegacyDatetimeCode=false&serverTimezone=Europe/Rome"
+        - name: "BUSINNESS_MANAGER_URL"
+          value: "http://{{ .Values.global.manager.dns }}:{{ .Values.global.manager.port }}"
         - name: "SPRING_DATASOURCE_USERNAME"
           valueFrom:
             secretKeyRef:
