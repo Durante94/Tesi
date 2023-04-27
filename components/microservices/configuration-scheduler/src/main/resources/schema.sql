@@ -7,5 +7,6 @@ CREATE TABLE input_entities (
     amplitude decimal(6,3) NOT NULL DEFAULT 0,
     frequency decimal(6,3) NOT NULL DEFAULT 0,
     function varchar(10) NOT NULL,
-    enable tinyint(1) NOT NULL DEFAULT 0
+    enable tinyint(1) NOT NULL DEFAULT 0,
+    agent_id varchar(100) NOT NULL 
 );

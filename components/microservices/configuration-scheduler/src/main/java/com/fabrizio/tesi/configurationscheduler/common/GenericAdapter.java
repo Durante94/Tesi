@@ -54,7 +54,7 @@ public class GenericAdapter<T, U> {
                 char c[] = matcher.group(2).toCharArray();
                 c[0] = Character.toLowerCase(c[0]);
                 String filedName = new String(c);
-                if (!checkAnnotation(type, filedName, isSetter))
+                if (checkAnnotation(type, filedName, isSetter))
                     continue;
 
                 (isSetter ? setters : getters).put(matcher.group(2), method);
@@ -65,8 +65,8 @@ public class GenericAdapter<T, U> {
             populateMaps(superType, getters, setters);
     }
 
-    private boolean checkAnnotation(final Class<?> type, final String filedName, boolean isSetter) {
-        return ANNOTATIONS.stream().anyMatch(ann -> {
+    private boolean checkAnnotation(final Class<?> type, final String filedName, final boolean isSetter) {
+        return isSetter && ANNOTATIONS.stream().anyMatch(ann -> {
             try {
                 return type.getDeclaredField(filedName).isAnnotationPresent(ann);
             } catch (NoSuchFieldException | SecurityException e) {

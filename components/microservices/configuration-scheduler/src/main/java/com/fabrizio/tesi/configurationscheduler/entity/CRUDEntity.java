@@ -1,5 +1,6 @@
 package com.fabrizio.tesi.configurationscheduler.entity;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -28,5 +29,6 @@ public class CRUDEntity {
     double frequency;
     String function;
     boolean enable;
+    @Column(name = "agent_id")
     String agentId;
 }
