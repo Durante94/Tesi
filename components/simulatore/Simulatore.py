@@ -25,7 +25,6 @@ def producer_task(conf, flag, transmit):
     frequency = float(os.getenv('FREQUENCY'))
     math_func = getattr(np, function)
     t = 1
-    # print(conf, function, amplitude, frequency, math_func, sep=", ")
 
     while flag and transmit:
         time.sleep(1)
@@ -40,7 +39,6 @@ def producer_task(conf, flag, transmit):
         t = t + 1
 
 def heartbeat_task(conf, flag):
-    print("Heartbeat", conf, sep=", ")
     producer = Producer(conf)
     while flag:
         time.sleep(int(os.getenv("HB_RATE")))
