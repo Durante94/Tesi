@@ -1,0 +1,39 @@
+apiVersion: apps/v1 
+kind: Deployment
+metadata:
+  name: config-scheduler
+  namespace: frontend
+spec:
+  selector:   
+    matchLabels:
+      app: config-scheduler
+  template:
+    metadata:
+      labels:
+        app: config-scheduler
+    spec:
+      containers:
+      - name: "config-scheduler"
+        image: docker.io/fabrizio294/configuration-scheduler:0.0.1
+        ports:
+        - containerPort: 8001
+        env:
+        - name: "BUSINNESS_MANAGER_URL"
+          value: "http://{{ .Values.global.manager.dns }}:{{ .Values.global.manager.port }}"
+        - name: "KAFKA_BOOTSTRAP-SERVERS"
+          value: "{{ .Values.global.internalKafkaFqdn }}:{{ .Values.global.internalKafkaPort }}"
+        - name: "SPRING_PROFILES_ACTIVE"
+          value: "prod"
+        - name: "SPRING_DATASOURCE_URL"
+          value: "jdbc:mysql://{{ .Values.global.mySqlHost }}:{{ .Values.global.mySqlPort }}/{{ .Values.global.mySqlDb }}?useLegacyDatetimeCode=false&serverTimezone=Europe/Rome"
+        - name: "SPRING_DATASOURCE_USERNAME"
+          valueFrom:
+            secretKeyRef:
+              name: rest-secret
+              key: usernameSql
+        - name: "SPRING_DATASOURCE_PASSWORD"
+          valueFrom:
+            secretKeyRef:
+              name: rest-secret
+              key: passwordSql
+

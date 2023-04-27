@@ -6,7 +6,7 @@ metadata:
   labels:
     type: local
 spec:
-  storageClassName: manual
+  storageClassName: openebs-hostpath
   capacity:
     storage: 20Gi
   accessModes:
@@ -20,7 +20,7 @@ metadata:
   name: mysql-pv-claim
   namespace: databases
 spec:
-  storageClassName: manual
+  storageClassName: openebs-hostpath
   accessModes:
     - ReadWriteOnce
   resources:
