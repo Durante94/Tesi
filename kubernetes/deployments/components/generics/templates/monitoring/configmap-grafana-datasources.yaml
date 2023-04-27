@@ -20,10 +20,11 @@ data:
       type: influxdb
       access: proxy
       url: http://influxdb.influx.svc:8086
+      user: {{ .Values.global.influxUsername }}
       jsonData:
         version: Flux
-        organization: organization
-        defaultBucket: bucket
+        organization: {{ .Values.global.influxOrg }}
+        defaultBucket: {{ .Values.global.influxBucket }}
         tlsSkipVerify: true
       secureJsonData:
-        token: token
+        token: {{ .Values.global.influxAdminToken }}
