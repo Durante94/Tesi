@@ -1,0 +1,74 @@
+spring:
+  main:
+    web-application-type: reactive
+  jpa:
+    show-sql: true
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: create
+  datasource:
+    url: jdbc:h2:mem:testdb
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+  application:
+    name: gateway
+  session:
+    jdbc:
+      schema: classpath:org/springframework/session/jdbc/schema-@@platform@@.sql;
+      initialize-schema: always
+      table-name: SPRING_SESSION
+  cloud:
+    inetutils:
+      timeout-seconds: 10
+    gateway:
+      routes: 
+        # Favicon
+        - id: favicon
+          uri: forward:///favicon.ico
+          predicates:
+            - Path=**/favicon.ico
+        # fe 
+        - id: web-configurator
+          predicates:
+            - Path=/mpdc/**
+          filters:
+            - RewritePath=/mpdc(?<segment>/?.*), $\{segment}
+          uri: http://${DMS_IDENTITY_SERVER_HOST:localhost}:3000
+        # Activity service
+        - id: pdc-configurator
+          predicates:
+            - Path=/api-pdc-configurator/**
+          uri: http://${DMS_IDENTITY_SERVER_HOST:localhost}:8080
+          filters:
+           - LangFilter
+           - TokenRelayFilter
+        # Activity service
+        - id: trigger-configurator
+          predicates:
+            - Path=/api-trigger-configurator/**
+          uri: http://${DMS_IDENTITY_SERVER_HOST:localhost}:8080
+          filters:
+           - LangFilter
+           - TokenRelayFilter
+        # Activity service
+        - id: flussi-configurator
+          predicates:
+            - Path=/api-gestione-flussi-output/c37/**
+          uri: http://${DMS_IDENTITY_SERVER_HOST:localhost}:8080
+          filters:
+           - LangFilter
+           - TokenRelayFilter
+        - id: config-service
+          predicates:
+            - Path=/config/**
+          uri: http://${DMS_IDENTITY_SERVER_HOST:localhost}:8085
+          filters:
+           - LangFilter
+           - TokenRelayFilter
+
+server:
+  port: 7080
+logging:
+  level:
+    root: INFO
