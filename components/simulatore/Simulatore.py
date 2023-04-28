@@ -7,15 +7,20 @@ from multiprocessing import Process, Manager
 import json
 import time
 import uuid
+import logging
 
 id = str(uuid.uuid4())
 print(id)
 
+LOG_LEVEL = logging.INFO  # Set logging level: DEBUG, INFO, WARNING, ERROR, CRITICAL
+
+logging.basicConfig(level=LOG_LEVEL)
+
 def acked(err, msg):
     if err is not None:
-        print("Failed to deliver message: %s: %s" % (str(msg), str(err)))
+        logging.error("Failed to deliver message: %s: %s" % (str(msg), str(err)))
     # else:
-    #     print("Message produced: %s" % (str(msg)))
+    #     logging.info("Message produced: %s" % (str(msg)))
 
 def producer_task(conf, flag, transmit):
     producer = Producer(conf)
@@ -53,6 +58,9 @@ conf = {
     'bootstrap.servers': os.getenv("KAFKA_HOST"),
     'client.id': socket.gethostname()
 }
+logging.debug("Kafka configuration: %s" % conf)
+logging.info("KAFKA_HOST: %s" % os.getenv("KAFKA_HOST"))
+
 consumer = Consumer({'bootstrap.servers': os.getenv("KAFKA_HOST"),
                     'group.id': "simulatore",
                         'auto.offset.reset': 'earliest'})
@@ -67,17 +75,19 @@ heartbeat_process = Process(target=heartbeat_task,
                             args=(conf.copy(), exit_flag))
 heartbeat_process.start()
 consumer.subscribe(['config-request'])
+
 try:
-    print("Started")
+    logging.info("Started")
     while True:
         try:
             msg = consumer.poll(timeout=60.0)
+            logging.info("Message consumed: %s" % str(msg))
             if msg is None:
                 continue
 
             if msg.error():
                 if msg.error().code() == KafkaError._PARTITION_EOF:
-                    print('%% %s [%d] reached end at offset %d\n' %
+                    logging.warning('%% %s [%d] reached end at offset %d\n' %
                             (msg.topic(), msg.partition(), msg.offset()))
                 elif msg.error():
                     raise KafkaException(msg.error())
@@ -85,7 +95,7 @@ try:
                 try:
                     msgValue = json.loads(msg.value())
                 except Exception as e:
-                    print("Error during deseralization", e, sep=": ")
+                    logging.error("Error during deserialization: %s" % e)
                     continue
 
                 if msgValue.get('id') != id:
@@ -109,7 +119,7 @@ try:
                             transmit_flag.set(False)
                             # data_task.terminate()
         except KafkaException as e:
-            print(e)
+            logging.error("KafkaException: %s" % e)
 finally:
     consumer.close()
     exit_flag.set(False)

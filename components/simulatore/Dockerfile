@@ -9,4 +9,4 @@ ENV KAFKA_HOST=localhost:9092 \
     FREQUENCY=4.2 \
     PARTIAL_KEY=simulatore \
     HB_RATE=5
-CMD ["python", "./Simulatore.py"]
+ENTRYPOINT ["python", "./Simulatore.py"]
