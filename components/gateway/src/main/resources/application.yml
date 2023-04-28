@@ -1,0 +1,58 @@
+spring:
+  main:
+    web-application-type: reactive
+  jpa:
+    show-sql: true
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: create
+  datasource:
+    url: jdbc:h2:mem:testdb
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+  application:
+    name: gateway
+  session:
+    jdbc:
+      schema: classpath:org/springframework/session/jdbc/schema-@@platform@@.sql;
+      initialize-schema: always
+      table-name: SPRING_SESSION
+  cloud:
+    inetutils:
+      timeout-seconds: 10
+    gateway:
+      httpclient:
+        websocket:
+          max-frame-payload-length : 104857600
+      routes: 
+        # Favicon
+        - id: favicon
+          uri: forward:///favicon.ico
+          predicates:
+            - Path=**/favicon.ico
+        # fe 
+        - id: web-configurator
+          predicates:
+            - Path=/web/**
+          filters:
+            - CheckAuth
+            - TokenRelayFilter
+            - RewritePath=/web(?<segment>/?.*), $\{segment}
+          uri: http://localhost:3000
+        # Activity service
+        - id: rest-service
+          predicates:
+            - Path=/api/**
+          uri: http://localhost:8080
+          filters:
+           - CheckAuth
+           - TokenRelayFilter
+server:
+  port: 7080
+  netty:
+    max-initial-line-length : 50MB
+
+logging:
+  level:
+    root: INFO
