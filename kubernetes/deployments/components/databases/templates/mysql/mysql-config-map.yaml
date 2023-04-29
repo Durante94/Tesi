@@ -6,6 +6,7 @@ metadata:
 data:
   initdb.sql: |
     CREATE DATABASE IF NOT EXISTS Tesi;
+    CREATE DATABASE IF NOT EXISTS keycloak;
     USE Tesi;
     CREATE TABLE IF NOT EXISTS input_entities (
         Id bigint NOT NULL AUTO_INCREMENT,

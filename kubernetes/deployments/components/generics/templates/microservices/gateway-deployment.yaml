@@ -18,6 +18,21 @@ spec:
         ports:
         - containerPort: 7080
         env:
+        - name: "AUTH_ENABLE"
+          value: "true"
+        - name: "AUTH_SECRET"
+          valueFrom:
+            secretKeyRef:
+              name: gateway-secret
+              key: secretOidc
+        - name: KEYCLOACK_REALM
+          value: ""
+        - name: KEYCLOACK_CLIENTID
+          value: ""
+        - name: KEYCLOACK_FEINGRESS
+          value: "http://{{ .Values.global.ingressFrontEnd }}"
+        - name: KEYCLOACK_OIDCADDR
+          value: "http://keycloak.keycloak.svc:8080/auth" 
         - name: "SPRING_CLOUD_GATEWAY_ROUTES_1__ID"
           value: "frontend"
         - name: "SPRING_CLOUD_GATEWAY_ROUTES_1__URI"
