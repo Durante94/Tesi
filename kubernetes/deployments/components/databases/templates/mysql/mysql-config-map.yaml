@@ -4,9 +4,13 @@ metadata:
   name: mysql-initdb-config
   namespace: databases
 data:
-  initdb.sql: |
+  init.sql: |
     CREATE DATABASE IF NOT EXISTS Tesi;
     CREATE DATABASE IF NOT EXISTS keycloak;
+
+    CREATE USER '{{ .Values.global.mySqlUserKeycloak }}'@'%' IDENTIFIED BY '{{ .Values.global.mySqlPwdKeycloak }}';
+    GRANT ALL PRIVILEGES ON keycloak.* TO '{{ .Values.global.mySqlUserKeycloak }}'@'%';
+
     USE Tesi;
     CREATE TABLE IF NOT EXISTS input_entities (
         Id bigint NOT NULL AUTO_INCREMENT,
@@ -19,4 +23,3 @@ data:
         agent_id varchar(100) NOT NULL,
         PRIMARY KEY (Id)
     );
-    # ALTER TABLE input_entities ADD agent_id varchar(100) NOT NULL
