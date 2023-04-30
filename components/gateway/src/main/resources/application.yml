@@ -44,7 +44,7 @@ spring:
         - id: rest-service
           predicates:
             - Path=/api/**
-          uri: http://localhost:8080
+          uri: http://localhost:8000
           filters:
            - CheckAuth
            - TokenRelayFilter
