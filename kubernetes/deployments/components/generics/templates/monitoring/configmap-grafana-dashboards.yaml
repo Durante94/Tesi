@@ -5976,7 +5976,7 @@ data:
           },
           "gridPos": {
             "h": 8,
-            "w": 12,
+            "w": 24,
             "x": 0,
             "y": 0
           },
@@ -6001,7 +6001,7 @@ data:
                 "uid": "P5697886F9CA74929"
               },
               "key": "Q-4043c525-58d3-4a17-be9d-75c57f12fbfc-0",
-              "query": "from(bucket: \"monitoring\")\r\n  |> range(start: -1m)\r\n",
+              "query": "from(bucket: \"monitoring\")\r\n  |> range(start: -1m)\r\n  |> map(fn: (r)=> ({r with value: r.value}))",
               "refId": "A"
             }
           ],
@@ -6024,6 +6024,6 @@ data:
       "timezone": "",
       "title": "Data visualization",
       "uid": "f873dcca-3e2e-49a1-a374-d8332876e6ad",
-      "version": 2,
+      "version": 3,
       "weekStart": ""
     }

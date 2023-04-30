@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: "gateway"
-        image: docker.io/fabrizio294/gateway:0.0.1
+        image: docker.io/fabrizio294/gateway:0.0.2
         ports:
         - containerPort: 7080
         env:
@@ -33,18 +33,6 @@ spec:
           value: "http://{{ .Values.global.ingressFrontEnd }}"
         - name: KEYCLOACK_OIDCADDR
           value: "http://keycloak.keycloak.svc:8080/auth" 
-        - name: "SPRING_CLOUD_GATEWAY_ROUTES_1__ID"
-          value: "frontend"
-        - name: "SPRING_CLOUD_GATEWAY_ROUTES_1__URI"
-          value: "http://frontend.frontend.svc:3000"
-        - name: "SPRING_CLOUD_GATEWAY_ROUTES_1__FILTERS_0_"
-          value: "RewritePath=/web/(?<segment>.*), /${segment}"
-        - name: "SPRING_CLOUD_GATEWAY_ROUTES_1__FILTERS_1_"
-          value: "CheckAuth"
-        - name: "SPRING_CLOUD_GATEWAY_ROUTES_1__FILTERS_2_"
-          value: "TokenRelayFilter"
-        - name: "SPRING_CLOUD_GATEWAY_ROUTES_1__PREDICATES_0"
-          value: "Path=/web/**"
         - name: "SPRING_CLOUD_GATEWAY_ROUTES_1__URI"
           value: "http://frontend.frontend.svc:3000"
         - name: "SPRING_CLOUD_GATEWAY_ROUTES_2__URI"
