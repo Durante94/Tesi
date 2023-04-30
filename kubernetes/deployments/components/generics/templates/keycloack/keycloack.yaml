@@ -58,12 +58,12 @@ spec:
         - name: "DB_USER"
           valueFrom:
             secretKeyRef:
-              name: rest-secret
+              name: keycloak-secret
               key: usernameSql
         - name: "DB_PASSWORD"
           valueFrom:
             secretKeyRef:
-              name: rest-secret
+              name: keycloak-secret
               key: passwordSql 
         ports:
         - name: http
@@ -82,6 +82,8 @@ type: Opaque
 stringData:
   username: "keyckloak_admin"
   password: "K3ycl04k-Pwd&"
+  usernameSql: {{ .Values.global.mySqlUserKeycloak }}
+  passwordSql: {{ .Values.global.mySqlPwdKeycloak }}
 ---
 apiVersion: v1
 kind: Namespace

@@ -21,6 +21,8 @@ global:
   mySqlUser: fabrizio
   mySqlPwd: mysqlPwdS3cr3t
   mySqlDb: Tesi
+  mySqlUserKeycloak: keycloak_user
+  mySqlPwdKeycloak: mysqlK3ycl04kPwdS3cr3t
   mySqlHost: mysql.databases.svc
   mySqlPort: 3306
 
