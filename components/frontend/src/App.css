@@ -1,13 +1,17 @@
+.ant-layout{
+  font-size: 18px !important;
+}
+
 .header,
 .content,
 .footer {
   position: fixed;
   width: 100%;
-
 }
 
 .header {
   top: 0;
+  color: #fff;
 }
 
 .content {
@@ -22,5 +26,18 @@
 }
 
 ::-webkit-scrollbar {
-  border-radius: 10%;
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #888;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
 }
