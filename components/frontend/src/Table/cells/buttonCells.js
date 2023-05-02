@@ -1,5 +1,5 @@
 import { Badge } from "antd";
-import { Dispaly, Download, Edit, Delete, Search } from "../../buttons";
+import { Dispaly, Download, Edit, Delete, Search } from "../../buttons/buttons";
 import {
     DownloadOutlined,
     EyeOutlined

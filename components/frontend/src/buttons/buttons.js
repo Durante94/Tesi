@@ -3,8 +3,7 @@ import {
   SearchOutlined,
   DownloadOutlined,
   DeleteOutlined,
-  EditOutlined,
-  EyeOutlined
+  EditOutlined
 } from "@ant-design/icons";
 
 export const Confirm = ({

@@ -1,8 +1,8 @@
 import { useMemo } from "react";
 import { Checkbox } from "antd";
-import { BadgeCell, DeleteCell, DownloadCell, EditCell, ViewCell, BadgeBlobsCell } from "../tables/cells/buttonCells";
-import { SymbolCell } from "../tables/cells/symbolCells";
-import { TimestampCell, StringCell, SelectCell, SimpleSelectCell, NumberCell, BooleanCell } from "../tables/cells/TextCells";
+import { BadgeCell, DeleteCell, DownloadCell, EditCell, ViewCell, BadgeBlobsCell } from "./cells/buttonCells";
+import { SymbolCell } from "./cells/symbolCells";
+import { TimestampCell, StringCell, SelectCell, SimpleSelectCell, NumberCell, BooleanCell } from "./cells/TextCells";
 
 export const RowRenderer = ({ tableName, rowKeyName, text, record, column }) => {
     if (column.symbol !== "none")

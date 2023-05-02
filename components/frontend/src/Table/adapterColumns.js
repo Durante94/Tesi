@@ -1,6 +1,5 @@
+import { SearchOutlined } from '@ant-design/icons';
 import { RowRenderer, TitleRenderer } from "./adapterRow";
-import { SymbolCell } from "../tables/cells/symbolCells";
-import { SelectCell, StringCell, TimestampCell, SimpleSelectCell, NumberCell, BooleanCell } from "../tables/cells/TextCells";
 
 const columnFixer = (colName, rowKeyName, colHasSymbol) => {
   if (colName === rowKeyName || colName === "expandable") {
@@ -39,19 +38,25 @@ const sorterType = (type, key, inPlace = true) => {
     return true;
 };
 
-export const adapterColumns = (tableName, rowKeyName, columns, data, onCheck, sort = {}, filters = {}, addSearchInCol = () => ({}), handleResize = () => ({})) =>
+const addSearchInCol = (dataIndex, colLabel, colType, options = {}, multi = false) => ({
+  filterDropdown: (filterDropDownProps) => <SearchTablePanel {...filterDropDownProps} {...{ colLabel, colType, dataIndex, options, multi }} />,
+  filterIcon: (filtered) => (<SearchOutlined style={{ fontSize: 20, color: filtered ? '#1890ff' : "#000" }} />),
+  onFilter: (value, record) => {
+    switch (colType) {
+      case "string":
+        return (record[dataIndex] || '').toString().toLowerCase().includes(value.toLowerCase());
+      case "enum":
+      case "number":
+        return (record[dataIndex] || -1).toString().includes(value.toString());
+      default:
+        return true;
+    }
+  },
+});
+
+export const adapterColumns = (tableName, rowKeyName, columns, data, onCheck, sort = {}, filters = {}) =>
   columns.map((cl, i) => {
-    const searchProps = cl.search ? addSearchInCol(cl.dataIndex, cl.title, cl.type, cl.options || cl.optionMap, cl.multi) : {},
-      resizeProps = cl.resize
-        ?
-        {
-          onHeaderCell: (column) => ({
-            width: column.width,
-            onResize: handleResize(i),
-          })
-        }
-        :
-        {};
+    const searchProps = cl.search ? addSearchInCol(cl.dataIndex, cl.title, cl.type, cl.options || cl.optionMap, cl.multi) : {};
 
     return {
       title: <TitleRenderer {...{ data, ...cl, filters, tableName, onCheck }} />,
@@ -64,44 +69,6 @@ export const adapterColumns = (tableName, rowKeyName, columns, data, onCheck, so
       fixed: columnFixer(cl.key, rowKeyName, cl.symbol === "rhombus" || cl.symbol === "tag" || cl.symbol === "circle" || cl.fixed),
       align: columnAligner(cl.type, cl.symbol === "rhombus" || cl.symbol === "tag" || cl.symbol === "circle"),
       render: (text, record) => <RowRenderer {...{ tableName, rowKeyName, text, record, column: cl }} />,
-      ...searchProps,
-      ...resizeProps
+      ...searchProps
     };
   });
-
-export const customRender = (
-  text,
-  type,
-  symbol,
-  record,
-  dataIndex,
-  readOnly,
-  editable,
-  tableName,
-  rowKeyName,
-  uniqueValues,
-  maxLength,
-  options = [],
-  width = 0
-) => {
-  if (symbol !== "none")
-    return <SymbolCell {...{ ...record, editable, symbol, dataIndex, text }} />;
-
-  switch (type) {
-    case "timestamp":
-      return <TimestampCell {...{ text }} />;
-    case "string":
-      return <StringCell {...{ ...record, editable, uniqueValues, readOnly, text, hasLength: maxLength, tableName, rowKeyName, id: record[rowKeyName], dataIndex }} />
-    case "select":
-      return <SelectCell {...{ ...record, editable, readOnly, text, tableName, rowKeyName, id: record[rowKeyName], dataIndex, options }} />
-    case "enum":
-    case "customSelect":
-      return <SimpleSelectCell />;
-    case "number":
-      return <NumberCell {...{ ...record, editable, readOnly, text, dataIndex, tableName, id: record[rowKeyName] }} />
-    case "boolean":
-      return <BooleanCell {...{ ...record, editable, text, tableName, rowKeyName, id: record[rowKeyName], dataIndex }} />;
-    default:
-      break;
-  }
-};

@@ -1,4 +1,4 @@
-import { Tag, Tooltip } from "antd";
+import { Tag, Tooltip, Spin } from "antd";
 
 const customSymbol = (type, text) => {
     switch (type) {

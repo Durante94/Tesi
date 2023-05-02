@@ -1,5 +1,6 @@
 import { Table } from "antd";
 import { useCallback, useEffect, useReducer } from "react";
+import { adapterColumns } from "./adapterColumns";
 
 const initialState = {
     loading: true,
@@ -32,9 +33,10 @@ const initialState = {
             case "pagination":
                 return {
                     ...state,
+                    ...action.payload,
                     pagination: {
                         ...state.pagination,
-                        ...action.payload
+                        ...action.payload.pagination
                     }
                 };
             default:
@@ -42,7 +44,7 @@ const initialState = {
         }
     };
 
-export const AntTable = ({ viewState = {}, restData = async () => ({ data: [], total: 0, pageSizeOptions: [] }), restColumns = () => ({ title: '', columns: [] }), updateViewRange = () => { } }) => {
+export const AntTable = ({ tableName = "", rowKey, viewState = {}, restData = async () => ({ data: [], total: 0, pageSizeOptions: [] }), getColumns = () => ({ title: '', columns: [] }), updateViewRange = () => { }, onCheck = () => { } }) => {
     const [{ loading, dataSource, columns, pagination, filters, sort }, dispatch] = useReducer(reducer, {
         ...initialState,
         ...viewState,
@@ -52,12 +54,34 @@ export const AntTable = ({ viewState = {}, restData = async () => ({ data: [], t
         }
     });
 
-    useEffect(() => dispatch({ action: "columns", payload: restColumns() }), [dispatch, restColumns]);
+    useEffect(() => dispatch({ type: "columns", payload: getColumns() }), [dispatch, getColumns]);
 
-    useEffect(() => dispatch({ type: "data", payload: restData(JSON.stringify({ ...filters, sort, pageSize: pagination.pageSize, selectedPage: pagination.current })) }),
-        [dispatch, restData, filters, sort, pagination.current, pagination.pageSize]);
+    useEffect(() => {
+        restData(JSON.stringify({ ...filters, sort, pageSize: pagination.pageSize, selectedPage: pagination.current }))
+            .then(resp => dispatch({ type: "data", payload: resp }))
+    }, [dispatch, restData, filters, sort, pagination.current, pagination.pageSize]);
 
-    const onChange = useCallback((pagination, filters, sorter, extra) => { }, []);
+    const onChange = useCallback((pagination, updatedFilters, sorter, extra) => {
+        const newFilters = Object.keys(updatedFilters).reduce((prev, curr) => {
+            const newProp = {};
+            if (columns.filter(col => col.dataIndex === curr).reduce((_, col) => col.multi || false, false))
+                newProp[curr] = updatedFilters[curr] || [];
+            else
+                newProp[curr] = (updatedFilters[curr] || []).at(0);
+            return { ...prev, ...newProp };
+        }, filters),
+            stateObj = {
+                filters: newFilters,
+                sort: { [sorter.columnKey]: sorter.order },
+                pagination: {
+                    current: pagination.current,
+                    pageSize: pagination.pageSize
+                }
+            };
+
+        dispatch({ type: "pagination", payload: stateObj });
+        updateViewRange(stateObj);
+    }, [columns, filters, dispatch, updateViewRange]);
 
     return <Table
         size="small"
@@ -66,6 +90,7 @@ export const AntTable = ({ viewState = {}, restData = async () => ({ data: [], t
             showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} items`,
             ...pagination
         }}
-        {...{ dataSource, columns, loading }}
+        columns={adapterColumns(tableName, rowKey, columns, dataSource, onCheck, sort, filters)}
+        {...{ dataSource, loading, onChange, rowKey }}
     />
 }
