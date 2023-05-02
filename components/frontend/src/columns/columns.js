@@ -7,7 +7,8 @@ export const crudColumns = () => ({
             dataIndex: 'name',
             type: "string",
             symbol: "none",
-            sorter: true
+            sorter: true,
+            search: true
         },
         {
             title: 'Descrizione',
@@ -15,7 +16,8 @@ export const crudColumns = () => ({
             dataIndex: 'description',
             type: "string",
             symbol: "none",
-            sorter: true
+            sorter: true,
+            search: true
         },
         {
             title: 'Funzione',
@@ -23,7 +25,8 @@ export const crudColumns = () => ({
             dataIndex: 'function',
             type: "string",
             symbol: "none",
-            sorter: true
+            sorter: true,
+            search: true
         },
         {
             title: 'Ampiezza',
@@ -31,7 +34,8 @@ export const crudColumns = () => ({
             dataIndex: 'amplitude',
             type: "number",
             symbol: "none",
-            sorter: true
+            sorter: true,
+            search: true
         },
         {
             title: 'Frequenza',
@@ -39,7 +43,8 @@ export const crudColumns = () => ({
             dataIndex: 'frequency',
             type: "number",
             symbol: "none",
-            sorter: true
+            sorter: true,
+            search: true
         },
         {
             title: 'Abilitato',

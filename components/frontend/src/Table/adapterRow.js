@@ -55,6 +55,7 @@ export const TitleRenderer = ({
     const checkedCount = useMemo(() => data.filter(r => r[dataIndex]).length, [data, dataIndex]);
     const filteredValue = useMemo(() => {
         let value = '';
+        console.log(filters, dataIndex, Array.isArray(filters[dataIndex]));
         if (filters[dataIndex] && filters[dataIndex].length > 0) {
             if (type === "enum") {
                 const filteredValues = filters[dataIndex].map(filt => options[filt]);

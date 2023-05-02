@@ -1,5 +1,6 @@
 import { SearchOutlined } from '@ant-design/icons';
 import { RowRenderer, TitleRenderer } from "./adapterRow";
+import { SearchTablePanel } from './utils/SearchTablePanel';
 
 const columnFixer = (colName, rowKeyName, colHasSymbol) => {
   if (colName === rowKeyName || colName === "expandable") {

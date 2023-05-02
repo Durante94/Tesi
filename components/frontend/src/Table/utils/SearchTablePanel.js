@@ -47,7 +47,7 @@ export const SearchTablePanel = ({ colLabel, colType, selectedKeys, confirm, dat
         }
 
         return resultProp;
-    }, [colLabel, colType, multi, inputRef, submitFilterValue]);/*dataIndex, */
+    }, [colLabel, colType, multi, inputRef, submitFilterValue, options]);
 
     return (<div style={{ padding: 15 }}>
         {{
