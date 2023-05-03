@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: "gateway"
-        image: docker.io/fabrizio294/gateway:0.0.2
+        image: docker.io/fabrizio294/gateway:0.0.3
         ports:
         - containerPort: 7080
         env:
@@ -26,14 +26,38 @@ spec:
               name: gateway-secret
               key: secretOidc
         - name: KEYCLOACK_REALM
-          value: ""
+          value: "a"
         - name: KEYCLOACK_CLIENTID
-          value: ""
+          value: "a"
         - name: KEYCLOACK_FEINGRESS
           value: "http://{{ .Values.global.ingressFrontEnd }}"
         - name: KEYCLOACK_OIDCADDR
-          value: "http://keycloak.keycloak.svc:8080/auth" 
+          value: "http://keycloak.keycloak.svc:8080/auth"
+        - name: "SPRING_CLOUD_GATEWAY_ROUTES_0__ID"
+          value: "favicon"
+        - name: "SPRING_CLOUD_GATEWAY_ROUTES_0__URI"
+          value: "forward:///favicon.ico"
+        - name: "SPRING_CLOUD_GATEWAY_ROUTES_0__PREDICATES_0"
+          value: "Path=**/favicon.ico"
+        - name: "SPRING_CLOUD_GATEWAY_ROUTES_1__ID"
+          value: "frontend"
         - name: "SPRING_CLOUD_GATEWAY_ROUTES_1__URI"
-          value: "http://frontend.frontend.svc:3000"
+          value: "http://frontend-service.frontend.svc:3000"
+        - name: "SPRING_CLOUD_GATEWAY_ROUTES_1__PREDICATES_0"
+          value: "Path=/web/**"
+        - name: "SPRING_CLOUD_GATEWAY_ROUTES_1__FILTERS_0_"
+          value: "RewritePath=/web/(?<segment>.*), /${segment}"
+        - name: "SPRING_CLOUD_GATEWAY_ROUTES_1__FILTERS_1_"
+          value: "CheckAuth"
+        - name: "SPRING_CLOUD_GATEWAY_ROUTES_1__FILTERS_2_"
+          value: "TokenRelayFilter"
+        - name: "SPRING_CLOUD_GATEWAY_ROUTES_2__ID"
+          value: "rest-service"
         - name: "SPRING_CLOUD_GATEWAY_ROUTES_2__URI"
           value: "http://rest-service.frontend.svc:8080"
+        - name: "SPRING_CLOUD_GATEWAY_ROUTES_2__PREDICATES_0"
+          value: "Path=/api/**"
+        - name: "SPRING_CLOUD_GATEWAY_ROUTES_2__FILTERS_0_"
+          value: "TokenRelayFilter"
+        - name: "SPRING_CLOUD_GATEWAY_ROUTES_2__FILTERS_1_"
+          value: "CheckAuth"
