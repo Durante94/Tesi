@@ -52,7 +52,32 @@ export const crudColumns = () => ({
             dataIndex: 'enable',
             type: "boolean",
             symbol: "none",
-            sorter: true
+            sorter: true,
+            width: 70
         },
+        {
+            title: '',
+            key: "view",
+            dataIndex: 'view',
+            type: "view",
+            symbol: "none",
+            width: 32
+        },
+        {
+            title: '',
+            key: "edit",
+            dataIndex: 'edit',
+            type: "edit",
+            symbol: "none",
+            width: 32
+        },
+        {
+            title: '',
+            key: "delete",
+            dataIndex: 'delete',
+            type: "delete",
+            symbol: "none",
+            width: 32
+        }
     ]
 })
