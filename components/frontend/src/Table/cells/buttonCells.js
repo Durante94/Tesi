@@ -60,7 +60,8 @@ export const DeleteCell = ({ canDelete, disabled, onDeleteClick }) =>
     <Delete
         disabled={!canDelete || disabled}
         tooltipTitle="Cancella"
-        type="danger"
+        type="primary"
         shape="square"
+        danger
         onClick={onDeleteClick}
     />

@@ -28,10 +28,7 @@ const sorterType = (type, key, inPlace = true) => {
       case "number":
         return (a, b) => a[key] - b[key];
       case "string":
-        return (a, b) => {
-          console.log(a, b, key);
-          return a[key] || "".localeCompare(b[key])
-        };
+        return (a, b) => a[key] || "".localeCompare(b[key]);
       default:
         break;
     }

@@ -1,9 +1,9 @@
 import { useCallback, useReducer } from "react";
 import { Layout } from "antd";
 import { AntTable } from "./Table/AntTable";
-import './App.css';
 import { getForTable } from "./rest/crud";
 import { crudColumns } from "./columns/columns";
+import './App.css';
 
 const initialState = {
   viewState: {},
@@ -12,11 +12,11 @@ const initialState = {
 }, reducer = (state, action) => {
   switch (action.type) {
     case "table":
-      return { ...state, viewState: action.payload };
-    case "deatail":
+      return { ...state, viewState: action.payload, detail: false };
+    case "detail":
       return { ...state, detail: true, edit: action.payload };
     default:
-      break;
+      return state;
   }
 };
 
@@ -25,6 +25,9 @@ function App() {
   const restData = useCallback(payload => getForTable(payload), []);
   const getColumns = useCallback(() => crudColumns(), []);
   const updateViewState = useCallback(state => dispatch({ type: "table", payload: state }), [dispatch]);
+  const onRowView = useCallback(id => dispatch({ type: "detail", payload: false }), [dispatch]);
+  const onRowEdit = useCallback(id => dispatch({ type: "detail", payload: true }), [dispatch]);
+  const onRowDelete = useCallback(id => console.log(id), []);
 
   const { Header, Content, Footer } = Layout;
 
@@ -34,9 +37,9 @@ function App() {
       <Content className="content">
         {detail
           ?
-          null
+          "SURPRISE MADAFAKKA"
           :
-          <AntTable {...{ restData, getColumns, viewState }} updateViewRange={updateViewState} />}
+          <AntTable {...{ restData, getColumns, viewState, onRowView, onRowEdit, onRowDelete }} rowKey="id" rowName="name" updateViewRange={updateViewState} />}
       </Content>
       <Footer className="footer">Footer</Footer>
     </Layout>

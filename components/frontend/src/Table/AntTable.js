@@ -1,10 +1,10 @@
-import { Table } from "antd";
-import { useCallback, useEffect, useReducer } from "react";
+import { Table, Modal } from "antd";
+import { useCallback, useEffect, useMemo, useReducer } from "react";
 import { adapterColumns } from "./adapterColumns";
 
 const initialState = {
     loading: true,
-    dataSource: [],
+    data: [],
     columns: [],
     pagination: {
         pageSizeOptions: [],
@@ -22,7 +22,7 @@ const initialState = {
             case "data":
                 return {
                     ...state,
-                    dataSource: action.payload.data,
+                    data: action.payload.data,
                     pagination: {
                         ...state.pagination,
                         total: action.payload.total,
@@ -39,13 +39,18 @@ const initialState = {
                         ...action.payload.pagination
                     }
                 };
+            case "loading":
+                return {
+                    ...state,
+                    loading: true
+                }
             default:
                 return state;
         }
     };
 
-export const AntTable = ({ tableName = "", rowKey, viewState = {}, restData = async () => ({ data: [], total: 0, pageSizeOptions: [] }), getColumns = () => ({ title: '', columns: [] }), updateViewRange = () => { }, onCheck = () => { } }) => {
-    const [{ loading, dataSource, columns, pagination, filters, sort }, dispatch] = useReducer(reducer, {
+export const AntTable = ({ tableName = "", rowKey, rowName = "", viewState = {}, restData = async () => ({ data: [], total: 0, pageSizeOptions: [] }), getColumns = () => ({ title: '', columns: [] }), updateViewRange = () => { }, onCheck = () => { }, onRowView = () => { }, onRowEdit = () => { }, onRowDelete = () => { } }) => {
+    const [{ loading, data, columns, pagination, filters, sort }, dispatch] = useReducer(reducer, {
         ...initialState,
         ...viewState,
         pagination: {
@@ -82,6 +87,25 @@ export const AntTable = ({ tableName = "", rowKey, viewState = {}, restData = as
         dispatch({ type: "pagination", payload: stateObj });
         updateViewRange(stateObj);
     }, [columns, filters, dispatch, updateViewRange]);
+
+    const dataSource = useMemo(() => data.map(row => ({
+        ...row,
+        onViewClick: () => {
+            dispatch({ type: "loading" });
+            onRowView(row[rowKey]);
+        },
+        onEditClick: () => {
+            dispatch({ type: "loading" });
+            onRowEdit(row[rowKey]);
+        },
+        onDeleteClick: () => Modal.warn({
+            centered: true,
+            title: "Warning",
+            content: `Are you sure you want to cancel ${row[rowName]}?`,
+            onOk: () => onRowDelete(row[rowKey]),
+            closable: true
+        })
+    })), [rowKey, data, onRowView, onRowEdit, onRowDelete]);
 
     return <Table
         size="small"

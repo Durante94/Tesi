@@ -119,15 +119,13 @@ export const Delete = ({
   shape,
   onClick = () => { },
   disabled,
+  danger,
 }) => (
   <Tooltip title={tooltipTitle}>
     {
       <Button className="cp-delete"
-        type={type}
-        shape={shape}
-        disabled={disabled}
+        {...{ danger, type, shape, disabled, onClick }}
         icon={<DeleteOutlined />}
-        onClick={() => onClick()}
       ></Button>
     }
   </Tooltip>
