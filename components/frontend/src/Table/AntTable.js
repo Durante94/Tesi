@@ -13,7 +13,8 @@ const initialState = {
         total: 0
     },
     filters: {},
-    sort: {}
+    sort: {},
+    refresh: false
 },
     reducer = (state, action) => {
         switch (action.type) {
@@ -44,13 +45,32 @@ const initialState = {
                     ...state,
                     loading: true
                 }
+            case "refresh":
+                return {
+                    ...state,
+                    refresh: !state.refresh,
+                    loading: action.payload
+                }
             default:
                 return state;
         }
     };
 
-export const AntTable = ({ tableName = "", rowKey, rowName = "", viewState = {}, restData = async () => ({ data: [], total: 0, pageSizeOptions: [] }), getColumns = () => ({ title: '', columns: [] }), updateViewRange = () => { }, onCheck = () => { }, onRowView = () => { }, onRowEdit = () => { }, onRowDelete = () => { } }) => {
-    const [{ loading, data, columns, pagination, filters, sort }, dispatch] = useReducer(reducer, {
+export const AntTable = ({
+    tableName = "",
+    rowKey,
+    rowName = "",
+    viewState = {},
+    restData = async () => ({ data: [], total: 0, pageSizeOptions: [] }),
+    getColumns = () => ({ title: '', columns: [] }),
+    updateViewRange = () => { },
+    onCheck = () => { },
+    onRowChange = async () => { },
+    onRowView = async () => { },
+    onRowEdit = async () => { },
+    onRowDelete = async () => { }
+}) => {
+    const [{ loading, data, columns, pagination, filters, sort, refresh }, dispatch] = useReducer(reducer, {
         ...initialState,
         ...viewState,
         pagination: {
@@ -64,7 +84,7 @@ export const AntTable = ({ tableName = "", rowKey, rowName = "", viewState = {},
     useEffect(() => {
         restData(JSON.stringify({ ...filters, sort, pageSize: pagination.pageSize, selectedPage: pagination.current }))
             .then(resp => dispatch({ type: "data", payload: resp }))
-    }, [dispatch, restData, filters, sort, pagination.current, pagination.pageSize]);
+    }, [dispatch, restData, filters, sort, pagination.current, pagination.pageSize, refresh]);
 
     const onChange = useCallback((pagination, updatedFilters, sorter, extra) => {
         const newFilters = Object.keys(updatedFilters).reduce((prev, curr) => {
@@ -83,35 +103,42 @@ export const AntTable = ({ tableName = "", rowKey, rowName = "", viewState = {},
                     pageSize: pagination.pageSize
                 }
             };
-
         dispatch({ type: "pagination", payload: stateObj });
         updateViewRange(stateObj);
     }, [columns, filters, dispatch, updateViewRange]);
 
     const dataSource = useMemo(() => data.map(row => ({
         ...row,
-        onViewClick: () => {
-            dispatch({ type: "loading" });
-            onRowView(row[rowKey]);
+        onChange: async (tableName, dataIndex, value, id) => {
+            await onRowChange(tableName, dataIndex, value, id)
+            dispatch({ type: "refresh", payload: true })
         },
-        onEditClick: () => {
+        onViewClick: async () => {
             dispatch({ type: "loading" });
-            onRowEdit(row[rowKey]);
+            await onRowView(row[rowKey]);
+        },
+        onEditClick: async () => {
+            dispatch({ type: "loading" });
+            await onRowEdit(row[rowKey]);
         },
         onDeleteClick: () => Modal.warn({
             centered: true,
             title: "Warning",
             content: `Are you sure you want to cancel ${row[rowName]}?`,
-            onOk: () => onRowDelete(row[rowKey]),
+            onOk: async () => {
+                await onRowDelete(row[rowKey]);
+                dispatch({ type: "refresh", payload: true })
+            },
             closable: true
         })
-    })), [rowKey, data, onRowView, onRowEdit, onRowDelete]);
+    })), [rowKey, rowName, data, onRowChange, onRowView, onRowEdit, onRowDelete]);
 
     return <Table
         size="small"
         style={{ height: "100%" }}
         pagination={{
             showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} items`,
+            position: "bottom-left",
             ...pagination
         }}
         columns={adapterColumns(tableName, rowKey, columns, dataSource, onCheck, sort, filters)}

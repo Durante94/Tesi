@@ -1,9 +1,9 @@
 import { Tooltip, Input, Select, Checkbox, InputNumber } from "antd";
 import moment from "moment";
 
-const TextCellWrap = View => (props) => props.editable ? <View {...props} /> : <span>{props.text}</span>;
+const TextCellWrap = View => (props) => props.editable ? <View {...props} /> : props.text;
 
-export const TimestampCell = ({ text }) => <span>{moment(text).format("DD/MM/YYYY HH:mm:ss")}</span>
+export const TimestampCell = ({ text }) => moment(text).format("DD/MM/YYYY HH:mm:ss")
 
 const StringCellInput = ({
     uniqueValues,
@@ -152,7 +152,7 @@ export const BooleanCell = ({
             checked={text}
             onChange={(e) => {
                 if (onChange) {
-                    onChange(tableName, rowKeyName, id, dataIndex, e.target.checked);
+                    onChange(tableName, dataIndex, e.target.checked, id);
                 }
             }}
         />

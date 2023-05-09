@@ -52,7 +52,7 @@ export const crudColumns = () => ({
             dataIndex: 'enable',
             type: "boolean",
             symbol: "none",
-            sorter: true,
+            sorter: false,
             width: 70
         },
         {

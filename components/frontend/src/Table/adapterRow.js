@@ -90,9 +90,8 @@ export const TitleRenderer = ({
                     disabled={!data.length}
                     indeterminate={checkedCount > 0 && checkedCount < data.length}
                     onChange={(e) => {
-                        if (onCheck) {
-                            onCheck(tableName, dataIndex, e.target.checked);
-                        }
+                        e.preventDefault();
+                        onCheck(tableName, dataIndex, e.target.checked);
                     }}
                 >
                     {title}

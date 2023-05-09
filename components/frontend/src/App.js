@@ -1,9 +1,9 @@
 import { useCallback, useReducer } from "react";
 import { Layout } from "antd";
-import { AntTable } from "./Table/AntTable";
 import { getForTable } from "./rest/crud";
 import { crudColumns } from "./columns/columns";
 import './App.css';
+import { TableContent } from "./TableContent";
 
 const initialState = {
   viewState: {},
@@ -22,12 +22,6 @@ const initialState = {
 
 function App() {
   const [{ viewState, detail, edit }, dispatch] = useReducer(reducer, initialState);
-  const restData = useCallback(payload => getForTable(payload), []);
-  const getColumns = useCallback(() => crudColumns(), []);
-  const updateViewState = useCallback(state => dispatch({ type: "table", payload: state }), [dispatch]);
-  const onRowView = useCallback(id => dispatch({ type: "detail", payload: false }), [dispatch]);
-  const onRowEdit = useCallback(id => dispatch({ type: "detail", payload: true }), [dispatch]);
-  const onRowDelete = useCallback(id => console.log(id), []);
 
   const { Header, Content, Footer } = Layout;
 
@@ -39,7 +33,8 @@ function App() {
           ?
           "SURPRISE MADAFAKKA"
           :
-          <AntTable {...{ restData, getColumns, viewState, onRowView, onRowEdit, onRowDelete }} rowKey="id" rowName="name" updateViewRange={updateViewState} />}
+          <TableContent {...{ viewState, dispatch }} />
+        }
       </Content>
       <Footer className="footer">Footer</Footer>
     </Layout>
