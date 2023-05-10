@@ -53,7 +53,7 @@ export const crudColumns = () => ({
             type: "boolean",
             symbol: "none",
             sorter: false,
-            width: 70
+            width: 100
         },
         {
             title: '',
@@ -61,7 +61,7 @@ export const crudColumns = () => ({
             dataIndex: 'view',
             type: "view",
             symbol: "none",
-            width: 32
+            width: 50
         },
         {
             title: '',
@@ -69,7 +69,7 @@ export const crudColumns = () => ({
             dataIndex: 'edit',
             type: "edit",
             symbol: "none",
-            width: 32
+            width: 50
         },
         {
             title: '',
@@ -77,7 +77,7 @@ export const crudColumns = () => ({
             dataIndex: 'delete',
             type: "delete",
             symbol: "none",
-            width: 32
+            width: 50
         }
     ]
 })

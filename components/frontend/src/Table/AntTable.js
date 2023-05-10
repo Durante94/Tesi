@@ -61,6 +61,7 @@ export const AntTable = ({
     rowKey,
     rowName = "",
     viewState = {},
+    style = {},
     restData = async () => ({ data: [], total: 0, pageSizeOptions: [] }),
     getColumns = () => ({ title: '', columns: [] }),
     updateViewRange = () => { },
@@ -135,13 +136,13 @@ export const AntTable = ({
 
     return <Table
         size="small"
-        style={{ height: "100%" }}
+        scroll={{ y: "60vh", x: "100vw" }}
         pagination={{
             showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} items`,
             position: "bottom-left",
             ...pagination
         }}
         columns={adapterColumns(tableName, rowKey, columns, dataSource, onCheck, sort, filters)}
-        {...{ dataSource, loading, onChange, rowKey }}
+        {...{ dataSource, loading, onChange, rowKey, style }}
     />
 }

@@ -1,27 +1,27 @@
-import { useCallback, useReducer } from "react";
+import { useReducer } from "react";
 import { Layout } from "antd";
-import { getForTable } from "./rest/crud";
-import { crudColumns } from "./columns/columns";
-import './App.css';
 import { TableContent } from "./TableContent";
+import { FormContent } from "./FormContent";
+import './App.css';
 
 const initialState = {
   viewState: {},
   detail: false,
   edit: false,
+  id: null
 }, reducer = (state, action) => {
   switch (action.type) {
     case "table":
       return { ...state, viewState: action.payload, detail: false };
     case "detail":
-      return { ...state, detail: true, edit: action.payload };
+      return { ...state, ...action.payload };
     default:
       return state;
   }
 };
 
 function App() {
-  const [{ viewState, detail, edit }, dispatch] = useReducer(reducer, initialState);
+  const [{ viewState, detail, edit, id }, dispatch] = useReducer(reducer, initialState);
 
   const { Header, Content, Footer } = Layout;
 
@@ -31,7 +31,7 @@ function App() {
       <Content className="content">
         {detail
           ?
-          "SURPRISE MADAFAKKA"
+          <FormContent {...{ edit, id, dispatch }} />
           :
           <TableContent {...{ viewState, dispatch }} />
         }
