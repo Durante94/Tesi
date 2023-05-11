@@ -23,7 +23,7 @@ spring:
           filters:
             - CheckAuth
             - TokenRelayFilter
-            - RewritePath=/web(?<segment>/?.*), $\{segment}
+            # - RewritePath=/web(?<segment>/?.*), $\{segment}
           uri: http://localhost:3000
         # Activity service
         - id: rest-service
