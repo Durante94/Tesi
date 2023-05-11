@@ -1,26 +1,37 @@
-import { useCallback, useEffect } from "react";
-import { GenericButton } from "./buttons/buttons";
-import { getDetail } from "./rest/crud";
+import { useCallback, useEffect, useReducer } from "react";
 import { Checkbox, Col, Form, Input, InputNumber, Row } from "antd";
+import { LoadingOutlined } from "@ant-design/icons";
+import { GenericButton } from "./buttons/buttons";
+import { getAgents, getDetail, saveData } from "./rest/crud";
+import { LazySelect } from "./Select/LazySelect";
+
+const initialState = {
+    initialValues: { "agentId": null },
+    loading: true
+},
+    reducer = (state, action) => {
+        if (action.type === "form")
+            return { initialValues: action.payload, loading: false };
+        else
+            return { ...state, loading: action.payload };
+    }
 
 export const FormContent = ({ edit, id, dispatch }) => {
+    const [{ initialValues, loading }, dispatchForm] = useReducer(reducer, initialState);
     const [form] = Form.useForm();
+    const changedAgent = Form.useWatch("agentId", form);
     const { Item } = Form;
 
-    const close = useCallback(() => dispatch({ type: "detail", payload: { detail: false } }), [dispatch]);
     const renderFormItem = useCallback(({ type, inputProps, ...props }) =>
-        <Item {...{ ...props }}
-            labelCol={12}
-            wrapperCol={12}  >
+        <Item {...{ ...props }}>
             {{
                 "text": <Input allowClear disabled={!edit} {...inputProps} />,
                 "number": <InputNumber disabled={!edit} decimalSeparator="." {...inputProps} />,
                 "boolean": <Checkbox disabled={!edit} {...inputProps} />,
-                "select": null
+                "select": <LazySelect disabled={!edit} {...inputProps} />
             }[type]}
         </Item>,
         [edit]);
-
     const renderColumn = useCallback((props, key) => props.hidden
         ?
         renderFormItem({ ...props, key })
@@ -29,44 +40,74 @@ export const FormContent = ({ edit, id, dispatch }) => {
             {renderFormItem(props)}
         </Col>,
         [renderFormItem])
+    const close = useCallback(() => dispatch({ type: "detail", payload: { detail: false } }), [dispatch]),
+        fetchOptions = useCallback(getAgents, []),
+        onFinish = useCallback(values => {
+            dispatchForm({ type: "loading", payload: true });
+            saveData(values).then(() => close()).finally(() => dispatchForm({ type: "loading", payload: false }))
+        }, [close, dispatchForm]);
+
     useEffect(() => {
         if (id)
-            getDetail(id).then(obj => form.setFieldsValue(obj));
-    }, [id, form]);
+            getDetail(id).then(obj => dispatchForm({ type: "form", payload: obj }));
+        else
+            dispatchForm({ type: "loading", payload: false })
+    }, [id, dispatchForm]);
+
+    useEffect(() => form.setFieldsValue(initialValues), [form, initialValues]);
 
     const fieldsProps = [
         { name: "id", hidden: true, noStyle: true, type: "" },
         { name: "name", type: "text", label: "Name", required: true, rules: [{ required: true }] },
         { name: "description", type: "text", label: "Description" },
+        { name: "agentId", type: "select", label: "Adapter", required: true, rules: [{ required: true }], inputProps: { width: "100%", fetchOptions, optionLabelProp: "value", fieldNames: { value: "value", label: "value" } } },
         { name: "amplitude", type: "number", label: "Configured Amplitude", required: true, rules: [{ required: true }], inputProps: { style: { width: "100%" }, disabled: true } },
         { name: "frequency", type: "number", label: "Configured Frequency", required: true, rules: [{ required: true }], inputProps: { style: { width: "100%" }, disabled: true } },
         { name: "function", type: "number", label: "Configured Function", required: true, rules: [{ required: true }], inputProps: { style: { width: "100%" }, disabled: true } },
-        { name: "enable", type: "boolean", label: "Enable", required: true, rules: [{ required: true }], valuePropName: "checked" },
-        { name: "agentId", type: "select", label: "Adapter", required: true, rules: [{ required: true }], inputProps: { style: { width: "100%" } } }
+        { name: "enable", type: "boolean", label: "Enable", required: true, rules: [{ required: true }], valuePropName: "checked", initialValue: false }
     ]
 
-    return <Form {...{ form }}
+    return <Form {...{ form, onFinish }}
         size="small"
         labelAlign="left"
-        onFinish={values => console.log(values)}
+        labelCol={{ span: 9 }}
+        wrapperCol={{ span: 15 }}
         onFinishFailed={obj => console.error(obj)}
         validateMessages={{
             required: "'${label}' is required"
         }}
     >
+        {loading
+            ?
+            <div className="mask-overlay" style={{
+                position: "absolute",
+                opacity: 0.7,
+                backgroundColor: "gray",
+                zIndex: 1000,
+                width: "100%",
+                height: "100%",
+                top: 0,
+                left: 0,
+                textAlign: "center",
+                paddingTop: "5%"
+            }}>
+                <LoadingOutlined style={{ fontSize: 50, color: "white" }} />
+            </div>
+            :
+            null}
         <Row>
             {fieldsProps.map(renderColumn)}
         </Row>
         <Row justify="end" style={{ margin: "0 10px" }}>
             <Col lg={{ span: 3 }} md={{ span: 4 }} sm={{ span: 5 }} xs={{ span: 5 }}>
-                <GenericButton text="Request Configuration" width="auto" />
+                <GenericButton text="Request Configuration" width="auto" disabled={!changedAgent || !edit} />
             </Col>
             <Col lg={{ offset: 15, span: 3 }} md={{ offset: 14, span: 3 }} sm={{ offset: 11, span: 4 }} xs={{ offset: 9, span: 5 }}>
-                <GenericButton text="Save" type="primary" htmlType="submit" />
+                <GenericButton text="Save" type="primary" htmlType="submit" disabled={!edit || (!!id && changedAgent !== initialValues.agentId)} />
             </Col>
             <Col lg={{ span: 3 }} md={{ span: 3 }} sm={{ span: 4 }} xs={{ span: 5 }}>
                 <GenericButton text="Close" type="primary" danger onClick={close} />
             </Col>
         </Row>
-    </Form>;
+    </Form >;
 }

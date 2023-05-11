@@ -48,8 +48,7 @@ const initialState = {
             case "refresh":
                 return {
                     ...state,
-                    refresh: !state.refresh,
-                    loading: action.payload
+                    refresh: !state.refresh
                 }
             default:
                 return state;
@@ -83,9 +82,10 @@ export const AntTable = ({
     useEffect(() => dispatch({ type: "columns", payload: getColumns() }), [dispatch, getColumns]);
 
     useEffect(() => {
+        dispatch({ type: "loading" });
         restData(JSON.stringify({ ...filters, sort, pageSize: pagination.pageSize, selectedPage: pagination.current }))
             .then(resp => dispatch({ type: "data", payload: resp }))
-    }, [dispatch, restData, filters, sort, pagination.current, pagination.pageSize, refresh]);
+    }, [dispatch, restData, filters, sort, pagination, refresh]);
 
     const onChange = useCallback((pagination, updatedFilters, sorter, extra) => {
         const newFilters = Object.keys(updatedFilters).reduce((prev, curr) => {
@@ -112,7 +112,7 @@ export const AntTable = ({
         ...row,
         onChange: async (tableName, dataIndex, value, id) => {
             await onRowChange(tableName, dataIndex, value, id)
-            dispatch({ type: "refresh", payload: true })
+            dispatch({ type: "refresh" })
         },
         onViewClick: async () => {
             dispatch({ type: "loading" });
@@ -128,7 +128,7 @@ export const AntTable = ({
             content: `Are you sure you want to cancel ${row[rowName]}?`,
             onOk: async () => {
                 await onRowDelete(row[rowKey]);
-                dispatch({ type: "refresh", payload: true })
+                dispatch({ type: "refresh" })
             },
             closable: true
         })

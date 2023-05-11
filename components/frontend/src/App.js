@@ -27,7 +27,7 @@ function App() {
 
   return (
     <Layout>
-      <Header className="header">Header</Header>
+      <Header className="header">My IOT Device Handler</Header>
       <Content className="content">
         {detail
           ?
@@ -36,7 +36,7 @@ function App() {
           <TableContent {...{ viewState, dispatch }} />
         }
       </Content>
-      <Footer className="footer">Footer</Footer>
+      <Footer className="footer"></Footer>
     </Layout>
   );
 }
