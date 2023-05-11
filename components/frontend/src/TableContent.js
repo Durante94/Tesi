@@ -26,6 +26,6 @@ export const TableContent = ({ viewState = {}, dispatch = () => { } }) => {
             rowName="name"
             updateViewRange={updateViewState}
         />
-        <GenericButton text="Add Device" type="primary" width="auto" onClick={() => dispatch({ type: "detail", payload: { detail: true, edit: true } })} />
+        <GenericButton text="Add Device" type="primary" width="auto" onClick={() => dispatch({ type: "detail", payload: { detail: true, edit: true, id: null } })} />
     </Space>
 }

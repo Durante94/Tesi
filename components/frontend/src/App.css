@@ -1,4 +1,4 @@
-.ant-layout{
+.ant-layout {
   font-size: 18px !important;
 }
 
@@ -17,7 +17,7 @@
 .content {
   top: 64px;
   bottom: 65px;
-  overflow: hidden;
+  overflow: hidden auto;
 }
 
 .footer {
