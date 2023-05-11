@@ -21,6 +21,7 @@ import com.fabrizio.tesi.rest.agent.dto.AgentRequestFilter;
 import com.fabrizio.tesi.rest.crud.dto.TableRequestDTO;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
@@ -47,7 +48,7 @@ public class AgentController {
 
     @GetMapping
     @ResponseBody
-    public List<String> getAgents(@RequestParam(required = false, defaultValue = "{}") String filter) {
+    public List<ObjectNode> getAgents(@RequestParam(required = false, defaultValue = "{}") String filter) {
         AgentRequestFilter deserilizedFilter;
         try {
             deserilizedFilter = jsonMapper.readValue(filter, AgentRequestFilter.class);
@@ -60,6 +61,7 @@ public class AgentController {
                 .filter(value -> deserilizedFilter.applyFiter(value))
                 .skip((deserilizedFilter.getSelectedPage() - 1) * deserilizedFilter.getPageSize())
                 .limit(deserilizedFilter.getPageSize())
+                .map(agent -> jsonMapper.createObjectNode().put("value", agent))
                 .collect(Collectors.toList());
     }
 }
