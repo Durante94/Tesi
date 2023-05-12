@@ -16,7 +16,7 @@ const initialState = {
             return { ...state, loading: action.payload };
     }
 
-export const FormContent = ({ edit, id, dispatch }) => {
+export const FormContent = ({ edit, id, dispatch, configuration }) => {
     const [{ initialValues, loading }, dispatchForm] = useReducer(reducer, initialState);
     const [form] = Form.useForm();
     const changedAgent = Form.useWatch("agentId", form);
@@ -53,6 +53,13 @@ export const FormContent = ({ edit, id, dispatch }) => {
         else
             dispatchForm({ type: "loading", payload: false })
     }, [id, dispatchForm]);
+
+    useEffect(() => {
+        if (configuration && changedAgent === configuration.agentId) {
+            form.setFieldsValue(configuration);
+            dispatch({ type: "config", payload: null })
+        }
+    }, [dispatch, form, configuration, changedAgent])
 
     useEffect(() => form.setFieldsValue(initialValues), [form, initialValues]);
 

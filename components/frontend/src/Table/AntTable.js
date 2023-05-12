@@ -85,7 +85,7 @@ export const AntTable = ({
         dispatch({ type: "loading" });
         restData(JSON.stringify({ ...filters, sort, pageSize: pagination.pageSize, selectedPage: pagination.current }))
             .then(resp => dispatch({ type: "data", payload: resp }))
-    }, [dispatch, restData, filters, sort, pagination, refresh]);
+    }, [dispatch, restData, filters, sort, pagination.pageSize, pagination.current, refresh]);
 
     const onChange = useCallback((pagination, updatedFilters, sorter, extra) => {
         const newFilters = Object.keys(updatedFilters).reduce((prev, curr) => {
@@ -111,7 +111,7 @@ export const AntTable = ({
     const dataSource = useMemo(() => data.map(row => ({
         ...row,
         onChange: async (tableName, dataIndex, value, id) => {
-            await onRowChange(tableName, dataIndex, value, id)
+            await onRowChange(tableName, dataIndex, value, id);
             dispatch({ type: "refresh" })
         },
         onViewClick: async () => {
