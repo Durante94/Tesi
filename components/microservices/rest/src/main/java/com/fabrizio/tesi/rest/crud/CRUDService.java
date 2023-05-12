@@ -57,7 +57,7 @@ public class CRUDService {
                                         .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
                 else {
                         TableRequestDTO filter = new TableRequestDTO(dto.getName(), null, 0,
-                                        0, null, false, null);
+                                        0, null, false, dto.getAgentId());
                         try {
                                 CRUDEntity present = repository.findOne(new CRUDSpecification(filter)).get();
                                 return ResponseEntity.status(HttpStatus.CONFLICT).body(adapter.enityToDto(present));
