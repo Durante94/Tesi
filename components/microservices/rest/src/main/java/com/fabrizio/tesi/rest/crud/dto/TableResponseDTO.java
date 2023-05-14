@@ -1,6 +1,6 @@
 package com.fabrizio.tesi.rest.crud.dto;
 
-import com.fabrizio.tesi.rest.common.annotaiton.ToEntityIgnore;
+import com.fabrizio.tesi.rest.common.annotation.ToEntityIgnore;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;

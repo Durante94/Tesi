@@ -1,5 +1,7 @@
 package com.fabrizio.tesi.rest.crud;
 
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -39,7 +41,7 @@ public class CRUDController {
     public ResponseTable<TableResponseDTO> listElem(
             @RequestParam(required = false, defaultValue = "{}") String filter) {
         try {
-            return service.getList(jsonMapper.readValue(filter, TableRequestDTO.class));
+            return service.getList(jsonMapper.readValue(filter, TableRequestDTO.class), true);
         } catch (JsonProcessingException e) {
             log.error("DESERIALIZZAZIONE: {} in {}", filter, TableRequestDTO.class.getName(), e.getMessage());
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Errore formato richiesta");
@@ -55,6 +57,13 @@ public class CRUDController {
     @PostMapping
     public ResponseEntity<TableResponseDTO> saveElem(@RequestBody TableResponseDTO dto) {
         return service.saveOrUpdate(dto);
+    }
+
+    @PostMapping("/{prop}/{value}")
+    public ResponseEntity<Void> toggleValue(@PathVariable("prop") String prop, @PathVariable("value") boolean value,
+            @RequestBody(required = false) Map<String, Long> body) {
+        long id = body.getOrDefault("id", -1L).longValue();
+        return id >= 0 ? service.toggleValue(prop, value, id) : service.toggleValue(prop, value);
     }
 
     @DeleteMapping("/{id}")

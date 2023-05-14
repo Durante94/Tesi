@@ -1,5 +1,7 @@
 package com.fabrizio.tesi.rest.crud;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
@@ -28,7 +30,7 @@ public class CRUDService {
         @Autowired
         CRUDRepository repository;
 
-        public ResponseTable<TableResponseDTO> getList(TableRequestDTO filter) {
+        public ResponseTable<TableResponseDTO> getList(TableRequestDTO filter, boolean canEdit) {
                 Page<CRUDEntity> results = repository.findAll(new CRUDSpecification(filter),
                                 PageRequest.of(filter.getSelectedPage() - 1, filter.getPageSize()));
 
@@ -36,7 +38,13 @@ public class CRUDService {
                                 TableResponseDTO.class);
 
                 return new ResponseTable<>(Long.valueOf(results.getTotalElements()).intValue(),
-                                results.stream().map(e -> adapter.enityToDto(e)).collect(Collectors.toList()));
+                                results.stream().map(e -> {
+                                        TableResponseDTO tmp = adapter.enityToDto(e);
+                                        tmp.setView(true);
+                                        tmp.setEdit(canEdit);
+                                        tmp.setDelete(canEdit);
+                                        return tmp;
+                                }).collect(Collectors.toList()));
         }
 
         public TableResponseDTO get(long id) {
@@ -56,11 +64,17 @@ public class CRUDService {
                         toSave = repository.findById(dto.getId())
                                         .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
                 else {
-                        TableRequestDTO filter = new TableRequestDTO(dto.getName(), null, 0,
-                                        0, null, false, dto.getAgentId());
                         try {
-                                CRUDEntity present = repository.findOne(new CRUDSpecification(filter)).get();
-                                return ResponseEntity.status(HttpStatus.CONFLICT).body(adapter.enityToDto(present));
+                                List<CRUDEntity> presents = repository.findByNameOrAgentId(dto.getName(),
+                                                dto.getAgentId());
+                                if (presents.stream().allMatch(entity -> entity.getId().longValue() == dto.getId()))
+                                        toSave = new CRUDEntity();
+                                else
+                                        return ResponseEntity.status(HttpStatus.CONFLICT)
+                                                        .body(adapter.enityToDto(presents.stream()
+                                                                        .filter(entity -> entity.getId()
+                                                                                        .longValue() != dto.getId())
+                                                                        .findFirst().get()));
                         } catch (NoSuchElementException e) {
                                 toSave = new CRUDEntity();
                         }
@@ -78,5 +92,29 @@ public class CRUDService {
                 } catch (EmptyResultDataAccessException e) {
                         return ResponseEntity.notFound().build();
                 }
+        }
+
+        public ResponseEntity<Void> toggleValue(String prop, boolean value) {
+                if (fieldPresence(prop, CRUDEntity.class)) {
+                        return repository.updateAllEnable(value) > 0
+                                        ? ResponseEntity.ok().build()
+                                        : ResponseEntity.notFound().build();
+                }
+                return ResponseEntity.badRequest().build();
+        }
+
+        public ResponseEntity<Void> toggleValue(String prop, boolean value, Long id) {
+                if (fieldPresence(prop, CRUDEntity.class)) {
+                        return repository.updateOneEnable(value, id) > 0
+                                        ? ResponseEntity.ok().build()
+                                        : ResponseEntity.notFound().build();
+                }
+                return ResponseEntity.badRequest().build();
+        }
+
+        private boolean fieldPresence(String prop, Class<?> type) {
+                return Arrays.asList(type.getDeclaredFields()).stream()
+                                .anyMatch(field -> field.getName().equals(prop) && (field.getType() == Boolean.TYPE
+                                                || field.getType() == boolean.class));
         }
 }

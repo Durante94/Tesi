@@ -14,7 +14,7 @@ import java.util.regex.Pattern;
 
 import javax.persistence.Id;
 
-import com.fabrizio.tesi.rest.common.annotaiton.ToEntityIgnore;
+import com.fabrizio.tesi.rest.common.annotation.ToEntityIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import lombok.AccessLevel;
@@ -57,7 +57,7 @@ public class GenericAdapter<T, U> {
                 char c[] = matcher.group(2).toCharArray();
                 c[0] = Character.toLowerCase(c[0]);
                 String filedName = new String(c);
-                if (!checkAnnotation(type, filedName, isSetter))
+                if (!checkAnnotation(type, filedName))
                     continue;
 
                 (isSetter ? setters : getters).put(matcher.group(2), method);
@@ -68,7 +68,7 @@ public class GenericAdapter<T, U> {
             populateMaps(superType, getters, setters);
     }
 
-    private boolean checkAnnotation(final Class<?> type, final String filedName, boolean isSetter) {
+    private boolean checkAnnotation(final Class<?> type, final String filedName) {
         JsonIgnoreProperties annotation = type.getAnnotation(JsonIgnoreProperties.class);
         boolean flag = annotation == null || !Arrays.asList(annotation.value()).contains(filedName);
         return ANNOTATIONS.stream().anyMatch(ann -> {

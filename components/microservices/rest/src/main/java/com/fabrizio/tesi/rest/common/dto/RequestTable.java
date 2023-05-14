@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.fabrizio.tesi.rest.common.annotation.ToEntityIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import lombok.AccessLevel;
@@ -23,4 +24,10 @@ public class RequestTable implements Serializable {
     int pageSize = 10;
     @NonNull
     Map<String, String> sort = new HashMap<>();
+    @ToEntityIgnore
+    boolean view;
+    @ToEntityIgnore
+    boolean edit;
+    @ToEntityIgnore
+    boolean delete;
 }

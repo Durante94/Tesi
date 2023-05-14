@@ -20,6 +20,7 @@ import org.springframework.web.server.ResponseStatusException;
 import com.fabrizio.tesi.rest.agent.dto.AgentRequestFilter;
 import com.fabrizio.tesi.rest.crud.dto.TableRequestDTO;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -39,11 +40,13 @@ public class AgentController {
     CacheManager cacheManager;
 
     Cache agentCache;
-    ObjectMapper jsonMapper = new ObjectMapper();
+    ObjectMapper jsonMapper;
 
     @PostConstruct
     void init() {
         agentCache = cacheManager.getCache("agents");
+        jsonMapper = new ObjectMapper();
+        jsonMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     }
 
     @GetMapping
@@ -59,7 +62,7 @@ public class AgentController {
         return ((List<String>) agentCache.get(agentCacheKey).get())
                 .stream()
                 .filter(value -> deserilizedFilter.applyFiter(value))
-                .skip((deserilizedFilter.getSelectedPage() - 1) * deserilizedFilter.getPageSize())
+                .skip(deserilizedFilter.getSelectedPage() * deserilizedFilter.getPageSize())
                 .limit(deserilizedFilter.getPageSize())
                 .map(agent -> jsonMapper.createObjectNode().put("value", agent))
                 .collect(Collectors.toList());

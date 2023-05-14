@@ -18,6 +18,6 @@ public class AgentRequestFilter extends RequestTable {
     String filter = "";
 
     public boolean applyFiter(String value) {
-        return value.toLowerCase().contains(filter.toLowerCase());
+        return filter == null || value.toLowerCase().contains(filter.toLowerCase());
     }
 }
