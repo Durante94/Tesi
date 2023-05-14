@@ -64,7 +64,7 @@ export const AntTable = ({
     restData = async () => ({ data: [], total: 0, pageSizeOptions: [] }),
     getColumns = () => ({ title: '', columns: [] }),
     updateViewRange = () => { },
-    onCheck = () => { },
+    onCheck = async () => { },
     onRowChange = async () => { },
     onRowView = async () => { },
     onRowEdit = async () => { },
@@ -108,6 +108,11 @@ export const AntTable = ({
         updateViewRange(stateObj);
     }, [columns, filters, dispatch, updateViewRange]);
 
+    const innerOnCheck = useCallback(async (tableName, dataIndex, value, id) => {
+        await onCheck(tableName, dataIndex, value, id);
+        dispatch({ type: "refresh" });
+    }, [onCheck]);
+
     const dataSource = useMemo(() => data.map(row => ({
         ...row,
         onChange: async (tableName, dataIndex, value, id) => {
@@ -142,7 +147,7 @@ export const AntTable = ({
             position: "bottom-left",
             ...pagination
         }}
-        columns={adapterColumns(tableName, rowKey, columns, dataSource, onCheck, sort, filters)}
+        columns={adapterColumns(tableName, rowKey, columns, dataSource, innerOnCheck, sort, filters)}
         {...{ dataSource, loading, onChange, rowKey, style }}
     />
 }

@@ -28,11 +28,12 @@ export const FormContent = ({ edit, id, dispatch, configuration }) => {
                 "text": <Input allowClear disabled={!edit} {...inputProps} />,
                 "number": <InputNumber disabled={!edit} decimalSeparator="." {...inputProps} />,
                 "boolean": <Checkbox disabled={!edit} {...inputProps} />,
-                "select": <LazySelect disabled={!edit} {...inputProps} />
+                "select": <LazySelect disabled={!edit} {...inputProps} />,
+                // "": <input type="hidden" />
             }[type]}
         </Item>,
         [edit]);
-    const renderColumn = useCallback((props, key) => props.hidden
+    const renderColumn = useCallback(({ hidden, ...props }, key) => hidden
         ?
         renderFormItem({ ...props, key })
         :
@@ -44,11 +45,11 @@ export const FormContent = ({ edit, id, dispatch, configuration }) => {
         fetchOptions = useCallback(getAgents, []),
         onFinish = useCallback(values => {
             dispatchForm({ type: "loading", payload: true });
-            saveData(values).then(() => close()).finally(() => dispatchForm({ type: "loading", payload: false }))
+            saveData(values).then(() => close()).catch(() => dispatchForm({ type: "loading", payload: false }))
         }, [close, dispatchForm]);
 
     useEffect(() => {
-        if (id)
+        if (isFinite(parseInt(id)))
             getDetail(id).then(obj => dispatchForm({ type: "form", payload: obj }));
         else
             dispatchForm({ type: "loading", payload: false })
@@ -107,10 +108,25 @@ export const FormContent = ({ edit, id, dispatch, configuration }) => {
         </Row>
         <Row justify="end" style={{ margin: "0 10px" }}>
             <Col lg={{ span: 3 }} md={{ span: 4 }} sm={{ span: 5 }} xs={{ span: 5 }}>
-                <GenericButton text="Request Configuration" width="auto" disabled={!changedAgent || !edit} />
+                <GenericButton
+                    text="Request Configuration"
+                    width="auto"
+                    disabled={!changedAgent || !edit}
+                    onClick={() => {
+                        /// TODO: cancellami
+                        dispatch({
+                            type: "config", payload: {
+                                agentId: form.getFieldValue("agentId"),
+                                amplitude: 8,
+                                frequency: 5,
+                                function: "test"
+                            }
+                        });
+                    }}
+                />
             </Col>
             <Col lg={{ offset: 15, span: 3 }} md={{ offset: 14, span: 3 }} sm={{ offset: 11, span: 4 }} xs={{ offset: 9, span: 5 }}>
-                <GenericButton text="Save" type="primary" htmlType="submit" disabled={!edit || (!!id && changedAgent !== initialValues.agentId)} />
+                <GenericButton text="Save" type="primary" htmlType="submit" disabled={!edit || (isFinite(parseInt(id)) && changedAgent !== initialValues.agentId)} />
             </Col>
             <Col lg={{ span: 3 }} md={{ span: 3 }} sm={{ span: 4 }} xs={{ span: 5 }}>
                 <GenericButton text="Close" type="primary" danger onClick={close} />

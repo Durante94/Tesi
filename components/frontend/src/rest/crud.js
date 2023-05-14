@@ -1,14 +1,12 @@
 import { notification } from "antd";
 import axios from "axios";
 
-const BASE_URL = "",
-    GET_ALL = BASE_URL + "/api/crud";
-
-const mockData = { "total": 20, "data": [{ "name": "prova 1", "description": "descTest -1", "amplitude": 1.0, "frequency": 9.0, "function": "sin", "enable": false, "agentId": "a", "id": 0, "view": true, "edit": true, "delete": true }, { "name": "prova 2", "description": "descTest -2", "amplitude": 3.9, "frequency": 9.7, "function": "cos", "enable": false, "agentId": "test", "id": 1, "view": true, "edit": true, "delete": true }, { "name": "prova 3", "description": "descTest -3", "amplitude": 5.8, "frequency": 41.8, "function": "sin", "enable": false, "agentId": "c", "id": 2, "view": true, "edit": true, "delete": true }, { "name": "avorp 1", "description": "tsetCsed -1", "amplitude": -6.3, "frequency": 74.69, "function": "cos", "enable": false, "agentId": "d", "id": 3, "view": true, "edit": true, "delete": true }, { "name": "test 2", "description": "testDesc -2", "amplitude": -15.63, "frequency": 954.368, "function": "sin", "enable": false, "agentId": "e", "id": 4, "view": true, "edit": true, "delete": true }, { "name": "prova 1", "description": "descTest -1", "amplitude": 1.0, "frequency": 9.0, "function": "sin", "enable": false, "agentId": "a", "id": 5, "view": true, "edit": true, "delete": true }, { "name": "prova 2", "description": "descTest -2", "amplitude": 3.9, "frequency": 9.7, "function": "cos", "enable": false, "agentId": "b", "id": 6, "view": true, "edit": true, "delete": true }, { "name": "prova 3", "description": "descTest -3", "amplitude": 5.8, "frequency": 41.8, "function": "sin", "enable": false, "agentId": "c", "id": 7, "view": true, "edit": true, "delete": true }, { "name": "avorp 1", "description": "tsetCsed -1", "amplitude": -6.3, "frequency": 74.69, "function": "cos", "enable": false, "agentId": "d", "id": 8, "view": true, "edit": true, "delete": true }, { "name": "test 2", "description": "testDesc -2", "amplitude": -15.63, "frequency": 954.368, "function": "sin", "enable": false, "agentId": "e", "id": 9, "view": true, "edit": true, "delete": true }, { "name": "prova 1", "description": "descTest -1", "amplitude": 1.0, "frequency": 9.0, "function": "sin", "enable": false, "agentId": "a", "id": 10, "view": true, "edit": true, "delete": true }, { "name": "prova 2", "description": "descTest -2", "amplitude": 3.9, "frequency": 9.7, "function": "cos", "enable": false, "agentId": "b", "id": 11, "view": true, "edit": true, "delete": true }, { "name": "prova 3", "description": "descTest -3", "amplitude": 5.8, "frequency": 41.8, "function": "sin", "enable": false, "agentId": "c", "id": 12, "view": true, "edit": true, "delete": true }, { "name": "avorp 1", "description": "tsetCsed -1", "amplitude": -6.3, "frequency": 74.69, "function": "cos", "enable": false, "agentId": "d", "id": 13, "view": true, "edit": true, "delete": true }, { "name": "test 2", "description": "testDesc -2", "amplitude": -15.63, "frequency": 954.368, "function": "sin", "enable": false, "agentId": "e", "id": 14, "view": true, "edit": true, "delete": true }, { "name": "prova 1", "description": "descTest -1", "amplitude": 1.0, "frequency": 9.0, "function": "sin", "enable": false, "agentId": "a", "id": 15, "view": true, "edit": true, "delete": true }, { "name": "prova 2", "description": "descTest -2", "amplitude": 3.9, "frequency": 9.7, "function": "cos", "enable": false, "agentId": "b", "id": 16, "view": true, "edit": true, "delete": true }, { "name": "prova 3", "description": "descTest -3", "amplitude": 5.8, "frequency": 41.8, "function": "sin", "enable": false, "agentId": "c", "id": 17, "view": true, "edit": true, "delete": true }, { "name": "avorp 1", "description": "tsetCsed -1", "amplitude": -6.3, "frequency": 74.69, "function": "cos", "enable": false, "agentId": "d", "id": 18, "view": true, "edit": true, "delete": true }, { "name": "test 2", "description": "testDesc -2", "amplitude": -15.63, "frequency": 954.368, "function": "sin", "enable": false, "agentId": "e", "id": 19, "view": true, "edit": true, "delete": true }], "pageSizeOptions": ["10", "20"] };
+const BASE_URL = "/api/",
+    GET_ALL = BASE_URL + "crud",
+    GET_AGENTS = BASE_URL + 'agent',
+    GET_DETAIL = GET_ALL + "/";
 
 export const getForTable = async stringPayload => {
-    return mockData;
-
     const params = new URLSearchParams();
     params.append("filter", stringPayload)
     try {
@@ -30,21 +28,118 @@ export const getForTable = async stringPayload => {
 };
 
 export const getDetail = async id => {
-    return mockData.data.find(obj => obj.id === id);
+    try {
+        const response = await axios.get(GET_DETAIL + id);
+        return response.data;
+    } catch (error) {
+        notification.error({
+            message: "Errore caricamento",
+            description: "Impossibile ottenere i dati",
+            duration: 6
+        })
+        console.error(error);
+        return {
+            total: 0,
+            pageSizeOptions: [],
+            data: []
+        };
+    }
 };
 
 export const getAgents = async (payload, signal) => {
-    return [{ value: "test" }, { value: "test1" }, { value: "test2" }, { value: "test2" }, { value: "test3" }];
+    const params = new URLSearchParams();
+    params.append("filter", payload)
+    try {
+        const response = await axios.get(GET_AGENTS, { params, signal });
+        return response.data;
+    } catch (error) {
+        if (!axios.isCancel(error)) {
+            notification.error({
+                message: "Errore caricamento",
+                description: "Impossibile ottenere i dati",
+                duration: 6
+            })
+            console.error(error);
+        }
+        return [];
+    }
 };
 
 export const checkClick = async (tableName, dataIndex, value, id) => {
-    console.log(tableName, dataIndex, value, id);
+    try {
+        await axios.post(`${GET_DETAIL}${dataIndex}/${value}`, { id });
+    } catch (error) {
+        if (error.response.status === 400) {
+            notification.error({
+                message: "Errore salvataggio",
+                description: "No devices",
+                duration: 6
+            })
+        } else if (error.response.status === 404) {
+            notification.error({
+                message: "Errore salvataggio",
+                description: "Device non trovato",
+                duration: 6
+            })
+        } else {
+            notification.error({
+                message: "Errore salvataggio",
+                description: "Impossibile salvare i dati",
+                duration: 6
+            })
+            console.error(error);
+        }
+        throw error;
+    }
 };
 
 export const deleteData = async id => {
-    console.log(id);
+    try {
+        await axios.delete(GET_DETAIL + id);
+    } catch (error) {
+        notification.error({
+            message: "Errore",
+            description: "Impossibile cancellare il device",
+            duration: 6
+        })
+        console.error(error);
+        return {
+            total: 0,
+            pageSizeOptions: [],
+            data: []
+        };
+    }
 };
 
 export const saveData = async obj => {
-    console.log(obj);
+    try {
+        await axios.post(GET_ALL, obj);
+    } catch (error) {
+        if (error.response.status === 409) {
+            let description;
+            if (error.response.data.name === obj.name)
+                description = "Nome già in uso"
+            else if (error.response.data.agentId === obj.agentId)
+                description = "Adapter già in uso";
+            notification.error({
+                message: "Errore salvataggio",
+                description,
+                duration: 6
+            })
+        } else if (error.response.status === 404) {
+            notification.error({
+                message: "Errore salvataggio",
+                description: "Device non trovato",
+                duration: 6
+            })
+        } else {
+            notification.error({
+                message: "Errore salvataggio",
+                description: "Impossibile salvare i dati",
+                duration: 6
+            })
+            console.error(error);
+        }
+        throw error;
+    }
 };

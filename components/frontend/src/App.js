@@ -47,13 +47,18 @@ function App() {
         }
       </Content>
       <Footer className="footer">
-        <Badge count={alarms.length}>
+        <Badge count={alarms.size}>
           <GenericButton
             text="Alarms"
-            disabled={alarms.length === 0}
+            disabled={alarms.size === 0}
+            danger
             onClick={() => Modal.info({
-
-            })}
+              title: "Active Alarms",
+              content: <>{[...alarms.entries()].map((pair, key) => <p {...{ key }}>Agent {pair[0]}: {pair[1]}</p>)}</>,
+              closable: true,
+              centered: true
+            })
+            }
           />
         </Badge>
       </Footer>

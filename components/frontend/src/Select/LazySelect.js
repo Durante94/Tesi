@@ -49,7 +49,7 @@ export const LazySelect = ({
         //fai fetch o meno
 
         abortController.current = new AbortController() //salvo in ref, aggiorno poi stato con chiamata rest col dispatch . 
-        dispatch({ type: `options`, payload: { key: fieldNames.value, options: await fetchOptions({ filter: filterVal, selectedPage: numBatch, id: selectedValue }, abortController.current.signal) } });
+        dispatch({ type: `options`, payload: { key: fieldNames.value, options: await fetchOptions(JSON.stringify({ filter: filterVal, selectedPage: numBatch, id: selectedValue }), abortController.current.signal) } });
     }, [filterVal, numBatch, selectedValue, fetchOptions, dispatch, fieldNames.value]);   //
 
     const filterOption = useCallback((input, option) => option[optionLabelProp].toLowerCase().indexOf(input.toLowerCase()) >= 0, [optionLabelProp]);
