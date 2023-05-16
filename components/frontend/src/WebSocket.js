@@ -12,7 +12,7 @@ export const WebSocket = ({ dispatch }) => {
     return <SockJsClient
         {...{ onMessage }}
         url="/ws-message"
-        topics={['/configResponse']}
+        topics={['/topic/configResponse', '/topic/alarm']}
         // ref={cli => {client.current = cli}}
         onConnect={() => { console.log("WS Connected") }}
         onDisconnect={() => { console.log("WS Disconnected") }}
