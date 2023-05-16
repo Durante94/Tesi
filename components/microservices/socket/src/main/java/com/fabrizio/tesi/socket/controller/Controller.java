@@ -2,6 +2,9 @@ package com.fabrizio.tesi.socket.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.kafka.support.KafkaHeaders;
+import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.handler.annotation.SendTo;
@@ -27,19 +30,22 @@ public class Controller {
     SimpMessagingTemplate template;
 
     @PostMapping
+    @KafkaListener(topics = "config-response", containerFactory = "kafkaListenerContainerConfigFactory")
     public ResponseEntity<Void> sendConfig(@RequestBody ConfigRespPayload message) {
         template.convertAndSend("/topic/configResponse", new ConfigRespDTO(message));
         return ResponseEntity.ok().build();
     }
 
     @PostMapping("/alarms/{id}")
-    public ResponseEntity<Void> sendAlarm(@PathVariable("id") String id, @RequestBody AlarmPayload message) {
+    @KafkaListener(topics = "alarm", containerFactory = "kafkaListenerContainerAlarmFactory")
+    public ResponseEntity<Void> sendAlarm(@PathVariable("id") @Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String id,
+            @RequestBody AlarmPayload message) {
         message.setId(id);
         template.convertAndSend("/topic/alarm", new AlarmDTO(message));
         return ResponseEntity.ok().build();
     }
 
-    @MessageMapping("/sendMessage")
+    @MessageMapping("/send")
     public void receiveMessage(@Payload MessageDTO<String> textMessageDTO) {
         // receive message from client
     }
