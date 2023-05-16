@@ -21,7 +21,7 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Slf4j
-@Profile("prod")
+// @Profile("prod")
 public class BusinessService {
     @Value("${businness.manager.cachekey}")
     public String agentCacheKey;

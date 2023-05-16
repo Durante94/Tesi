@@ -15,16 +15,16 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Slf4j
-@Profile("dev")
+// @Profile("dev")
 public class BusinnesServiceDev {
     @Value("${businness.manager.cachekey}")
     public String agentCacheKey;
 
-    @Scheduled(fixedDelayString = "${businness.manager.updatedelay}")
-    @CachePut(value = "agents", key = "#root.target.agentCacheKey", unless = "#result.size() <= 0")
-    public List<String> agentsList() {
-        log.debug("Scheduled agent task");
-        return List.of("test", "test1");
-    }
+    // @Scheduled(fixedDelayString = "${businness.manager.updatedelay}")
+    // @CachePut(value = "agents", key = "#root.target.agentCacheKey", unless = "#result.size() <= 0")
+    // public List<String> agentsList() {
+    //     log.debug("Scheduled agent task");
+    //     return List.of("test", "test1");
+    // }
 }
 
