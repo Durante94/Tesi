@@ -1,6 +1,7 @@
 package com.fabrizio.tesi.rest.agent;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
@@ -9,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
+import org.springframework.cache.Cache.ValueWrapper;
+import org.springframework.cache.support.SimpleValueWrapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -59,7 +62,10 @@ public class AgentController {
             log.error("DESERIALIZZAZIONE: {} in {}", filter, TableRequestDTO.class.getName(), e.getMessage());
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Errore formato richiesta");
         }
-        return ((List<String>) agentCache.get(agentCacheKey).get())
+        Optional<ValueWrapper> cachedRef = Optional.ofNullable(
+                Optional.ofNullable(agentCache.get(agentCacheKey)).orElse(new SimpleValueWrapper(List.of())));
+
+        return ((List<String>) cachedRef.get().get())
                 .stream()
                 .filter(value -> deserilizedFilter.applyFiter(value))
                 .skip(deserilizedFilter.getSelectedPage() * deserilizedFilter.getPageSize())

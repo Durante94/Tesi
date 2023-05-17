@@ -14,6 +14,7 @@ import org.springframework.kafka.annotation.EnableKafka;
 import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
 import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
+import org.springframework.kafka.support.serializer.ErrorHandlingDeserializer;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
 
 import com.fabrizio.tesi.socket.dto.AlarmPayload;
@@ -63,7 +64,7 @@ public class KafkaConsumerConfig {
             {
                 put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class);
             }
-        }, new StringDeserializer(), new JsonDeserializer<>(ConfigRespPayload.class));
+        }, new StringDeserializer(), new ErrorHandlingDeserializer<>(new JsonDeserializer<>(ConfigRespPayload.class)));
     }
 
     @Bean
@@ -79,7 +80,7 @@ public class KafkaConsumerConfig {
             {
                 props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class);
             }
-        }, new StringDeserializer(), new JsonDeserializer<>(AlarmPayload.class));
+        }, new StringDeserializer(), new ErrorHandlingDeserializer<>(new JsonDeserializer<>(AlarmPayload.class)));
     }
 
     @Bean
