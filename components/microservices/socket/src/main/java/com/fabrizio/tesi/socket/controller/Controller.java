@@ -31,7 +31,9 @@ public class Controller {
 
     @PostMapping
     @KafkaListener(topics = "config-response", containerFactory = "kafkaListenerContainerConfigFactory")
-    public ResponseEntity<Void> sendConfig(@RequestBody ConfigRespPayload message) {
+    public ResponseEntity<Void> sendConfig(@RequestBody ConfigRespPayload message,
+            @Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String id) {
+        message.setAgentId(id);
         template.convertAndSend("/topic/configResponse", new ConfigRespDTO(message));
         return ResponseEntity.ok().build();
     }
