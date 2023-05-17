@@ -16,18 +16,17 @@ LOG_LEVEL = logging.INFO  # Set logging level: DEBUG, INFO, WARNING, ERROR, CRIT
 
 logging.basicConfig(level=LOG_LEVEL)
 
+
 def acked(err, msg):
     if err is not None:
-        logging.error("Failed to deliver message: %s: %s" % (str(msg), str(err)))
+        logging.error("Failed to deliver message: %s: %s" %
+                      (str(msg), str(err)))
     # else:
     #     logging.info("Message produced: %s" % (str(msg)))
 
-def producer_task(conf, flag, transmit):
-    producer = Producer(conf)
 
-    function = os.getenv("MATH_FUN")
-    amplitude = float(os.getenv('AMPLITUDE'))
-    frequency = float(os.getenv('FREQUENCY'))
+def producer_task(conf, flag, transmit, function, amplitude, frequency, partialKey):
+    producer = Producer(conf)
     math_func = getattr(np, function)
     t = 1
 
@@ -36,20 +35,22 @@ def producer_task(conf, flag, transmit):
         value = np.array2string(
             amplitude * math_func(t + np.pi / frequency))
         producer.produce("data",
-                            key=os.getenv("PARTIAL_KEY") + id,
-                            value=json.dumps(
-                                {"value": value}) .encode('utf-8'),
-                            callback=acked)
+                         key=partialKey + id,
+                         value=json.dumps(
+                             {"value": value}) .encode('utf-8'),
+                         callback=acked)
         producer.poll(2)
         t = t + 1
 
-def heartbeat_task(conf, flag):
+
+def heartbeat_task(conf, flag, sleepTime, partialKey):
     producer = Producer(conf)
     while flag:
-        time.sleep(int(os.getenv("HB_RATE")))
+        time.sleep(sleepTime)
         producer.produce("heartbeat",
-                            key=os.getenv("PARTIAL_KEY") + id,
-                            callback=acked)
+                         key=partialKey + id,
+                         callback=acked)
+
 
 manager = Manager()
 exit_flag = manager.Value('i', True)
@@ -63,16 +64,18 @@ logging.info("KAFKA_HOST: %s" % os.getenv("KAFKA_HOST"))
 
 consumer = Consumer({'bootstrap.servers': os.getenv("KAFKA_HOST"),
                     'group.id': "simulatore",
-                        'auto.offset.reset': 'earliest'})
+                     'auto.offset.reset': 'earliest'})
 producer = Producer(conf)
 function = os.getenv("MATH_FUN")
 amplitude = float(os.getenv("AMPLITUDE"))
 frequency = float(os.getenv('FREQUENCY'))
+hb_rate = int(os.getenv("HB_RATE"))
+key = os.getenv("PARTIAL_KEY")
 
 data_task = Process(target=producer_task, args=(
-    conf.copy(), exit_flag, transmit_flag))
+    conf.copy(), exit_flag, transmit_flag, function, amplitude, frequency, key))
 heartbeat_process = Process(target=heartbeat_task,
-                            args=(conf.copy(), exit_flag))
+                            args=(conf.copy(), exit_flag, hb_rate, key))
 heartbeat_process.start()
 consumer.subscribe(['config-request'])
 
@@ -88,7 +91,7 @@ try:
             if msg.error():
                 if msg.error().code() == KafkaError._PARTITION_EOF:
                     logging.warning('%% %s [%d] reached end at offset %d\n' %
-                            (msg.topic(), msg.partition(), msg.offset()))
+                                    (msg.topic(), msg.partition(), msg.offset()))
                 elif msg.error():
                     raise KafkaException(msg.error())
             else:
@@ -104,13 +107,13 @@ try:
                 match msg.key():
                     case b'request':
                         producer.produce('config-response',
-                                            key=os.getenv("PARTIAL_KEY") + id,
-                                            value=json.dumps({
-                                                'function': function,
-                                                'amplitude': amplitude,
-                                                'frequency': frequency
-                                            }).encode(),
-                                            callback=acked)
+                                         key=os.getenv("PARTIAL_KEY") + id,
+                                         value=json.dumps({
+                                             'function': function,
+                                             'amplitude': amplitude,
+                                             'frequency': frequency
+                                         }).encode(),
+                                         callback=acked)
                     case b'toggle':
                         if bool(str(msgValue["payload"]).capitalize()):
                             transmit_flag.set(True)
