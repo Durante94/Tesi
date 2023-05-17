@@ -25,7 +25,7 @@ def acked(err, msg):
     #     logging.info("Message produced: %s" % (str(msg)))
 
 
-def producer_task(conf, flag, transmit, function, amplitude, frequency, partialKey):
+def producer_task(conf, flag, transmit, function, amplitude, frequency, currentId):
     producer = Producer(conf)
     math_func = getattr(np, function)
     t = 1
@@ -35,7 +35,7 @@ def producer_task(conf, flag, transmit, function, amplitude, frequency, partialK
         value = np.array2string(
             amplitude * math_func(t + np.pi / frequency))
         producer.produce("data",
-                         key=partialKey + id,
+                         key=currentId,
                          value=json.dumps(
                              {"value": value}) .encode('utf-8'),
                          callback=acked)
@@ -43,12 +43,12 @@ def producer_task(conf, flag, transmit, function, amplitude, frequency, partialK
         t = t + 1
 
 
-def heartbeat_task(conf, flag, sleepTime, partialKey):
+def heartbeat_task(conf, flag, sleepTime, currentId):
     producer = Producer(conf)
     while flag:
         time.sleep(sleepTime)
         producer.produce("heartbeat",
-                         key=partialKey + id,
+                         key=currentId,
                          callback=acked)
 
 
@@ -70,12 +70,11 @@ function = os.getenv("MATH_FUN")
 amplitude = float(os.getenv("AMPLITUDE"))
 frequency = float(os.getenv('FREQUENCY'))
 hb_rate = int(os.getenv("HB_RATE"))
-key = os.getenv("PARTIAL_KEY")
 
 data_task = Process(target=producer_task, args=(
-    conf.copy(), exit_flag, transmit_flag, function, amplitude, frequency, key))
+    conf.copy(), exit_flag, transmit_flag, function, amplitude, frequency, id))
 heartbeat_process = Process(target=heartbeat_task,
-                            args=(conf.copy(), exit_flag, hb_rate, key))
+                            args=(conf.copy(), exit_flag, hb_rate, id))
 heartbeat_process.start()
 consumer.subscribe(['config-request'])
 
@@ -107,7 +106,7 @@ try:
                 match msg.key():
                     case b'request':
                         producer.produce('config-response',
-                                         key=os.getenv("PARTIAL_KEY") + id,
+                                         key=id,
                                          value=json.dumps({
                                              'function': function,
                                              'amplitude': amplitude,
