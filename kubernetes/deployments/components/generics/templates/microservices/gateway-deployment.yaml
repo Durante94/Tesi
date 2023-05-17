@@ -42,7 +42,7 @@ spec:
         - name: "SPRING_CLOUD_GATEWAY_ROUTES_1__ID"
           value: "frontend"
         - name: "SPRING_CLOUD_GATEWAY_ROUTES_1__URI"
-          value: "http://frontend-service.frontend.svc:3000"
+          value: "http://ui-service.frontend.svc:3000"
         - name: "SPRING_CLOUD_GATEWAY_ROUTES_1__PREDICATES_0"
           value: "Path=/web/**"
         - name: "SPRING_CLOUD_GATEWAY_ROUTES_1__FILTERS_0_"

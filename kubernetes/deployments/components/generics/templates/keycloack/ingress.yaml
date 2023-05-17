@@ -1,0 +1,21 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: keycloak
+  namespace: keycloak
+spec:
+#   tls:
+#     - hosts:
+#         - {{ .Values.global.fqdnIngressWamsFrontEnd | default .Values.gateway.ingress.fqdn }}
+#       secretName: mpdc-tls
+  rules:
+    - host: iot-handler.keycloak
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: keycloak    
+                port:
+                  number: 30080

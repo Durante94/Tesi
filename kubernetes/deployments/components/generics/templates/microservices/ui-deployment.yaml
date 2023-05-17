@@ -1,0 +1,34 @@
+apiVersion: apps/v1 
+kind: Deployment
+metadata:
+  name: ui
+  namespace: frontend
+spec:
+  selector:   
+    matchLabels:
+      app: ui
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: ui
+    spec:
+      containers:
+      - name: ui
+        image: docker.io/fabrizio294/ui:0.0.0
+        ports:
+        - containerPort: 3000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ui-service
+  namespace: frontend
+spec:
+  selector:
+    app: ui
+  type: ClusterIP
+  ports:
+  - name: http 
+    port: 3000
+    targetPort: 3000
