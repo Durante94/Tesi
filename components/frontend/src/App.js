@@ -11,7 +11,8 @@ const initialState = {
   detail: false,
   edit: false,
   id: null,
-  configuration: {},
+  configResp: null,
+  configReq: null,
   alarms: new Map()
 }, reducer = (state, action) => {
   switch (action.type) {
@@ -19,8 +20,10 @@ const initialState = {
       return { ...state, viewState: action.payload, detail: false };
     case "detail":
       return { ...state, ...action.payload };
-    case "config":
-      return { ...state, configuration: action.payload };
+    case "config-resp":
+      return { ...state, configResp: action.payload };
+    case "config-req":
+      return { ...state, configReq: action.payload };
     case "alarm":
       const alarms = new Map(state.alarms);
       alarms.set(action.payload.id, action.payload);
@@ -43,11 +46,9 @@ const initialState = {
 };
 
 function App() {
-  const [{ viewState, detail, edit, id, configuration, alarms }, dispatch] = useReducer(reducer, initialState);
+  const [{ viewState, detail, edit, id, configResp, configReq, alarms }, dispatch] = useReducer(reducer, initialState);
 
   const { Header, Content, Footer } = Layout;
-
-  const SavedWS = useCallback(() => <WebSocket {...{ dispatch }} />, [dispatch]);
 
   return (
     <Layout>
@@ -55,7 +56,7 @@ function App() {
       <Content className="content">
         {detail
           ?
-          <FormContent {...{ edit, id, configuration, dispatch }} />
+          <FormContent {...{ edit, id, configResp, dispatch }} />
           :
           <TableContent {...{ viewState, dispatch }} />
         }
@@ -77,7 +78,7 @@ function App() {
           />
         </Badge>
       </Footer>
-      <SavedWS />
+      <WebSocket {...{ dispatch }} request={configReq} />
     </Layout>
   );
 }

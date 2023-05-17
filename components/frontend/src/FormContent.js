@@ -16,7 +16,7 @@ const initialState = {
             return { ...state, loading: action.payload };
     }
 
-export const FormContent = ({ edit, id, dispatch, configuration }) => {
+export const FormContent = ({ edit, id, dispatch, configResp }) => {
     const [{ initialValues, loading }, dispatchForm] = useReducer(reducer, initialState);
     const [form] = Form.useForm();
     const changedAgent = Form.useWatch("agentId", form);
@@ -56,11 +56,11 @@ export const FormContent = ({ edit, id, dispatch, configuration }) => {
     }, [id, dispatchForm]);
 
     useEffect(() => {
-        if (configuration && changedAgent === configuration.agentId) {
-            form.setFieldsValue(configuration);
-            dispatch({ type: "config", payload: null })
+        if (configResp && changedAgent === configResp.agentId) {
+            form.setFieldsValue(configResp);
+            dispatch({ type: "config-resp", payload: null })
         }
-    }, [dispatch, form, configuration, changedAgent])
+    }, [dispatch, form, configResp, changedAgent])
 
     useEffect(() => form.setFieldsValue(initialValues), [form, initialValues]);
 
@@ -112,17 +112,7 @@ export const FormContent = ({ edit, id, dispatch, configuration }) => {
                     text="Request Configuration"
                     width="auto"
                     disabled={!changedAgent || !edit}
-                    onClick={() => {
-                        /// TODO: cancellami
-                        dispatch({
-                            type: "config", payload: {
-                                agentId: form.getFieldValue("agentId"),
-                                amplitude: 8,
-                                frequency: 5,
-                                function: "test"
-                            }
-                        });
-                    }}
+                    onClick={() => dispatch({ type: "config-req", payload: { id: form.getFieldValue("agentId") } })}
                 />
             </Col>
             <Col lg={{ offset: 15, span: 3 }} md={{ offset: 14, span: 3 }} sm={{ offset: 11, span: 4 }} xs={{ offset: 9, span: 5 }}>
