@@ -24,14 +24,13 @@ def acked(err, msg):
     #     print("Message produced: %s" % (str(msg)))
 
 
-def agent_check(agentDict, execute):
-    producer = Producer({'bootstrap.servers': os.getenv("KAFKA_HOST"),
-                            'client.id': socket.gethostname()})
+def agent_check(agentDict, execute, kafka, hbVal, hbTol):
+    producer = Producer({'bootstrap.servers': kafka,
+                         'client.id': socket.gethostname()})
     while execute:
         now = time.time()
-        hbVal = int(os.getenv("HB_RATE"))
         for id in agentDict.keys():
-            if now-agentDict[id] > hbVal+int(os.getenv("HB_RATE_TOL")):
+            if now-agentDict[id] > hbVal + hbTol:
                 producer.produce("alarm",
                                  key=id,
                                  value=json.dumps({
@@ -44,8 +43,8 @@ def agent_check(agentDict, execute):
     print("Agent check process closed")
 
 
-def heartbeat_ckeck(agentDict, execute):
-    consumer = Consumer({'bootstrap.servers': os.getenv("KAFKA_HOST"),
+def heartbeat_ckeck(agentDict, execute, kafka, partial_key):
+    consumer = Consumer({'bootstrap.servers': kafka,
                         'group.id': "manager",
                          'auto.offset.reset': 'smallest'})
     consumer.subscribe(['heartbeat'])
@@ -62,7 +61,7 @@ def heartbeat_ckeck(agentDict, execute):
                 elif msg.error():
                     raise KafkaException(msg.error())
             else:
-                key = msg.key().decode("utf-8").removeprefix(os.getenv("PARTIAL_KEY"))
+                key = msg.key().decode("utf-8").removeprefix(partial_key)
                 agentDict[key] = time.time()
         except KafkaException as e:
             print(e)
@@ -73,10 +72,16 @@ def heartbeat_ckeck(agentDict, execute):
 concurrentManager = Manager()
 agentDict = concurrentManager.dict()
 closeFlag = concurrentManager.Value('i', True)
+
+kafkaHost = os.getenv("KAFKA_HOST")
+hbVal = int(os.getenv("HB_RATE"))
+hbTol = int(os.getenv("HB_RATE_TOL"))
+key = os.getenv("PARTIAL_KEY")
+
 agent_controller_task = Process(
-    target=agent_check, args=(agentDict, closeFlag))
+    target=agent_check, args=(agentDict, closeFlag, kafkaHost, hbVal, hbTol))
 heartbeat_controller_task = Process(
-    target=heartbeat_ckeck, args=(agentDict, closeFlag))
+    target=heartbeat_ckeck, args=(agentDict, closeFlag, kafkaHost, key))
 agent_controller_task.start()
 heartbeat_controller_task.start()
 
