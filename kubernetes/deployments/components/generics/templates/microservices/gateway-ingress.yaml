@@ -4,10 +4,6 @@ metadata:
   name: fe-ingress
   namespace: frontend
 spec:
-#   tls:
-#     - hosts:
-#         - {{ .Values.global.fqdnIngressWamsFrontEnd | default .Values.gateway.ingress.fqdn }}
-#       secretName: mpdc-tls
   rules:
     - host: iot-handler
       http:

@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
       - name: "simulatore"
-        image: docker.io/fabrizio294/simulatore:0.0.5
+        image: docker.io/fabrizio294/simulatore:0.0.6
         env:
         - name: "KAFKA_HOST"
           value: "local-cluster-kafka-bootstrap.kafka.svc:9092"

@@ -1,0 +1,25 @@
+apiVersion: apps/v1 
+kind: Deployment
+metadata:
+  name: socket
+  namespace: frontend
+spec:
+  selector:   
+    matchLabels:
+      app: socket
+  template:
+    metadata:
+      labels:
+        app: socket
+    spec:
+      containers:
+      - name: "socket"
+        image: docker.io/fabrizio294/socket-service:0.0.0
+        ports:
+        - containerPort: 8000
+        env:
+        - name: "SPRING_PROFILES_ACTIVE"
+          value: ""
+        - name: "SPRING_KAFKA_BOOTSTRAP-SERVERS"
+          value: "{{ .Values.global.internalKafkaFqdn }}:{{ .Values.global.internalKafkaPort }}"
+

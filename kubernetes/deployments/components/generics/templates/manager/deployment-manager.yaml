@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: manager-backend
-          image: docker.io/fabrizio294/manager:0.0.2
+          image: docker.io/fabrizio294/manager:0.0.3
           ports:
             - containerPort: 8000
           env:

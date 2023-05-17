@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: "rest"
-        image: docker.io/fabrizio294/rest-service:0.0.4
+        image: docker.io/fabrizio294/rest-service:0.0.5
         ports:
         - containerPort: 8000
         env:
