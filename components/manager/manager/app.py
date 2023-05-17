@@ -43,7 +43,7 @@ def agent_check(agentDict, execute, kafka, hbVal, hbTol):
     print("Agent check process closed")
 
 
-def heartbeat_ckeck(agentDict, execute, kafka, partial_key):
+def heartbeat_ckeck(agentDict, execute, kafka):
     consumer = Consumer({'bootstrap.servers': kafka,
                         'group.id': "manager",
                          'auto.offset.reset': 'smallest'})
@@ -61,7 +61,7 @@ def heartbeat_ckeck(agentDict, execute, kafka, partial_key):
                 elif msg.error():
                     raise KafkaException(msg.error())
             else:
-                key = msg.key().decode("utf-8").removeprefix(partial_key)
+                key = msg.key().decode("utf-8")
                 agentDict[key] = time.time()
         except KafkaException as e:
             print(e)
@@ -76,12 +76,11 @@ closeFlag = concurrentManager.Value('i', True)
 kafkaHost = os.getenv("KAFKA_HOST")
 hbVal = int(os.getenv("HB_RATE"))
 hbTol = int(os.getenv("HB_RATE_TOL"))
-key = os.getenv("PARTIAL_KEY")
 
 agent_controller_task = Process(
     target=agent_check, args=(agentDict, closeFlag, kafkaHost, hbVal, hbTol))
 heartbeat_controller_task = Process(
-    target=heartbeat_ckeck, args=(agentDict, closeFlag, kafkaHost, key))
+    target=heartbeat_ckeck, args=(agentDict, closeFlag, kafkaHost))
 agent_controller_task.start()
 heartbeat_controller_task.start()
 
