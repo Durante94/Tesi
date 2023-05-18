@@ -13,9 +13,11 @@ spec:
       labels:
         app: ui
     spec:
+      imagePullSecrets:
+        - name: docker-registry-secret
       containers:
       - name: ui
-        image: docker.io/fabrizio294/ui:0.0.0
+        image: docker.io/fabrizio294/ui:0.0.3
         ports:
         - containerPort: 3000
 ---

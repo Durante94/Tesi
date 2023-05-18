@@ -12,6 +12,8 @@ spec:
       labels:
         app: socket
     spec:
+      imagePullSecrets:
+        - name: docker-registry-secret
       containers:
       - name: "socket"
         image: docker.io/fabrizio294/socket-service:0.0.0

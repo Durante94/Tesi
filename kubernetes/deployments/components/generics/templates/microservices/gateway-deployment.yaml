@@ -12,6 +12,8 @@ spec:
       labels:
         app: gateway
     spec:
+      imagePullSecrets:
+        - name: docker-registry-secret
       containers:
       - name: "gateway"
         image: docker.io/fabrizio294/gateway:0.0.3
@@ -19,7 +21,7 @@ spec:
         - containerPort: 7080
         env:
         - name: "AUTH_ENABLE"
-          value: "true"
+          value: "false"
         - name: "AUTH_SECRET"
           valueFrom:
             secretKeyRef:
@@ -32,7 +34,7 @@ spec:
         - name: KEYCLOACK_FEINGRESS
           value: "http://{{ .Values.global.ingressFrontEnd }}"
         - name: KEYCLOACK_OIDCADDR
-          value: "http://keycloak.keycloak.svc:8080/auth"
+          value: "http://192.168.230.129:30090/auth"
         - name: "SPRING_CLOUD_GATEWAY_ROUTES_0__ID"
           value: "favicon"
         - name: "SPRING_CLOUD_GATEWAY_ROUTES_0__URI"

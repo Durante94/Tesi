@@ -13,6 +13,8 @@ spec:
       labels:
         app: manager-backend
     spec:
+      imagePullSecrets:
+        - name: docker-registry-secret
       containers:
         - name: manager-backend
           image: docker.io/fabrizio294/manager:0.0.3

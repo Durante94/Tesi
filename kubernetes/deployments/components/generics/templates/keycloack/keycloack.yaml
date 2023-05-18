@@ -9,9 +9,10 @@ spec:
   ports:
   - port: 8080
     targetPort: 8080
+    nodePort: 30090
   selector:
     app: keycloak
-  type: ClusterIP
+  type: NodePort
 ---
 apiVersion: apps/v1
 kind: Deployment
