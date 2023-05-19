@@ -34,7 +34,10 @@ spec:
       containers:
       - name: keycloak
         image: quay.io/keycloak/keycloak:21.1.1
-        args: ["start-dev"]
+        args: ["start-dev", "--import-realm"] # COMMENTAMI "start-dev" IN PROD
+        volumeMounts:
+        - name: keycloak-config
+          mountPath: /opt/keycloak/data/import
         env:
         - name: KEYCLOAK_ADMIN
           valueFrom:
@@ -73,6 +76,10 @@ spec:
           httpGet:
             path: /realms/master
             port: 8080
+      volumes:
+      - name: keycloak-config
+        configMap:
+          name: keycloak-configmap
 ---
 apiVersion: v1
 kind: Secret
