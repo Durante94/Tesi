@@ -57,6 +57,13 @@ k0s install controller --single --enable-worker;
 Finally
 ```
 kc config view -o yaml --raw > /k0s/config.yaml
+```
+If the above command retrieve a empty config file, use this one as fallback:
+```
+k0s kubeconfig admin > /k0s/config.yaml
+```
+Last configuration command:
+```
 export KUBECONFIG=/k0s/config.yaml
 ```
 ## Installing k9s
