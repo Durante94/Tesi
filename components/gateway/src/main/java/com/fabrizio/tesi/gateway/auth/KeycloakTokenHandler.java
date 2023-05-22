@@ -25,64 +25,65 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public abstract class KeycloakTokenHandler {
 
-    @Value("${keycloack.feingress}")
-    String HOST;
+	@Value("${keycloack.feingress}")
+	String HOST;
 
-    @Value("${keycloack.oidcaddr}")
-    String OIDCHOST;
+	@Value("${keycloack.oidcaddr}")
+	String OIDCHOST;
 
-    @Value("${keycloack.clientid}")
-    String clientid;
+	@Value("${keycloack.clientid}")
+	String clientid;
 
-    @Value("${auth.secret}")
-    String CLIENT_SECRET;
+	@Value("${auth.secret}")
+	String CLIENT_SECRET;
 
-    @Value("${keycloack.realm}")
-    String realm;
+	@Value("${keycloack.realm}")
+	String realm;
 
-    protected String postData;
+	protected String postData;
 
-    public KeycloakTokenHandler() {
-        this.postData = "";
-        disableCertificateValidation();
-    }
+	public KeycloakTokenHandler() {
+		this.postData = "";
+		disableCertificateValidation();
+	}
 
-    protected abstract String getGrantType();
+	protected abstract String getGrantType();
 
-    protected abstract void setPostDataParam(String value);
+	protected abstract void setPostDataParam(String value);
 
-    private void disableCertificateValidation() {
-        try {
-            SSLContext sc = SSLContext.getInstance("TLS");
-            TrustManager[] trustAllCerts = new TrustManager[] { new X509TrustManager() {
-                public X509Certificate[] getAcceptedIssuers() {
-                    return null;
-                }
+	private void disableCertificateValidation() {
+		try {
+			SSLContext sc = SSLContext.getInstance("TLS");
+			TrustManager[] trustAllCerts = new TrustManager[] { new X509TrustManager() {
+				public X509Certificate[] getAcceptedIssuers() {
+					return null;
+				}
 
-                public void checkClientTrusted(X509Certificate[] certs, String authType) {
-                }
+				public void checkClientTrusted(X509Certificate[] certs, String authType) {
+				}
 
-                public void checkServerTrusted(X509Certificate[] certs, String authType) {
-                }
-            }};
-            sc.init(null, trustAllCerts, new SecureRandom());
-            HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
+				public void checkServerTrusted(X509Certificate[] certs, String authType) {
+				}
+			} };
+			sc.init(null, trustAllCerts, new SecureRandom());
+			HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
 
-            HostnameVerifier allHostsValid = new HostnameVerifier() {
-                public boolean verify(String hostname, SSLSession session) {
-                    return true;
-                }
-            };
-            HttpsURLConnection.setDefaultHostnameVerifier(allHostsValid);
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to disable certificate validation", e);
-        }
-    }
+			HostnameVerifier allHostsValid = new HostnameVerifier() {
+				public boolean verify(String hostname, SSLSession session) {
+					return true;
+				}
+			};
+			HttpsURLConnection.setDefaultHostnameVerifier(allHostsValid);
+		} catch (Exception e) {
+			throw new RuntimeException("Failed to disable certificate validation", e);
+		}
+	}
 
 	public String getToken(String value) throws IOException {
 		setPostDataParam(value);
 		URL url = new URL(OIDCHOST + "/realms/" + realm + "/protocol/openid-connect/token");
-		HttpsURLConnection con = (HttpsURLConnection) url.openConnection();
+		// HttpsURLConnection con = (HttpsURLConnection) url.openConnection();
+		HttpURLConnection con = (HttpURLConnection) url.openConnection();
 		con.setRequestMethod("POST");
 		con.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
 		String postData = "client_secret=" + CLIENT_SECRET + "&client_id=" + clientid + "&grant_type=" + getGrantType()
@@ -114,7 +115,7 @@ public abstract class KeycloakTokenHandler {
 		HttpsURLConnection con = (HttpsURLConnection) url.openConnection();
 		con.setRequestMethod("POST");
 		con.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
-		String postData = "client_secret=" + CLIENT_SECRET +"&refresh_token=" + idToken + "&client_id=" + clientid;
+		String postData = "client_secret=" + CLIENT_SECRET + "&refresh_token=" + idToken + "&client_id=" + clientid;
 		byte[] postDataBytes = postData.getBytes(StandardCharsets.UTF_8);
 		con.setDoOutput(true);
 		try (DataOutputStream dos = new DataOutputStream(con.getOutputStream())) {
