@@ -1,10 +1,11 @@
-import { useCallback, useReducer } from "react";
+import { useReducer } from "react";
 import { Badge, Layout, Modal } from "antd";
+import { LogoutOutlined } from "@ant-design/icons";
 import { TableContent } from "./TableContent";
 import { FormContent } from "./FormContent";
 import './App.css';
 import { WebSocket } from "./WebSocket";
-import { GenericButton } from "./buttons/buttons";
+import { GenericButton, Delete } from "./buttons/buttons";
 
 const initialState = {
   viewState: {},
@@ -15,6 +16,7 @@ const initialState = {
   configReq: null,
   alarms: new Map()
 }, reducer = (state, action) => {
+  let alarms;
   switch (action.type) {
     case "table":
       return { ...state, viewState: action.payload, detail: false };
@@ -25,8 +27,12 @@ const initialState = {
     case "config-req":
       return { ...state, configReq: action.payload };
     case "alarm":
-      const alarms = new Map(state.alarms);
+      alarms = new Map(state.alarms);
       alarms.set(action.payload.id, action.payload);
+      return { ...state, alarms }
+    case "toggle-alarm":
+      alarms = new Map(state.alarms);
+      alarms.delete(action.payload);
       return { ...state, alarms }
     default:
       return state;
@@ -52,7 +58,14 @@ function App() {
 
   return (
     <Layout>
-      <Header className="header">My IOT Device Handler</Header>
+      <Header className="header">
+        My IOT Device Handler
+        <LogoutOutlined
+          style={{ fontSize: 30, lineHeight: "64px" }}
+          title={"Logout"}
+          onClick={() => axios.post("/gateway/auth/logout").finally(() => window.location.reload())}
+        />
+      </Header>
       <Content className="content">
         {detail
           ?
@@ -69,7 +82,12 @@ function App() {
             danger
             onClick={() => Modal.info({
               title: "Active Alarms",
-              content: <>{[...alarms.entries()].map((pair, key) => <p {...{ key }}><b>Agent {pair[0]}</b>: {formatAlarm(pair[1])}</p>)}</>,
+              content: <>
+                {[...alarms.entries()].map((pair, key) => <p {...{ key }}>
+                  <b>Agent {pair[0]}</b>: {formatAlarm(pair[1])}
+                  <Delete danger={true} onClick={() => dispatch({ type: "toggle-alarm", payload: pair[0] })} />
+                </p>)}
+              </>,
               closable: true,
               centered: true,
               width: "60vw"
