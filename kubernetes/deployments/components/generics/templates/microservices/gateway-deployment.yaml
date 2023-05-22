@@ -16,25 +16,25 @@ spec:
         - name: docker-registry-secret
       containers:
       - name: "gateway"
-        image: docker.io/fabrizio294/gateway:0.0.3
+        image: docker.io/fabrizio294/gateway:0.0.4
         ports:
         - containerPort: 7080
         env:
         - name: "AUTH_ENABLE"
-          value: "false"
+          value: "true"
         - name: "AUTH_SECRET"
           valueFrom:
             secretKeyRef:
               name: gateway-secret
               key: secretOidc
         - name: KEYCLOACK_REALM
-          value: "a"
+          value: "tesi"
         - name: KEYCLOACK_CLIENTID
-          value: "a"
+          value: "tesi-client"
         - name: KEYCLOACK_FEINGRESS
-          value: "http://{{ .Values.global.ingressFrontEnd }}"
+          value: "http://192.168.230.129:30080"
         - name: KEYCLOACK_OIDCADDR
-          value: "http://192.168.230.129:30090/auth"
+          value: "http://192.168.230.129:30090"
         - name: "SPRING_CLOUD_GATEWAY_ROUTES_0__ID"
           value: "favicon"
         - name: "SPRING_CLOUD_GATEWAY_ROUTES_0__URI"
@@ -44,7 +44,7 @@ spec:
         - name: "SPRING_CLOUD_GATEWAY_ROUTES_1__ID"
           value: "frontend"
         - name: "SPRING_CLOUD_GATEWAY_ROUTES_1__URI"
-          value: "http://ui-service.frontend.svc:3000"
+          value: "http://ui-service.frontend.svc:8080"
         - name: "SPRING_CLOUD_GATEWAY_ROUTES_1__PREDICATES_0"
           value: "Path=/web/**"
         - name: "SPRING_CLOUD_GATEWAY_ROUTES_1__FILTERS_0_"
@@ -60,16 +60,16 @@ spec:
         - name: "SPRING_CLOUD_GATEWAY_ROUTES_2__PREDICATES_0"
           value: "Path=/api/**"
         - name: "SPRING_CLOUD_GATEWAY_ROUTES_2__FILTERS_0_"
-          value: "TokenRelayFilter"
-        - name: "SPRING_CLOUD_GATEWAY_ROUTES_2__FILTERS_1_"
           value: "CheckAuth"
+        - name: "SPRING_CLOUD_GATEWAY_ROUTES_2__FILTERS_1_"
+          value: "TokenRelayFilter"
         - name: "SPRING_CLOUD_GATEWAY_ROUTES_3__ID"
-          value: "rest-service"
+          value: "socket-service"
         - name: "SPRING_CLOUD_GATEWAY_ROUTES_3__URI"
           value: "http://socket-service.frontend.svc:8080"
         - name: "SPRING_CLOUD_GATEWAY_ROUTES_3__PREDICATES_0"
           value: "Path=/ws-message/**"
         - name: "SPRING_CLOUD_GATEWAY_ROUTES_3__FILTERS_0_"
-          value: "TokenRelayFilter"
-        - name: "SPRING_CLOUD_GATEWAY_ROUTES_3__FILTERS_1_"
           value: "CheckAuth"
+        - name: "SPRING_CLOUD_GATEWAY_ROUTES_3__FILTERS_1_"
+          value: "TokenRelayFilter"
