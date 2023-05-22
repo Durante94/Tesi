@@ -25,29 +25,39 @@ def acked(err, msg):
 
 
 def agent_check(agentDict, execute, kafka, hbVal, hbTol):
-    producer = Producer({'bootstrap.servers': kafka,
-                         'client.id': socket.gethostname()})
+    producer = Producer({"bootstrap.servers": kafka, "client.id": socket.gethostname()})
+    alarmSended = {}
     while execute:
         now = time.time()
         for id in agentDict.keys():
-            if now-agentDict[id] > hbVal + hbTol:
-                producer.produce("alarm",
-                                 key=id,
-                                 value=json.dumps({
-                                     'type': "connection",
-                                     'time': now,
-                                     'lastHB': agentDict[id]
-                                 }).encode(),
-                                 callback=acked)
+            if now - agentDict[id] > hbVal + hbTol:
+                if alarmSended.get(id) == None:
+                    producer.produce(
+                        "alarm",
+                        key=id,
+                        value=json.dumps(
+                            {"type": "connection", "time": now, "lastHB": agentDict[id]}
+                        ).encode(),
+                        callback=acked,
+                    )
+                    alarmSended[id] = False
+                elif alarmSended.get(id):
+                    agentDict.pop(id)
+                else:
+                    alarmSended[id] = True
         time.sleep(hbVal)
     print("Agent check process closed")
 
 
 def heartbeat_ckeck(agentDict, execute, kafka):
-    consumer = Consumer({'bootstrap.servers': kafka,
-                        'group.id': "manager",
-                         'auto.offset.reset': 'smallest'})
-    consumer.subscribe(['heartbeat'])
+    consumer = Consumer(
+        {
+            "bootstrap.servers": kafka,
+            "group.id": "manager",
+            "auto.offset.reset": "smallest",
+        }
+    )
+    consumer.subscribe(["heartbeat"])
     while execute:
         try:
             msg = consumer.poll(timeout=60.0)
@@ -56,8 +66,10 @@ def heartbeat_ckeck(agentDict, execute, kafka):
 
             if msg.error():
                 if msg.error().code() == KafkaError._PARTITION_EOF:
-                    print('%% %s [%d] reached end at offset %d\n' %
-                          (msg.topic(), msg.partition(), msg.offset()))
+                    print(
+                        "%% %s [%d] reached end at offset %d\n"
+                        % (msg.topic(), msg.partition(), msg.offset())
+                    )
                 elif msg.error():
                     raise KafkaException(msg.error())
             else:
@@ -71,23 +83,25 @@ def heartbeat_ckeck(agentDict, execute, kafka):
 
 concurrentManager = Manager()
 agentDict = concurrentManager.dict()
-closeFlag = concurrentManager.Value('i', True)
+closeFlag = concurrentManager.Value("i", True)
 
 kafkaHost = os.getenv("KAFKA_HOST")
 hbVal = int(os.getenv("HB_RATE"))
 hbTol = int(os.getenv("HB_RATE_TOL"))
 
 agent_controller_task = Process(
-    target=agent_check, args=(agentDict, closeFlag, kafkaHost, hbVal, hbTol))
+    target=agent_check, args=(agentDict, closeFlag, kafkaHost, hbVal, hbTol)
+)
 heartbeat_controller_task = Process(
-    target=heartbeat_ckeck, args=(agentDict, closeFlag, kafkaHost))
+    target=heartbeat_ckeck, args=(agentDict, closeFlag, kafkaHost)
+)
 agent_controller_task.start()
 heartbeat_controller_task.start()
 
 # RESTFul init
 app = application = falcon.App()
 agentsEndpoint = List(agentDict)
-app.add_route('/', agentsEndpoint)
+app.add_route("/", agentsEndpoint)
 
 closeFlag.set(False)
 # agent_controller_task.terminate()
