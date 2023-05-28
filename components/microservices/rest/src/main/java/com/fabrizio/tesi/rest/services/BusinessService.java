@@ -36,7 +36,7 @@ public class BusinessService {
     }
 
     @Scheduled(fixedDelayString = "${businness.manager.updatedelay}")
-    @CachePut(value = "agents", key = "#root.target.agentCacheKey", unless = "#result.size() <= 0")
+    @CachePut(value = "agents", key = "#root.target.agentCacheKey")
     public List<String> agentsList() {
         log.debug("Scheduled agent task");
         ResponseEntity<List<String>> agents;

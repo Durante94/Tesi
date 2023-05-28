@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -39,9 +40,11 @@ public class CRUDController {
     @GetMapping
     @ResponseBody
     public ResponseTable<TableResponseDTO> listElem(
-            @RequestParam(required = false, defaultValue = "{}") String filter) {
+            @RequestParam(required = false, defaultValue = "{}") String filter,
+            @RequestHeader Map<String, String> headers) {
         try {
-            return service.getList(jsonMapper.readValue(filter, TableRequestDTO.class), true);
+            return service.getList(jsonMapper.readValue(filter, TableRequestDTO.class),
+                    headers.getOrDefault("role", "").equals("admin"));
         } catch (JsonProcessingException e) {
             log.error("DESERIALIZZAZIONE: {} in {}", filter, TableRequestDTO.class.getName(), e.getMessage());
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Errore formato richiesta");

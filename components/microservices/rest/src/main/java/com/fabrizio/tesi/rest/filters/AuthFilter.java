@@ -48,8 +48,8 @@ public class AuthFilter extends OncePerRequestFilter {
                 filterChain.doFilter(mutableRequest, response);
             } catch (IOException | ServletException e) {
                 log.error("Filter error:", e);
-                return;
             }
+            return;
         }
         String token = request.getHeader("Authorization");
 
