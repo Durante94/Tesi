@@ -21,6 +21,6 @@ export const WebSocket = ({ dispatch, request }) => {
         ref={cli => { client.current = cli }}
         onConnect={() => { console.log("WS Connected") }}
         onDisconnect={() => { console.log("WS Disconnected") }}
-        onConnectFailure={err => console.error(err)}
+        onConnectFailure={err => console.log(err)}
     />
 };

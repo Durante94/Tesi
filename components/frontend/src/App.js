@@ -1,11 +1,13 @@
 import { useReducer } from "react";
 import { Badge, Layout, Modal } from "antd";
 import { LogoutOutlined } from "@ant-design/icons";
+import axios from "axios";
 import { TableContent } from "./TableContent";
 import { FormContent } from "./FormContent";
 import './App.css';
 import { WebSocket } from "./WebSocket";
 import { GenericButton, Delete } from "./buttons/buttons";
+import { AuthenticationRetainer } from "./AuthenticationRetainer"
 
 const initialState = {
   viewState: {},
@@ -97,6 +99,7 @@ function App() {
         </Badge>
       </Footer>
       <WebSocket {...{ dispatch }} request={configReq} />
+      <AuthenticationRetainer />
     </Layout>
   );
 }
