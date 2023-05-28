@@ -41,6 +41,7 @@ spec:
           value: "forward:///favicon.ico"
         - name: "SPRING_CLOUD_GATEWAY_ROUTES_0__PREDICATES_0"
           value: "Path=**/favicon.ico"
+
         - name: "SPRING_CLOUD_GATEWAY_ROUTES_1__ID"
           value: "frontend"
         - name: "SPRING_CLOUD_GATEWAY_ROUTES_1__URI"
@@ -53,6 +54,7 @@ spec:
           value: "CheckAuth"
         - name: "SPRING_CLOUD_GATEWAY_ROUTES_1__FILTERS_2_"
           value: "TokenRelayFilter"
+
         - name: "SPRING_CLOUD_GATEWAY_ROUTES_2__ID"
           value: "rest-service"
         - name: "SPRING_CLOUD_GATEWAY_ROUTES_2__URI"
@@ -63,6 +65,7 @@ spec:
           value: "CheckAuth"
         - name: "SPRING_CLOUD_GATEWAY_ROUTES_2__FILTERS_1_"
           value: "TokenRelayFilter"
+
         - name: "SPRING_CLOUD_GATEWAY_ROUTES_3__ID"
           value: "socket-service"
         - name: "SPRING_CLOUD_GATEWAY_ROUTES_3__URI"
@@ -72,4 +75,15 @@ spec:
         - name: "SPRING_CLOUD_GATEWAY_ROUTES_3__FILTERS_0_"
           value: "CheckAuth"
         - name: "SPRING_CLOUD_GATEWAY_ROUTES_3__FILTERS_1_"
+          value: "TokenRelayFilter"
+
+        - name: "SPRING_CLOUD_GATEWAY_ROUTES_4__ID"
+          value: "frontend-static"
+        - name: "SPRING_CLOUD_GATEWAY_ROUTES_4__URI"
+          value: "http://ui-service.frontend.svc:8080"
+        - name: "SPRING_CLOUD_GATEWAY_ROUTES_4__PREDICATES_0"
+          value: "Path=/static/**"
+        - name: "SPRING_CLOUD_GATEWAY_ROUTES_4__FILTERS_0_"
+          value: "CheckAuth"
+        - name: "SPRING_CLOUD_GATEWAY_ROUTES_4__FILTERS_1_"
           value: "TokenRelayFilter"
