@@ -28,23 +28,34 @@ def agent_check(agentDict, execute, kafka, hbVal, hbTol):
     producer = Producer({"bootstrap.servers": kafka, "client.id": socket.gethostname()})
     alarmSended = {}
     while execute:
+        keys_to_remove = []
         now = time.time()
-        for id in agentDict.keys():
-            if now - agentDict[id] > hbVal + hbTol:
+        try:
+            iterated_dict = agentDict.copy()
+        except BrokenPipeError as e:
+            print(e)
+            iterated_dict = {}
+            time.sleep(hbVal)
+            continue
+
+        for id in iterated_dict.keys():
+            if now - iterated_dict[id] > hbVal + hbTol:
                 if alarmSended.get(id) == None:
                     producer.produce(
                         "alarm",
                         key=id,
                         value=json.dumps(
-                            {"type": "connection", "time": now, "lastHB": agentDict[id]}
+                            {"type": "connection", "time": now, "lastHB": iterated_dict[id]}
                         ).encode(),
                         callback=acked,
                     )
                     alarmSended[id] = False
                 elif alarmSended.get(id):
-                    agentDict.pop(id)
+                    keys_to_remove.append(id)
                 else:
                     alarmSended[id] = True
+        for id in keys_to_remove:
+            del agentDict[id]
         time.sleep(hbVal)
     print("Agent check process closed")
 
@@ -77,6 +88,8 @@ def heartbeat_ckeck(agentDict, execute, kafka):
                 agentDict[key] = time.time()
         except KafkaException as e:
             print(e)
+        except Exception as general:
+            print(general)
     consumer.close()
     print("Heartbeat process closed")
 
