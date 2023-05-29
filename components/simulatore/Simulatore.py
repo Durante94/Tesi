@@ -29,11 +29,12 @@ def producer_task(conf, flag, transmit, function, amplitude, frequency, currentI
     producer = Producer(conf)
     math_func = getattr(np, function)
     t = 1
-
+    logging.debug("Data task started")
     while flag and transmit:
         time.sleep(1)
         value = np.array2string(
             amplitude * math_func(t + np.pi / frequency))
+        logging.debug(value)
         producer.produce("data",
                          key=currentId,
                          value=json.dumps(
@@ -45,6 +46,7 @@ def producer_task(conf, flag, transmit, function, amplitude, frequency, currentI
 
 def heartbeat_task(conf, flag, sleepTime, currentId):
     producer = Producer(conf)
+    logging.debug("Heartbeat task started")
     while flag:
         time.sleep(sleepTime)
         producer.produce("heartbeat",
@@ -60,7 +62,7 @@ conf = {
     'client.id': socket.gethostname()
 }
 logging.debug("Kafka configuration: %s" % conf)
-logging.info("KAFKA_HOST: %s" % os.getenv("KAFKA_HOST"))
+logging.debug("KAFKA_HOST: %s" % os.getenv("KAFKA_HOST"))
 
 consumer = Consumer({'bootstrap.servers': os.getenv("KAFKA_HOST"),
                     'group.id': "simulatore",
@@ -76,14 +78,20 @@ data_task = Process(target=producer_task, args=(
 heartbeat_process = Process(target=heartbeat_task,
                             args=(conf.copy(), exit_flag, hb_rate, id))
 heartbeat_process.start()
-consumer.subscribe(['config-request'])
+while True:
+    try:
+        consumer.subscribe(['config-request'])
+        break
+    except Exception as e:
+        logging.warn("%%Consumer error: %s" % e)
+        continue
 
 try:
     logging.info("Started")
     while True:
         try:
             msg = consumer.poll(timeout=60.0)
-            logging.info("Message consumed: %s" % str(msg))
+            logging.debug("Message consumed: %s" % str(msg))
             if msg is None:
                 continue
 
@@ -114,18 +122,18 @@ try:
                                          }).encode(),
                                          callback=acked)
                     case b'toggle':
-                        if bool(str(msgValue["payload"]).capitalize()):
+                        if eval(str(msgValue["payload"]).capitalize()):
                             transmit_flag.set(True)
                             data_task.start()
                         else:
                             transmit_flag.set(False)
-                            # data_task.terminate()
+                            data_task.terminate()
         except KafkaException as e:
             logging.error("KafkaException: %s" % e)
 finally:
     consumer.close()
     exit_flag.set(False)
     transmit_flag.set(False)
-    heartbeat_process.join()
+    heartbeat_process.terminate()
     if data_task.is_alive():
-        data_task.join()
+        data_task.terminate()
