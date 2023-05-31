@@ -44,7 +44,7 @@ public class CRUDController {
             @RequestHeader Map<String, String> headers) {
         try {
             return service.getList(jsonMapper.readValue(filter, TableRequestDTO.class),
-                    headers.getOrDefault("role", "").equals("admin"));
+                    headers.getOrDefault("role", "").equalsIgnoreCase("admin"));
         } catch (JsonProcessingException e) {
             log.error("DESERIALIZZAZIONE: {} in {}", filter, TableRequestDTO.class.getName(), e.getMessage());
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Errore formato richiesta");
