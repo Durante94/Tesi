@@ -16,7 +16,7 @@ spec:
         - name: docker-registry-secret
       containers:
       - name: "rest"
-        image: docker.io/fabrizio294/rest-service:0.0.7
+        image: docker.io/fabrizio294/rest-service:0.0.8
         ports:
         - containerPort: 8000
         env:
@@ -36,6 +36,8 @@ spec:
             secretKeyRef:
               name: rest-secret
               key: passwordSql
+        - name: "AUTH_ENABLE"
+          value: "true"
         - name: "AUTH_SECRET"
           valueFrom:
             secretKeyRef:

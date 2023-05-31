@@ -34,7 +34,7 @@ spec:
       containers:
       - name: keycloak
         image: quay.io/keycloak/keycloak:21.1.1
-        args: ["start-dev", "--import-realm"] # COMMENTAMI "start-dev" IN PROD
+        args: ["start-dev", "--import-realm", "--db=${DB_VENDOR}", "--db-url=\"${KEYCLOAK_DB_URL}\"", "--db-username=\"${KEYCLOAK_DB_USER}\"", "--db-password=\"${KEYCLOAK_DB_PASSWORD}\""] # SOSTITUISCI "start-dev" IN PROD CON "start"
         volumeMounts:
         - name: keycloak-config
           mountPath: /opt/keycloak/data/import
@@ -51,20 +51,18 @@ spec:
               key: password
         - name: KC_PROXY
           value: "edge"
-        - name: "DB_VENDOR"
+        - name: DB_VENDOR
           value: "mysql"
-        - name: "DB_ADDR"
-          value: "{{ .Values.global.mySqlHost }}"
-        - name: "DB_PORT"
-          value: "{{ .Values.global.mySqlPort }}"
-        - name: "DB_DATABASE"
+        - name: "KEYCLOAK_DB_URL"
+          value: "jdbc:mysql://{{ .Values.global.mySqlHost }}:{{ .Values.global.mySqlPort }}/keycloak"
+        - name: "KEYCLOAK_DB_NAME"
           value: "keycloak"
-        - name: "DB_USER"
+        - name: "KEYCLOAK_DB_USER"
           valueFrom:
             secretKeyRef:
               name: keycloak-secret
               key: usernameSql
-        - name: "DB_PASSWORD"
+        - name: "KEYCLOAK_DB_PASSWORD"
           valueFrom:
             secretKeyRef:
               name: keycloak-secret

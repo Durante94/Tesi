@@ -20,6 +20,8 @@ spec:
         ports:
         - containerPort: 7080
         env:
+        - name: "AUTH_SHOWJWT"
+          value: "false"
         - name: "AUTH_ENABLE"
           value: "true"
         - name: "AUTH_SECRET"
