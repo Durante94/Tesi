@@ -26,13 +26,13 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
         registry.addEndpoint(String.format("/%s", endpont)).withSockJS();
     }
 
-    @Bean
-    FilterRegistrationBean<AuthFilter> authFilter() {
-        FilterRegistrationBean<AuthFilter> bean = new FilterRegistrationBean<>();
+    // @Bean
+    // FilterRegistrationBean<AuthFilter> authFilter() {
+    //     FilterRegistrationBean<AuthFilter> bean = new FilterRegistrationBean<>();
 
-        bean.setFilter(new AuthFilter());
-        bean.addUrlPatterns(String.format("/%s/*", endpont));
+    //     bean.setFilter(new AuthFilter());
+    //     bean.addUrlPatterns(String.format("/%s/*", endpont));
 
-        return bean;
-    }
+    //     return bean;
+    // }
 }

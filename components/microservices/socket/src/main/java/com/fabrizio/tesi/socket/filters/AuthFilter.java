@@ -23,6 +23,7 @@ import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 
+@Component
 @Order(1)
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Slf4j
