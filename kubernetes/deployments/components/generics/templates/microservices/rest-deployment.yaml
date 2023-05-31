@@ -36,4 +36,8 @@ spec:
             secretKeyRef:
               name: rest-secret
               key: passwordSql
-
+        - name: "AUTH_SECRET"
+          valueFrom:
+            secretKeyRef:
+              name: gateway-secret
+              key: secretOidc
