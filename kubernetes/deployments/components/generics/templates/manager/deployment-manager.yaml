@@ -17,9 +17,11 @@ spec:
         - name: docker-registry-secret
       containers:
         - name: manager-backend
-          image: docker.io/fabrizio294/manager:0.0.4
+          image: docker.io/fabrizio294/manager:0.0.5
           ports:
             - containerPort: 8000
           env:
             - name: "KAFKA_HOST"
               value: "local-cluster-kafka-bootstrap.kafka.svc:9092"
+            - name: "KAFKA_GROUP"
+              value: tesi

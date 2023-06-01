@@ -22,6 +22,8 @@ spec:
         env:
         - name: "SPRING_PROFILES_ACTIVE"
           value: ""
+        - name: "SPRING_KAFKA_CONSUMER_GROUP-ID"
+          value: tesi
         - name: "SPRING_KAFKA_BOOTSTRAP-SERVERS"
           value: "{{ .Values.global.internalKafkaFqdn }}:{{ .Values.global.internalKafkaPort }}"
         - name: "AUTH_ENABLE"

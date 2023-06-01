@@ -26,6 +26,8 @@ spec:
           value: "{{ .Values.global.internalKafkaFqdn }}:{{ .Values.global.internalKafkaPort }}"
         - name: "SPRING_PROFILES_ACTIVE"
           value: "prod"
+        - name: "SPRING_KAFKA_CONSUMER_GROUP-ID"
+          value: tesi
         - name: "SPRING_DATASOURCE_URL"
           value: "jdbc:mysql://{{ .Values.global.mySqlHost }}:{{ .Values.global.mySqlPort }}/{{ .Values.global.mySqlDb }}?useLegacyDatetimeCode=false&serverTimezone=Europe/Rome"
         - name: "SPRING_DATASOURCE_USERNAME"

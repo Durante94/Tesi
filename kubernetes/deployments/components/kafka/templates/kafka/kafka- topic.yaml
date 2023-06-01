@@ -1,0 +1,74 @@
+kind: KafkaTopic
+apiVersion: kafka.strimzi.io/v1beta2
+metadata:
+  name: config-request
+  labels:
+    strimzi.io/cluster: {{ $.Values.global.internalKafkaClusterName }}
+  namespace: kafka
+spec:
+  partitions: 1
+  replicas: 1
+  topicName: config-request
+  config:
+    retention.ms: 10000
+    segment.bytes: 16384
+---
+kind: KafkaTopic
+apiVersion: kafka.strimzi.io/v1beta2
+metadata:
+  name: config-response
+  labels:
+    strimzi.io/cluster: {{ $.Values.global.internalKafkaClusterName }}
+  namespace: kafka
+spec:
+  partitions: 1
+  replicas: 1
+  topicName: config-response
+  config:
+    retention.ms: 10000
+    segment.bytes: 10485760
+---
+kind: KafkaTopic
+apiVersion: kafka.strimzi.io/v1beta2
+metadata:
+  name: alarm
+  labels:
+    strimzi.io/cluster: {{ $.Values.global.internalKafkaClusterName }}
+  namespace: kafka
+spec:
+  partitions: 1
+  replicas: 1
+  topicName: alarm
+  config:
+    retention.ms: 10000
+    segment.bytes: 16384
+---
+kind: KafkaTopic
+apiVersion: kafka.strimzi.io/v1beta2
+metadata:
+  name: heartbeat
+  labels:
+    strimzi.io/cluster: {{ $.Values.global.internalKafkaClusterName }}
+  namespace: kafka
+spec:
+  partitions: 1
+  replicas: 1
+  topicName: heartbeat
+  config:
+    retention.ms: 10000
+    segment.bytes: 4096
+---
+kind: KafkaTopic
+apiVersion: kafka.strimzi.io/v1beta2
+metadata:
+  name: data
+  labels:
+    strimzi.io/cluster: {{ $.Values.global.internalKafkaClusterName }}
+  namespace: kafka
+spec:
+  partitions: 1
+  replicas: 1
+  topicName: data
+  config:
+    retention.ms: 10000
+    segment.bytes: 10485760

@@ -19,7 +19,7 @@ spec:
         - name: docker-registry-secret
       containers:
       - name: "simulatore"
-        image: docker.io/fabrizio294/simulatore:0.0.6-comm
+        image: docker.io/fabrizio294/simulatore:0.0.7
         env:
         - name: "KAFKA_HOST"
           value: "local-cluster-kafka-bootstrap.kafka.svc:9092"
@@ -29,3 +29,5 @@ spec:
           value: "8.6"
         - name: "FREQUENCY"
           value: "9.16"
+        - name: "KAFKA_GROUP"
+          value: tesi
