@@ -64,7 +64,7 @@ def heartbeat_ckeck(agentDict, execute, kafka):
     consumer = Consumer(
         {
             "bootstrap.servers": kafka,
-            "group.id": "manager",
+            "group.id": os.getenv("KAFKA_GROUP"),
             "auto.offset.reset": "smallest",
         }
     )

@@ -7,6 +7,7 @@ RUN pip install --upgrade pip \
 ENV KAFKA_HOST=localhost:9092 \
     PARTIAL_KEY=simulatore \
     HB_RATE=5 \
-    HB_RATE_TOL=5
+    HB_RATE_TOL=5 \
+    KAFKA_GROUP=tesi
 EXPOSE 8000
 CMD ["gunicorn", "--bind", "0.0.0.0:8000", "manager.app"]
