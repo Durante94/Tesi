@@ -8,5 +8,6 @@ ENV KAFKA_HOST=localhost:9092 \
     AMPLITUDE=6 \
     FREQUENCY=4.2 \
     PARTIAL_KEY=simulatore \
-    HB_RATE=5
+    HB_RATE=5 \
+    KAFKA_GROUP=tesi
 ENTRYPOINT ["python", "./Simulatore.py"]

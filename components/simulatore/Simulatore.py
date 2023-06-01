@@ -65,7 +65,7 @@ logging.debug("Kafka configuration: %s" % conf)
 logging.debug("KAFKA_HOST: %s" % os.getenv("KAFKA_HOST"))
 
 consumer = Consumer({'bootstrap.servers': os.getenv("KAFKA_HOST"),
-                    'group.id': "simulatore",
+                    'group.id': os.getenv("KAFKA_GROUP"),
                      'auto.offset.reset': 'earliest'})
 producer = Producer(conf)
 function = os.getenv("MATH_FUN")
