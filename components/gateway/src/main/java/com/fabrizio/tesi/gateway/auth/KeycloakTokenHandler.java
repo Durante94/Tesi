@@ -112,7 +112,8 @@ public abstract class KeycloakTokenHandler {
 
 	public boolean deleteToken(String idToken) throws IOException {
 		URL url = new URL(OIDCHOST + "/realms/" + realm + "/protocol/openid-connect/logout");
-		HttpsURLConnection con = (HttpsURLConnection) url.openConnection();
+		// HttpsURLConnection con = (HttpsURLConnection) url.openConnection();
+		HttpURLConnection con = (HttpURLConnection) url.openConnection();
 		con.setRequestMethod("POST");
 		con.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
 		String postData = "client_secret=" + CLIENT_SECRET + "&refresh_token=" + idToken + "&client_id=" + clientid;
