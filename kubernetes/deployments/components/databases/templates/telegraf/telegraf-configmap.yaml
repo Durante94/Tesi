@@ -104,4 +104,4 @@ data:
       consumer_group = "_telegraf_InfluxDBv1.8_consumers"
       offset = "newest"
       max_message_len = 1000000
-      data_format = "influx"
+      data_format = "json"

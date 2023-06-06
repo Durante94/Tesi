@@ -16,7 +16,7 @@ spec:
         - name: docker-registry-secret
       containers:
       - name: "gateway"
-        image: docker.io/fabrizio294/gateway:0.0.4
+        image: docker.io/fabrizio294/gateway:0.0.5
         ports:
         - containerPort: 7080
         env:

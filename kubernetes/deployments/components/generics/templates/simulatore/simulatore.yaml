@@ -9,7 +9,7 @@ spec:
   selector:   
     matchLabels:
       app: simulatore
-  replicas: {{ int $simReplicas }}
+  # replicas: {{ int $simReplicas }}
   template:
     metadata:
       labels:
@@ -18,16 +18,18 @@ spec:
       imagePullSecrets:
         - name: docker-registry-secret
       containers:
-      - name: "simulatore"
+      {{ range  $i, $e := untilStep 0 (int ($simReplicas)) 1 }} 
+      - name: "{{- printf "%s%d" "simulatore" $i -}}"
         image: docker.io/fabrizio294/simulatore:0.0.7
         env:
         - name: "KAFKA_HOST"
           value: "local-cluster-kafka-bootstrap.kafka.svc:9092"
         - name: "MATH_FUN"
-          value: "sin"
+          value: "{{ if eq (mod $i 2) 0}}sin{{ else }}cos{{ end }}"
         - name: "AMPLITUDE"
-          value: "8.6"
+          value: "{{- add $i 1 -}}"
         - name: "FREQUENCY"
-          value: "9.16"
+          value: "{{- add $i 1 -}}"
         - name: "KAFKA_GROUP"
-          value: tesi
+          value: "{{- printf "%s%d" "tesi" $i -}}"
+      {{ end }}
