@@ -45,6 +45,7 @@ def producer_task(conf, flag, transmit, function, amplitude, frequency, currentI
 
 
 def heartbeat_task(conf, flag, sleepTime, currentId):
+    time.sleep(5)
     producer = Producer(conf)
     logging.debug("Heartbeat task started")
     while flag:
@@ -90,7 +91,7 @@ try:
     logging.info("Started")
     while True:
         try:
-            msg = consumer.poll(timeout=60.0)
+            msg = consumer.poll(timeout=10.0)
             logging.debug("Message consumed: %s" % str(msg))
             if msg is None:
                 continue
