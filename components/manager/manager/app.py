@@ -25,6 +25,7 @@ def acked(err, msg):
 
 
 def agent_check(agentDict, execute, kafka, hbVal, hbTol):
+    time.sleep(5)
     producer = Producer({"bootstrap.servers": kafka, "client.id": socket.gethostname()})
     alarmSended = {}
     while execute:
