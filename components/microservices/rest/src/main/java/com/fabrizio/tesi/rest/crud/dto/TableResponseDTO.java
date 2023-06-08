@@ -19,4 +19,5 @@ import lombok.experimental.FieldDefaults;
 public class TableResponseDTO extends TableRequestDTO {
     @ToEntityIgnore
     long id;
+    boolean readOnly;
 }

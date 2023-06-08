@@ -43,8 +43,7 @@ public class CRUDController {
             @RequestParam(required = false, defaultValue = "{}") String filter,
             @RequestHeader Map<String, String> headers) {
         try {
-            return service.getList(jsonMapper.readValue(filter, TableRequestDTO.class),
-                    headers.getOrDefault("role", "").equalsIgnoreCase("admin"));
+            return service.getList(jsonMapper.readValue(filter, TableRequestDTO.class), isAdmin(headers));
         } catch (JsonProcessingException e) {
             log.error("DESERIALIZZAZIONE: {} in {}", filter, TableRequestDTO.class.getName(), e.getMessage());
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Errore formato richiesta");
@@ -58,20 +57,31 @@ public class CRUDController {
     }
 
     @PostMapping
-    public ResponseEntity<TableResponseDTO> saveElem(@RequestBody TableResponseDTO dto) {
-        return service.saveOrUpdate(dto);
+    public ResponseEntity<TableResponseDTO> saveElem(@RequestBody TableResponseDTO dto,
+            @RequestHeader Map<String, String> headers) {
+        return isAdmin(headers) ? service.saveOrUpdate(dto) : ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
 
     @PostMapping("/{prop}/{value}")
     public ResponseEntity<Void> toggleValue(@PathVariable("prop") String prop, @PathVariable("value") boolean value,
-            @RequestBody(required = false) Map<String, Long> body) {
+            @RequestBody(required = false) Map<String, Long> body, @RequestHeader Map<String, String> headers) {
+        if (isAdmin(headers))
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         long id = body.getOrDefault("id", -1L).longValue();
         return id >= 0 ? service.toggleValue(prop, value, id) : service.toggleValue(prop, value);
     }
 
     @DeleteMapping("/{id}")
-    @ResponseBody
-    public ResponseEntity<Void> deleteElem(@PathVariable("id") long id) {
-        return service.delete(id);
+    public ResponseEntity<Void> deleteElem(@PathVariable("id") long id, @RequestHeader Map<String, String> headers) {
+        return isAdmin(headers) ? service.delete(id) : ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+    }
+
+    @GetMapping("/enable")
+    public boolean userAllowedEdit(@RequestHeader Map<String, String> headers) {
+        return isAdmin(headers);
+    }
+
+    private boolean isAdmin(Map<String, String> headers) {
+        return headers.getOrDefault("role", "").equalsIgnoreCase("admin");
     }
 }

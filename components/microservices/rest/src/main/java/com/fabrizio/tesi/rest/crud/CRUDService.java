@@ -43,6 +43,7 @@ public class CRUDService {
                                         tmp.setView(true);
                                         tmp.setEdit(canEdit);
                                         tmp.setDelete(canEdit);
+                                        tmp.setReadOnly(!canEdit);
                                         return tmp;
                                 }).collect(Collectors.toList()));
         }
