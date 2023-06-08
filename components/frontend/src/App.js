@@ -1,4 +1,4 @@
-import { useReducer } from "react";
+import { useEffect, useReducer } from "react";
 import { Badge, Layout, Modal } from "antd";
 import { LogoutOutlined } from "@ant-design/icons";
 import axios from "axios";
@@ -8,6 +8,7 @@ import './App.css';
 import { WebSocket } from "./WebSocket";
 import { GenericButton, Delete } from "./buttons/buttons";
 import { AuthenticationRetainer } from "./AuthenticationRetainer"
+import { canEdit } from "./rest/crud";
 
 const initialState = {
   viewState: {},
@@ -16,7 +17,8 @@ const initialState = {
   id: null,
   configResp: null,
   configReq: null,
-  alarms: new Map()
+  alarms: new Map(),
+  editEnable: false
 }, reducer = (state, action) => {
   let alarms;
   switch (action.type) {
@@ -36,6 +38,8 @@ const initialState = {
       alarms = new Map(state.alarms);
       alarms.delete(action.payload);
       return { ...state, alarms }
+    case "userEnable":
+      return { ...state, editEnable: action.payload };
     default:
       return state;
   }
@@ -54,9 +58,11 @@ const initialState = {
 };
 
 function App() {
-  const [{ viewState, detail, edit, id, configResp, configReq, alarms }, dispatch] = useReducer(reducer, initialState);
+  const [{ viewState, detail, edit, id, configResp, configReq, alarms, editEnable }, dispatch] = useReducer(reducer, initialState);
 
   const { Header, Content, Footer } = Layout;
+
+  useEffect(() => { canEdit().then(payload => dispatch({ type: "userEnable", payload })) }, [dispatch]);
 
   return (
     <Layout>
@@ -73,7 +79,7 @@ function App() {
           ?
           <FormContent {...{ edit, id, configResp, dispatch }} />
           :
-          <TableContent {...{ viewState, dispatch }} />
+          <TableContent {...{ viewState, editEnable, dispatch }} />
         }
       </Content>
       <Footer className="footer">

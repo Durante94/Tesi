@@ -6,6 +6,21 @@ const BASE_URL = "/api/",
     GET_AGENTS = BASE_URL + 'agent',
     GET_DETAIL = GET_ALL + "/";
 
+export const canEdit = async () => {
+    try {
+        const dio = await axios.get(GET_DETAIL + "enable");
+        console.log(dio.data);
+        return dio.data;
+    } catch (error) {
+        notification.error({
+            message: "Errore caricamento",
+            description: "Impossibile ottenere i dati",
+            duration: 6
+        });
+        return false;
+    }
+}
+
 export const getForTable = async stringPayload => {
     const params = new URLSearchParams();
     params.append("filter", stringPayload)

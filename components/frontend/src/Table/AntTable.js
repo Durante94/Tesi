@@ -64,7 +64,7 @@ export const AntTable = ({
     restData = async () => ({ data: [], total: 0, pageSizeOptions: [] }),
     getColumns = () => ({ title: '', columns: [] }),
     updateViewRange = () => { },
-    onCheck = async () => { },
+    onCheck,
     onRowChange = async () => { },
     onRowView = async () => { },
     onRowEdit = async () => { },
@@ -147,7 +147,7 @@ export const AntTable = ({
             position: "bottom-left",
             ...pagination
         }}
-        columns={adapterColumns(tableName, rowKey, columns, dataSource, innerOnCheck, sort, filters)}
+        columns={adapterColumns(tableName, rowKey, columns, dataSource, onCheck ? innerOnCheck : false, sort, filters)}
         {...{ dataSource, loading, onChange, rowKey, style }}
     />
 }
