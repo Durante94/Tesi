@@ -11,6 +11,7 @@ import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.experimental.FieldDefaults;
 
 @Entity
@@ -28,6 +29,7 @@ public class CRUDEntity {
     double amplitude;
     double frequency;
     String function;
+    @Setter
     boolean enable;
     @Column(name = "agent_id")
     String agentId;
