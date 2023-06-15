@@ -55,7 +55,8 @@ spec:
   - name: http
     port: 8086
     targetPort: 8086
-  type: ClusterIP
+    nodePort: 30086
+  type: NodePort
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
