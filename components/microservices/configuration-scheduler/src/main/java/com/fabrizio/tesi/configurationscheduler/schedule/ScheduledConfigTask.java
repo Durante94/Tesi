@@ -1,4 +1,4 @@
-package com.fabrizio.tesi.configurationscheduler.schdule;
+package com.fabrizio.tesi.configurationscheduler.schedule;
 
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -45,7 +45,7 @@ public class ScheduledConfigTask {
     }
 
     @Scheduled(fixedDelayString = "${businness.manager.updatedelay}")
-    void entitiesCheck() {
+    public void entitiesCheck() {
         GenericAdapter<CRUDEntity, CRUDDTO> adapter = new GenericAdapter<>(CRUDEntity.class, CRUDDTO.class);
         crudRepository.findAll().stream().forEach(entity -> {
             AtomicBoolean sendMessagge = new AtomicBoolean(false);
@@ -59,7 +59,7 @@ public class ScheduledConfigTask {
             if (sendMessagge.get()) {
                 cache.put(entity.getId(), fromDB);
                 templateMsg.send(confRequestTopic, "toggle",
-                        new ConfigRequest().enable(entity.isEnable()).agent(entity.getAgentId()));
+                        new ConfigRequest(entity.getAgentId(), entity.isEnable()));
             }
         });
     }
