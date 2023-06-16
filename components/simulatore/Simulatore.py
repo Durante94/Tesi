@@ -38,7 +38,7 @@ def producer_task(conf, flag, transmit, function, amplitude, frequency, currentI
         producer.produce("data",
                          key=currentId,
                          value=json.dumps(
-                             {"value": value}) .encode('utf-8'),
+                             {"value": value, "agent": id}) .encode('utf-8'),
                          callback=acked)
         producer.poll(2)
         t = t + 1
