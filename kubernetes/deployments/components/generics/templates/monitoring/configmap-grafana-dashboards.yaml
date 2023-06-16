@@ -5892,138 +5892,124 @@ data:
 
   data-visulization.json: |-
     {
-      "annotations": {
-        "list": [
-          {
-            "builtIn": 1,
-            "datasource": {
-              "type": "grafana",
-              "uid": "-- Grafana --"
-            },
-            "enable": true,
-            "hide": true,
-            "iconColor": "rgba(0, 211, 255, 1)",
-            "name": "Annotations & Alerts",
-            "type": "dashboard"
-          }
-        ]
+      "datasource": {
+        "type": "influxdb",
+        "uid": "P5697886F9CA74929"
       },
-      "editable": true,
-      "fiscalYearStartMonth": 0,
-      "graphTooltip": 0,
-      "id": 5,
-      "links": [],
-      "liveNow": false,
-      "panels": [
+      "description": "Data transimetted on the dedicated Kafka topic",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "show": "points+lines",
+            "axisPlacement": "auto",
+            "axisColorMode": "series",
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "axisCenteredZero": true,
+            "hideFrom": {
+              "tooltip": false,
+              "viz": false,
+              "legend": false
+            },
+            "lineStyle": {
+              "fill": "solid"
+            },
+            "lineWidth": 1,
+            "pointSize": {
+              "fixed": 4
+            }
+          },
+          "color": {
+            "mode": "palette-classic"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "none",
+          "displayName": "Value/Time"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 22,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "id": 1,
+      "options": {
+        "seriesMapping": "manual",
+        "series": [
+          {
+            "pointColor": {
+              "field": "agent"
+            },
+            "pointSize": {
+              "fixed": 5,
+              "max": 100,
+              "min": 1
+            },
+            "x": "_time",
+            "y": "value"
+          }
+        ],
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        },
+        "legend": {
+          "showLegend": true,
+          "displayMode": "list",
+          "placement": "bottom",
+          "calcs": []
+        },
+        "dims": {},
+        "xAxis": {
+          "buckets": null,
+          "labels": {
+            "autoRotate": true,
+            "max": null,
+            "min": null,
+            "mode": "auto",
+            "show": true,
+            "values": []
+          },
+          "mode": "time",
+          "name": null,
+          "show": true,
+          "values": []
+        }
+      },
+      "pluginVersion": "10.0.0",
+      "targets": [
         {
           "datasource": {
             "type": "influxdb",
             "uid": "P5697886F9CA74929"
           },
-          "description": "The data passed using the topic \"data\"",
-          "fieldConfig": {
-            "defaults": {
-              "color": {
-                "mode": "palette-classic"
-              },
-              "custom": {
-                "axisCenteredZero": false,
-                "axisColorMode": "text",
-                "axisLabel": "",
-                "axisPlacement": "auto",
-                "barAlignment": 0,
-                "drawStyle": "line",
-                "fillOpacity": 0,
-                "gradientMode": "none",
-                "hideFrom": {
-                  "legend": false,
-                  "tooltip": false,
-                  "viz": false
-                },
-                "lineInterpolation": "smooth",
-                "lineWidth": 1,
-                "pointSize": 5,
-                "scaleDistribution": {
-                  "type": "linear"
-                },
-                "showPoints": "auto",
-                "spanNulls": false,
-                "stacking": {
-                  "group": "A",
-                  "mode": "none"
-                },
-                "thresholdsStyle": {
-                  "mode": "off"
-                }
-              },
-              "mappings": [],
-              "thresholds": {
-                "mode": "absolute",
-                "steps": [
-                  {
-                    "color": "green",
-                    "value": null
-                  },
-                  {
-                    "color": "red",
-                    "value": 80
-                  }
-                ]
-              },
-              "unit": "none"
-            },
-            "overrides": []
-          },
-          "gridPos": {
-            "h": 8,
-            "w": 24,
-            "x": 0,
-            "y": 0
-          },
-          "id": 1,
-          "options": {
-            "legend": {
-              "calcs": [],
-              "displayMode": "list",
-              "placement": "bottom",
-              "showLegend": true
-            },
-            "tooltip": {
-              "mode": "single",
-              "sort": "none"
-            }
-          },
-          "pluginVersion": "9.5.1",
-          "targets": [
-            {
-              "datasource": {
-                "type": "influxdb",
-                "uid": "P5697886F9CA74929"
-              },
-              "key": "Q-4043c525-58d3-4a17-be9d-75c57f12fbfc-0",
-              "query": "from(bucket: "monitoring") |> range(start: v.timeRangeStart, stop: v.timeRangeStop) |> filter(fn: (r) => r["_measurement"] == "kafka_consumer") |> pivot(rowKey:["_time"], columnKey: ["_field"], valueColumn: "_value") |> keep(columns: ["_time", "value"]) |> yield(name: "data")",
-              "refId": "A"
-            }
-          ],
-          "title": "Data Transmitted",
-          "type": "timeseries"
+          "key": "Q-3e493303-26e6-4e52-ab74-75f11d0de383-0",
+          "query": "from(bucket: \"monitoring\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r._measurement == \"kafka_consumer\")\r\n  |> pivot(rowKey:[\"_time\"], columnKey: [\"_field\"], valueColumn: \"_value\")\r\n  |> yield(name: \"data\")",
+          "refId": "A"
         }
       ],
-      "refresh": "",
-      "schemaVersion": 38,
-      "style": "dark",
-      "tags": [],
-      "templating": {
-        "list": []
-      },
-      "time": {
-        "from": "now-1m",
-        "to": "now"
-      },
-      "timepicker": {},
-      "timezone": "",
-      "title": "Data visualization",
-      "uid": "f873dcca-3e2e-49a1-a374-d8332876e6ad",
-      "version": 3,
-      "weekStart": ""
+      "title": "Transmitted data",
+      "transformations": [
+        {
+          "id": "configFromData",
+          "options": {}
+        }
+      ],
+      "type": "xychart"
     }
