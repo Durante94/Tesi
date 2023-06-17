@@ -34,9 +34,9 @@ public abstract class SpecificationPath<T, U extends RequestTable> {
         return entityPaths.get(property);
     }
 
-    protected Expression<?> getPath(String property, Class<?> type) {
-        return entityPaths.get(property).as(type);
-    }
+//    protected Expression<?> getPath(String property, Class<?> type) {
+//        return entityPaths.get(property).as(type);
+//    }
 
     protected List<Order> addSorter(CriteriaBuilder cb) {
         List<Order> orderList = new LinkedList<Order>();

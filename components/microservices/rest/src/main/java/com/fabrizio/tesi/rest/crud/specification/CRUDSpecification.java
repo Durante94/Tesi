@@ -13,15 +13,16 @@ import com.fabrizio.tesi.rest.crud.dto.TableRequestDTO;
 import com.fabrizio.tesi.rest.crud.entity.CRUDEntity;
 
 public class CRUDSpecification extends SpecificationPath<CRUDEntity, TableRequestDTO>
-        implements Specification<CRUDEntity> {
+		implements Specification<CRUDEntity> {
 
-    public CRUDSpecification(TableRequestDTO filter) {
-        super(filter);
-    }
+	public CRUDSpecification(TableRequestDTO filter) {
+		super(filter);
+	}
 
-    @Override
+	@Override
     public Predicate toPredicate(Root<CRUDEntity> root, CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder) {
         Predicate p = criteriaBuilder.conjunction();
+        initPaths(root);
 
         if (StringUtils.isNotBlank(filter.getName())) {
             p.getExpressions().add(criteriaBuilder.and(
@@ -40,18 +41,28 @@ public class CRUDSpecification extends SpecificationPath<CRUDEntity, TableReques
             ));
         }
         if (filter.getAmplitude() != 0) {
-            p.getExpressions().add(criteriaBuilder.and(
+			String queryParam = filter.getAmplitude() % 1 == 0 
+					?
+						Long.toString((long) filter.getAmplitude())
+					: 
+						Double.toString(filter.getAmplitude());
+          p.getExpressions().add(criteriaBuilder.and(
                 criteriaBuilder.like(
                     root.get("amplitude").as(String.class),
-                    Double.toString(filter.getAmplitude())
+                    "%" + queryParam + "%"
                 ) 
             ));
         }
         if (filter.getFrequency() != 0) {
+			String queryParam = filter.getFrequency() % 1 == 0 
+					?
+						Long.toString((long) filter.getFrequency())
+					: 
+						Double.toString(filter.getFrequency());
             p.getExpressions().add(criteriaBuilder.and(
                 criteriaBuilder.like(
                     root.get("frequency").as(String.class),
-                    Double.toString(filter.getFrequency())
+                    "%" + queryParam + "%"
                 ) 
             ));
         }
