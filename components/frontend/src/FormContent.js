@@ -12,6 +12,8 @@ const initialState = {
     reducer = (state, action) => {
         if (action.type === "form")
             return { initialValues: action.payload, loading: false };
+        else if (action.type == "agent")
+            return { initialValues: { ...state.initialValues, agentId: action.payload }, loading: false };
         else
             return { ...state, loading: action.payload };
     }
@@ -58,6 +60,7 @@ export const FormContent = ({ edit, id, dispatch, configResp }) => {
     useEffect(() => {
         if (configResp && changedAgent === configResp.agentId) {
             form.setFieldsValue(configResp);
+            dispatchForm({ type: "agent", payload: configResp.agentId })
             dispatch({ type: "config-resp", payload: null })
         }
     }, [dispatch, form, configResp, changedAgent])
