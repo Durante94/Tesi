@@ -27,7 +27,11 @@ spec:
         - name: "SPRING_KAFKA_BOOTSTRAP-SERVERS"
           value: "{{ .Values.global.internalKafkaFqdn }}:{{ .Values.global.internalKafkaPort }}"
         - name: "AUTH_ENABLE"
-          value: "true"
+          value: "{{ .Values.global.authEnable }}"
+        {{ if eq .Values.global.authEnable false }}
+        - name: "AUTH_MOCKROLE"
+          value: "admin"
+        {{ end }}
         - name: "AUTH_SECRET"
           valueFrom:
             secretKeyRef:

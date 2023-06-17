@@ -1,4 +1,5 @@
 global:
+  authEnable: true
   simulatoreReplicas: 4
   supplementalGroups: [1000]
   storageClassName: openebs-hostpath

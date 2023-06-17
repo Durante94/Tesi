@@ -37,7 +37,11 @@ spec:
               name: rest-secret
               key: passwordSql
         - name: "AUTH_ENABLE"
-          value: "true"
+          value: "{{ .Values.global.authEnable }}"
+        {{ if eq .Values.global.authEnable false }}
+        - name: "AUTH_MOCKROLE"
+          value: "admin"
+        {{ end }}
         - name: "AUTH_SECRET"
           valueFrom:
             secretKeyRef:
