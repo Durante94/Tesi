@@ -8,9 +8,7 @@ const BASE_URL = "/api/",
 
 export const canEdit = async () => {
     try {
-        const dio = await axios.get(GET_DETAIL + "enable");
-        console.log(dio.data);
-        return dio.data;
+        return await axios.get(GET_DETAIL + "enable").data;
     } catch (error) {
         notification.error({
             message: "Errore caricamento",
