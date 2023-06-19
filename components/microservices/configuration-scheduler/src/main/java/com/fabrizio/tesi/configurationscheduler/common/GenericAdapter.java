@@ -117,35 +117,35 @@ public class GenericAdapter<T, U> {
         return dto;
     }
 
-    public void dtoToEntity(T entity, U dto) {
-        for (Entry<String, Method> entry : dtoGetters.entrySet()) {
-            Object value;
-            // RETRIEVE VALUE FROM DTO GETTER
-            try {
-                value = entry.getValue().invoke(dto);
-            } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-                log.error("Method {} for {} error:", entry.getValue().getName(), entity.getClass().getSimpleName(), e);
-                continue;
-            }
-            // GET THE CORRESPONDING ENTITY SETTER
-            Method entityMethod;
-            try {
-                entityMethod = entitySetters.get(entry.getKey());
-                entityMethod.setAccessible(true);
-            } catch (NullPointerException e) {
-                log.error("No method {} for {} error: {}", "set" + entry.getKey(), entity.getClass().getSimpleName(),
-                        e);
-                continue;
-            }
-            // SET THE DTO VALUE IN THE ENTITY
-            try {
-                entityMethod.invoke(entity, value);
-            } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-                log.error("Method {} for {} cannot set value \"{}\": {}", entityMethod.getName(),
-                        dto.getClass().getSimpleName(), value,
-                        e);
-                continue;
-            }
-        }
-    }
+//    public void dtoToEntity(T entity, U dto) {
+//        for (Entry<String, Method> entry : dtoGetters.entrySet()) {
+//            Object value;
+//            // RETRIEVE VALUE FROM DTO GETTER
+//            try {
+//                value = entry.getValue().invoke(dto);
+//            } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+//                log.error("Method {} for {} error:", entry.getValue().getName(), entity.getClass().getSimpleName(), e);
+//                continue;
+//            }
+//            // GET THE CORRESPONDING ENTITY SETTER
+//            Method entityMethod;
+//            try {
+//                entityMethod = entitySetters.get(entry.getKey());
+//                entityMethod.setAccessible(true);
+//            } catch (NullPointerException e) {
+//                log.error("No method {} for {} error: {}", "set" + entry.getKey(), entity.getClass().getSimpleName(),
+//                        e);
+//                continue;
+//            }
+//            // SET THE DTO VALUE IN THE ENTITY
+//            try {
+//                entityMethod.invoke(entity, value);
+//            } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+//                log.error("Method {} for {} cannot set value \"{}\": {}", entityMethod.getName(),
+//                        dto.getClass().getSimpleName(), value,
+//                        e);
+//                continue;
+//            }
+//        }
+//    }
 }
