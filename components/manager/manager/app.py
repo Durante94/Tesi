@@ -8,7 +8,7 @@ import time
 import falcon
 import logging
 
-LOG_LEVEL = logging.DEBUG  # Set logging level: DEBUG, INFO, WARNING, ERROR, CRITICAL
+LOG_LEVEL = logging.INFO  # Set logging level: DEBUG, INFO, WARNING, ERROR, CRITICAL
 
 logging.basicConfig(level=LOG_LEVEL)
 
