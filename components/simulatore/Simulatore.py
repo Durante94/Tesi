@@ -1,28 +1,27 @@
 import numpy as np
 from confluent_kafka import Producer, Consumer
 from confluent_kafka.cimpl import KafkaException, KafkaError
-import socket
 import os
 from multiprocessing import Process, Manager
 import json
 import time
 import uuid
 import logging
+import random
 
 id = str(uuid.uuid4())
 print(id)
 
-LOG_LEVEL = logging.INFO  # Set logging level: DEBUG, INFO, WARNING, ERROR, CRITICAL
-
-logging.basicConfig(level=LOG_LEVEL)
+# Set logging level: DEBUG, INFO, WARNING, ERROR, CRITICAL
+logging.basicConfig(level=logging.INFO)
 
 
 def acked(err, msg):
     if err is not None:
         logging.error("Failed to deliver message: %s: %s" %
                       (str(msg), str(err)))
-    # else:
-    #     logging.info("Message produced: %s" % (str(msg)))
+    else:
+        logging.debug("Message produced: %s" % (str(msg)))
 
 
 def producer_task(conf, flag, transmit, function, amplitude, frequency, currentId):
@@ -45,7 +44,7 @@ def producer_task(conf, flag, transmit, function, amplitude, frequency, currentI
 
 
 def heartbeat_task(conf, flag, sleepTime, currentId):
-    time.sleep(5)
+    time.sleep(random.randint(1,10))
     producer = Producer(conf)
     logging.debug("Heartbeat task started")
     while flag:
@@ -53,6 +52,7 @@ def heartbeat_task(conf, flag, sleepTime, currentId):
         producer.produce("heartbeat",
                          key=currentId,
                          callback=acked)
+        logging.debug("Heartbeat produced %s" % currentId)
 
 
 manager = Manager()
@@ -60,14 +60,17 @@ exit_flag = manager.Value('i', True)
 transmit_flag = manager.Value('i', True)
 conf = {
     'bootstrap.servers': os.getenv("KAFKA_HOST"),
-    'client.id': socket.gethostname()
+    'client.id': "simulatore-"+id
 }
 logging.debug("Kafka configuration: %s" % conf)
 logging.debug("KAFKA_HOST: %s" % os.getenv("KAFKA_HOST"))
 
 consumer = Consumer({'bootstrap.servers': os.getenv("KAFKA_HOST"),
                     'group.id': os.getenv("KAFKA_GROUP"),
-                     'auto.offset.reset': 'earliest'})
+                     'auto.offset.reset': 'latest'})
+
+time.sleep(random.randint(1,10))
+
 producer = Producer(conf)
 function = os.getenv("MATH_FUN")
 amplitude = float(os.getenv("AMPLITUDE"))
