@@ -65,7 +65,7 @@ public class CRUDController {
     @PostMapping("/{prop}/{value}")
     public ResponseEntity<Void> toggleValue(@PathVariable("prop") String prop, @PathVariable("value") boolean value,
             @RequestBody(required = false) Map<String, Long> body, @RequestHeader Map<String, String> headers) {
-        if (isAdmin(headers))
+        if (!isAdmin(headers))
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         long id = body.getOrDefault("id", -1L).longValue();
         return id >= 0 ? service.toggleValue(prop, value, id) : service.toggleValue(prop, value);
