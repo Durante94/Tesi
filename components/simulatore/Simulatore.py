@@ -74,8 +74,6 @@ amplitude = float(os.getenv("AMPLITUDE"))
 frequency = float(os.getenv('FREQUENCY'))
 hb_rate = int(os.getenv("HB_RATE"))
 
-data_task = Process(target=producer_task, args=(
-    conf.copy(), exit_flag, transmit_flag, function, amplitude, frequency, id))
 heartbeat_process = Process(target=heartbeat_task,
                             args=(conf.copy(), exit_flag, hb_rate, id))
 heartbeat_process.start()
@@ -125,6 +123,8 @@ try:
                     case b'toggle':
                         if eval(str(msgValue["payload"]).capitalize()):
                             transmit_flag.set(True)
+                            data_task = Process(target=producer_task, args=(
+                                conf.copy(), exit_flag, transmit_flag, function, amplitude, frequency, id))
                             data_task.start()
                         else:
                             transmit_flag.set(False)
