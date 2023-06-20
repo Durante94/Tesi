@@ -16,9 +16,9 @@ public interface CRUDRepository extends JpaRepository<CRUDEntity, Long>, JpaSpec
 
     @Query("UPDATE CRUDEntity e SET e.enable=?1")
     @Modifying
-    int updateAllEnable(boolean value);
+    void updateAllEnable(boolean value);
 
     @Query("UPDATE CRUDEntity e SET e.enable=?1 WHERE e.id=?2")
     @Modifying
-    int updateOneEnable(boolean value, Long id);
+    void updateOneEnable(boolean value, Long id);
 }
