@@ -8,9 +8,9 @@ import time
 import falcon
 import logging
 
-LOG_LEVEL = logging.INFO  # Set logging level: DEBUG, INFO, WARNING, ERROR, CRITICAL
+# Set logging level: DEBUG, INFO, WARNING, ERROR, CRITICAL
+logging.basicConfig(level=logging.INFO)
 
-logging.basicConfig(level=LOG_LEVEL)
 
 class List:
     def __init__(self, agentDict):
@@ -23,14 +23,16 @@ class List:
 
 def acked(err, msg):
     if err is not None:
-        logging.error("Failed to deliver message: %s: %s" % (str(msg), str(err)))
+        logging.error("Failed to deliver message: %s: %s" %
+                      (str(msg), str(err)))
     # else:
     #     logging.debug("Message produced: %s" % (str(msg)))
 
 
 def agent_check(agentDict, execute, kafka, hbVal, hbTol):
     time.sleep(10)
-    producer = Producer({"bootstrap.servers": kafka, "client.id": socket.gethostname()})
+    producer = Producer({"bootstrap.servers": kafka,
+                        "client.id": socket.gethostname()})
     alarmSended = {}
     while execute:
         keys_to_remove = []
@@ -50,7 +52,8 @@ def agent_check(agentDict, execute, kafka, hbVal, hbTol):
                         "alarm",
                         key=id,
                         value=json.dumps(
-                            {"type": "connection", "time": now, "lastHB": iterated_dict[id]}
+                            {"type": "connection", "time": now,
+                                "lastHB": iterated_dict[id]}
                         ).encode(),
                         callback=acked,
                     )
@@ -72,7 +75,7 @@ def heartbeat_ckeck(agentDict, execute, kafka):
                 {
                     "bootstrap.servers": kafka,
                     "group.id": os.getenv("KAFKA_GROUP"),
-                    "auto.offset.reset": "smallest",
+                    "auto.offset.reset": "latest",
                 }
             )
             break
