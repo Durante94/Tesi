@@ -6,7 +6,11 @@ import os
 import json
 import time
 import falcon
+import logging
 
+LOG_LEVEL = logging.DEBUG  # Set logging level: DEBUG, INFO, WARNING, ERROR, CRITICAL
+
+logging.basicConfig(level=LOG_LEVEL)
 
 class List:
     def __init__(self, agentDict):
@@ -19,13 +23,13 @@ class List:
 
 def acked(err, msg):
     if err is not None:
-        print("Failed to deliver message: %s: %s" % (str(msg), str(err)))
+        logging.error("Failed to deliver message: %s: %s" % (str(msg), str(err)))
     # else:
-    #     print("Message produced: %s" % (str(msg)))
+    #     logging.debug("Message produced: %s" % (str(msg)))
 
 
 def agent_check(agentDict, execute, kafka, hbVal, hbTol):
-    time.sleep(5)
+    time.sleep(10)
     producer = Producer({"bootstrap.servers": kafka, "client.id": socket.gethostname()})
     alarmSended = {}
     while execute:
@@ -34,7 +38,7 @@ def agent_check(agentDict, execute, kafka, hbVal, hbTol):
         try:
             iterated_dict = agentDict.copy()
         except BrokenPipeError as e:
-            print(e)
+            logging.error(e)
             iterated_dict = {}
             time.sleep(hbVal)
             continue
@@ -58,41 +62,50 @@ def agent_check(agentDict, execute, kafka, hbVal, hbTol):
         for id in keys_to_remove:
             del agentDict[id]
         time.sleep(hbVal)
-    print("Agent check process closed")
+    logging.debug("Agent check process closed")
 
 
 def heartbeat_ckeck(agentDict, execute, kafka):
-    consumer = Consumer(
-        {
-            "bootstrap.servers": kafka,
-            "group.id": os.getenv("KAFKA_GROUP"),
-            "auto.offset.reset": "smallest",
-        }
-    )
+    while True:
+        try:
+            consumer = Consumer(
+                {
+                    "bootstrap.servers": kafka,
+                    "group.id": os.getenv("KAFKA_GROUP"),
+                    "auto.offset.reset": "smallest",
+                }
+            )
+            break
+        except Exception as e:
+            logging.warn("%%Consumer error: %s" % e)
+            continue
+    logging.debug("Consumer connected")
     consumer.subscribe(["heartbeat"])
+    logging.debug("Consumer subscibed")
     while execute:
         try:
-            msg = consumer.poll(timeout=60.0)
+            msg = consumer.poll(timeout=10.0)
             if msg is None:
                 continue
 
             if msg.error():
                 if msg.error().code() == KafkaError._PARTITION_EOF:
-                    print(
+                    logging.info(
                         "%% %s [%d] reached end at offset %d\n"
                         % (msg.topic(), msg.partition(), msg.offset())
                     )
                 elif msg.error():
                     raise KafkaException(msg.error())
             else:
+                logging.debug("Messagge consumed")
                 key = msg.key().decode("utf-8")
                 agentDict[key] = time.time()
         except KafkaException as e:
-            print(e)
+            logging.error(e)
         except Exception as general:
-            print(general)
+            logging.error(general)
     consumer.close()
-    print("Heartbeat process closed")
+    logging.debug("Heartbeat process closed")
 
 
 concurrentManager = Manager()
