@@ -40,7 +40,7 @@ spec:
   replicas: 1
   topicName: alarm
   config:
-    retention.ms: 10000
+    retention.ms: 100000
     segment.bytes: 16384
 ---
 kind: KafkaTopic
@@ -55,7 +55,7 @@ spec:
   replicas: 1
   topicName: heartbeat
   config:
-    retention.ms: 10000
+    retention.ms: 100000
     segment.bytes: 4096
 ---
 kind: KafkaTopic
@@ -70,5 +70,5 @@ spec:
   replicas: 1
   topicName: data
   config:
-    retention.ms: 10000
+    retention.ms: 100000
     segment.bytes: 10485760

@@ -20,7 +20,7 @@ spec:
       containers:
       {{ range  $i, $e := untilStep 0 (int ($simReplicas)) 1 }} 
       - name: "{{- printf "%s%d" "simulatore" $i -}}"
-        image: docker.io/fabrizio294/simulatore:0.0.10
+        image: docker.io/fabrizio294/simulatore:0.0.14
         env:
         - name: "KAFKA_HOST"
           value: "local-cluster-kafka-bootstrap.kafka.svc:9092"

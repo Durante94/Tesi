@@ -5912,7 +5912,7 @@ data:
       "editable": true,
       "fiscalYearStartMonth": 0,
       "graphTooltip": 0,
-      "id": 5,
+      "id": 3,
       "links": [],
       "liveNow": false,
       "panels": [
@@ -5959,8 +5959,8 @@ data:
             "overrides": []
           },
           "gridPos": {
-            "h": 21,
-            "w": 24,
+            "h": 13,
+            "w": 21,
             "x": 0,
             "y": 0
           },
@@ -6026,7 +6026,7 @@ data:
           "type": "xychart"
         }
       ],
-      "refresh": "",
+      "refresh": "5s",
       "schemaVersion": 38,
       "style": "dark",
       "tags": [],
@@ -6041,6 +6041,6 @@ data:
       "timezone": "",
       "title": "Transmitted data",
       "uid": "b09bcb5d-c084-4581-bffd-5ae295bc2da6",
-      "version": 4,
+      "version": 3,
       "weekStart": ""
     }
