@@ -59,7 +59,7 @@ public class AgentController {
         try {
             deserilizedFilter = jsonMapper.readValue(filter, AgentRequestFilter.class);
         } catch (JsonProcessingException e) {
-            log.error("DESERIALIZZAZIONE: {} in {}", filter, TableRequestDTO.class.getName(), e.getMessage());
+            log.error("DESERIALIZZAZIONE: {} in {}", filter, TableRequestDTO.class.getName(), e);
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Errore formato richiesta");
         }
         Optional<ValueWrapper> cachedRef = Optional.ofNullable(
@@ -67,7 +67,7 @@ public class AgentController {
 
         return ((List<String>) cachedRef.get().get())
                 .stream()
-                .filter(value -> deserilizedFilter.applyFiter(value))
+                .filter(deserilizedFilter::applyFiter)
                 .skip(deserilizedFilter.getSelectedPage() * deserilizedFilter.getPageSize())
                 .limit(deserilizedFilter.getPageSize())
                 .map(agent -> jsonMapper.createObjectNode().put("value", agent))

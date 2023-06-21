@@ -1,6 +1,7 @@
 package com.fabrizio.tesi.rest.cache;
 
 import java.util.Arrays;
+import java.util.List;
 
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.EnableCaching;
@@ -15,7 +16,7 @@ public class CacheConfig {
     @Bean
     CacheManager cacheManager() {
         SimpleCacheManager cacheManager = new SimpleCacheManager();
-        cacheManager.setCaches(Arrays.asList(new ConcurrentMapCache("agents")));
+        cacheManager.setCaches(List.of(new ConcurrentMapCache("agents")));
         return cacheManager;
     }
 }

@@ -20,21 +20,27 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 @AutoConfigureTestDatabase
 @ActiveProfiles("dev")
 class AgentControllerTest {
-	@Autowired
-	AgentController controller;
+    @Autowired
+    AgentController controller;
 
-	@Test
-	void getAllAgents() {
-		List<ObjectNode> agents = controller.getAgents("{}");
-		assertNotNull(agents);
-	}
+    @Test
+    void getAllAgents() {
+        List<ObjectNode> agents = controller.getAgents("{}");
+        assertNotNull(agents);
+    }
 
-	@Test
-	void invalidJsonFilterTest() {
-		try {
-			controller.getAgents("");
-		} catch (ResponseStatusException e) {
-			assertEquals(e.getStatus(), HttpStatus.BAD_REQUEST);
-		}
-	}
+    @Test
+    void invalidJsonFilterTest() {
+        try {
+            controller.getAgents("");
+        } catch (ResponseStatusException e) {
+            assertEquals(e.getStatus(), HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @Test
+    void getFilteredAgents() {
+        List<ObjectNode> agents = controller.getAgents("{\"filter\": \"a\"}");
+        assertNotNull(agents);
+    }
 }
