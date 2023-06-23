@@ -45,6 +45,7 @@ public class ControllerTest {
             assertEquals(arg0, "/topic/configResponse");
             assertNotNull(arg1);
             assertNotNull(arg1.getPayload());
+            assertEquals(headerValue, arg1.getPayload().getAgentId());
             assertEquals(amplitude, arg1.getPayload().getAmplitude());
             assertEquals(frequency, arg1.getPayload().getFrequency());
             assertEquals(function, arg1.getPayload().getFunction());
@@ -56,13 +57,13 @@ public class ControllerTest {
 
     @Test
     void sendAlarmTest() throws JsonProcessingException {
-        long time = 1687466895000L, lastHB = 1687466895000L;
+        long time = 1687466895L, lastHB = 1687466895L;
         String type = "testType", headerValue = "test";
         String json = String.format("{\n" +
                 "\t\"type\": \"%s\",\n" +
-                "\t\"time\": %s,\n" +
-                "\t\"lastHB\": %s\n" +
-                "}", type, Long.toString(time), Long.toString(lastHB));
+                "\t\"time\": %d,\n" +
+                "\t\"lastHB\": %d\n" +
+                "}", type, time, lastHB);
 
         Mockito.doAnswer(invocation -> {
             String arg0 = invocation.getArgument(0, String.class);
@@ -71,8 +72,9 @@ public class ControllerTest {
             assertEquals(arg0, "/topic/alarm");
             assertNotNull(arg1);
             assertNotNull(arg1.getPayload());
-            assertEquals(time, arg1.getPayload().getTime().getTime());
-            assertEquals(lastHB, arg1.getPayload().getLastHB().getTime());
+            assertEquals(headerValue, arg1.getPayload().getId());
+            assertEquals(time, arg1.getPayload().getTime().getTime() / 1000);
+            assertEquals(lastHB, arg1.getPayload().getLastHB().getTime() / 1000);
             assertEquals(type, arg1.getPayload().getType());
             return null;
         }).when(socketTemplate).convertAndSend(Mockito.anyString(), Mockito.any(AlarmDTO.class));
@@ -89,7 +91,6 @@ public class ControllerTest {
                 "\t\"frequency\": %d,\n" +
                 "\t\"function\": \"%s\"\n" +
                 "}", amplitude, frequency, function);
-        ConfigRespPayload payload = new ConfigRespPayload();
 
         ConfigRespDTO test = controller.broadcastConfig(new ConfigRespDTO(objectMapper.readValue(json, ConfigRespPayload.class)));
 
@@ -103,7 +104,7 @@ public class ControllerTest {
 
     @Test
     void broadcastAlarmTest() throws JsonProcessingException {
-        long time = 1687466895000L, lastHB = 1687466895000L;
+        long time = 1687466895L, lastHB = 1687466895L;
         String type = "testType";
         String json = String.format("{\n" +
                 "\t\"type\": \"%s\",\n" +
@@ -116,8 +117,27 @@ public class ControllerTest {
         assertNotNull(test);
         assertEquals("alarm", test.getType());
         assertNotNull(test.getPayload());
-        assertEquals(time, test.getPayload().getTime().getTime());
-        assertEquals(lastHB, test.getPayload().getLastHB().getTime());
+        assertEquals(time, test.getPayload().getTime().getTime() / 1000);
+        assertEquals(lastHB, test.getPayload().getLastHB().getTime() / 1000);
         assertEquals(type, test.getPayload().getType());
+    }
+
+    @Test
+    void recieveMessageTest() throws JsonProcessingException {
+        String agentId = "test", json = String.format("{\"id\": \"%s\"}", agentId);
+
+        Mockito.doAnswer(invocation -> {
+            String arg0 = invocation.getArgument(0, String.class);
+            String arg1 = invocation.getArgument(1, String.class);
+            ConfigReqDTO arg2 = invocation.getArgument(2, ConfigReqDTO.class);
+
+            assertEquals(arg0, "config-request");
+            assertEquals(arg1, "request");
+            assertNotNull(arg2);
+            assertEquals(agentId, arg2.getId());
+            return null;
+        }).when(kafkaTemplate).send(Mockito.anyString(), Mockito.anyString(), Mockito.any(ConfigReqDTO.class));
+
+        controller.receiveMessage(objectMapper.readValue(json, ConfigReqDTO.class));
     }
 }
