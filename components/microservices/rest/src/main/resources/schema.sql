@@ -1,6 +1,6 @@
 -- MySQL dump 10.13  Distrib 8.0.21, for Linux (x86_64)
 
-CREATE TABLE input_entities (
+CREATE TABLE IF NOT EXISTS input_entities (
     Id bigint NOT NULL AUTO_INCREMENT,
     name varchar(50) NOT NULL,
     description varchar(100) DEFAULT NULL,
