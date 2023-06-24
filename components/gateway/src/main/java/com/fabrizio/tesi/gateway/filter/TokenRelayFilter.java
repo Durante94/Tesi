@@ -13,22 +13,22 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class TokenRelayFilter extends AbstractGatewayFilterFactory<TokenRelayFilter.Config> {
 
-	public TokenRelayFilter() {
-		super(Config.class);
-	}
+    public TokenRelayFilter() {
+        super(Config.class);
+    }
 
-	@Override
-	public GatewayFilter apply(Config config) {
-	    return (exchange, chain) -> {
-	        WebSession session = exchange.getSession().share().block();
-	            ServerHttpRequest modifiedRequest = exchange.getRequest().mutate().headers(httpHeaders -> {
-	                httpHeaders.set("Authorization", session.getAttribute("Authorization").toString());
-	            }).build();
-	            return chain.filter(exchange.mutate().request(modifiedRequest).build());
-	    };
-	}
+    @Override
+    public GatewayFilter apply(Config config) {
+        return (exchange, chain) -> {
+            WebSession session = exchange.getSession().share().block();
+            ServerHttpRequest modifiedRequest = exchange.getRequest().mutate().headers(httpHeaders -> {
+                httpHeaders.set("Authorization", session.getAttribute("Authorization").toString());
+            }).build();
+            return chain.filter(exchange.mutate().request(modifiedRequest).build());
+        };
+    }
 
-	public static class Config {
+    public static class Config {
 
-	}
+    }
 }

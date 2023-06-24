@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import com.google.gson.JsonElement;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -65,7 +66,7 @@ public class JwtService {
 
 	public Boolean checkTokenState(WebSession session) {
 		if (!session.getAttributes().containsKey(SESSION_ATTRIBUTE_AUTHORIZATION)) {
-			if (!authEnabled.booleanValue()) {
+			if (!authEnabled) {
 				Builder JWTbuilder = JWT.create();
 
 				Calendar customExpire = Calendar.getInstance();
@@ -88,16 +89,13 @@ public class JwtService {
 			return false;
 		}
 
-		String ts = (String) session.getAttribute(SESSION_ATTRIBUTE_AUTHORIZATION);
+		String ts = session.getAttribute(SESSION_ATTRIBUTE_AUTHORIZATION);
 		if (StringUtils.isBlank(ts))
 			return false;
 
 		DecodedJWT decodedJWT = JWT.decode(ts);
 
-		if (new Date().compareTo(decodedJWT.getExpiresAt()) > 0)
-			return false;
-
-		return true;
+		return new Date().compareTo(decodedJWT.getExpiresAt()) <= 0;
 	}
 
 	public ResponseEntity<Integer> auth(WebSession session, String code) throws WamsAuthenticationException {
@@ -128,7 +126,7 @@ public class JwtService {
 
 	public void logout(WebSession session) {
 		String refreshToken = retrieveToken(session);
-		if (refreshToken == null || StringUtils.isBlank(refreshToken)) {
+		if (StringUtils.isBlank(refreshToken)) {
 			log.error("No Session attribute: \"" + SESSION_ATTRIBUTE_REFRESH + "\". Logout requested, no worries");
 			return;
 		}
@@ -141,12 +139,12 @@ public class JwtService {
 	}
 
 	private String retrieveToken(WebSession session) {
-		return (String) session.getAttribute(SESSION_ATTRIBUTE_REFRESH);
+		return session.getAttribute(SESSION_ATTRIBUTE_REFRESH);
 	}
 
 	private int storeJWTInSession(KeycloakTokenHandler handler, WebSession session, String value)
 			throws WamsAuthenticationException {
-		String response = null;
+		String response;
 		try {
 			response = handler.getToken(value);
 		} catch (IOException e) {
@@ -169,13 +167,13 @@ public class JwtService {
 			roles = gson
 					.fromJson(accessTokenClaims.get("resource_access").asMap().get(clientId).toString(),
 							JsonObject.class)
-					.get("roles").getAsJsonArray().asList().stream().map(r -> r.getAsString())
+					.get("roles").getAsJsonArray().asList().stream().map(JsonElement::getAsString)
 					.collect(Collectors.toList());
 		} catch (Exception e) {
 			throw new WamsAuthenticationException(true);
 
 		}
-		Boolean isAdmin = roles.indexOf("admin") > -1, isAnalist = roles.indexOf("analist") > -1;
+		boolean isAdmin = roles.contains("admin"), isAnalist = roles.contains("analist");
 
 		DecodedJWT decodedJWT = JWT.decode(responseSet.get("id_token").getAsString());
 
@@ -188,14 +186,12 @@ public class JwtService {
 
 		// Building new JWT with retrieved one.
 
-		String jwtToken = null;
+		String jwtToken;
 		int validitySpan = responseSet.get("expires_in").getAsInt();
 		try {
 			Builder JWTbuilder = JWT.create();
 
-			payload.forEach((k, v) -> {
-				JWTbuilder.withClaim(k, v.asString());
-			});
+			payload.forEach((k, v) -> JWTbuilder.withClaim(k, v.asString()));
 
 			if (isAdmin)
 				JWTbuilder.withClaim("role", "ADMIN");
@@ -214,10 +210,7 @@ public class JwtService {
 		} catch (JWTCreationException e) {
 			log.error("Error creating token for refresh");
 			throw new WamsAuthenticationException();
-		} catch (IllegalArgumentException e) {
-			log.error(e.getMessage());
-			throw new WamsAuthenticationException();
-		} catch (UnsupportedEncodingException e) {
+		} catch (IllegalArgumentException | UnsupportedEncodingException e) {
 			log.error(e.getMessage());
 			throw new WamsAuthenticationException();
 		}

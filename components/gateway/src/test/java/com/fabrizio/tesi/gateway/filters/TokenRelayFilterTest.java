@@ -1,6 +1,6 @@
 package com.fabrizio.tesi.gateway.filters;
 
-import com.fabrizio.tesi.gateway.filter.CheckAuth;
+import com.fabrizio.tesi.gateway.filter.TokenRelayFilter;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,20 +13,26 @@ import org.springframework.mock.web.server.MockServerWebExchange;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringBootTest
-public class CheckAuthTest {
+public class TokenRelayFilterTest {
     @Autowired
-    CheckAuth filter;
+    TokenRelayFilter filter;
     @Mock
     GatewayFilterChain chain;
 
     @Test
-    void emptySessionAuthDisabled() {
-        GatewayFilter filterChain = filter.apply(new CheckAuth.Config());
+    void langFilterAttrTest() {
+        String testSessionAttribute = "test";
+        GatewayFilter filterChain = filter.apply(new TokenRelayFilter.Config());
         MockServerHttpRequest request = MockServerHttpRequest.get("").build();
         MockServerWebExchange webExchnage = MockServerWebExchange.from(request);
 
+        webExchnage.getSession().block().getAttributes().put("Authorization", testSessionAttribute);
+
         filterChain.filter(webExchnage, chain);
 
+        String langAttr = webExchnage.getSession().share().block().getAttribute("Authorization");
+
         assertEquals(request, webExchnage.getRequest());
+        assertEquals(testSessionAttribute, langAttr);
     }
 }
