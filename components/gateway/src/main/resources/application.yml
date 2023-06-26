@@ -41,3 +41,15 @@ server:
 logging:
   level:
     root: INFO
+    
+auth:
+  enable: false
+  mockrole: ADMIN
+  showjwt: true
+  secret:  E03JKtneTWHrWRb6LBM5MXpTECtviKrr
+  
+keycloack:
+  realm: Tesi
+  clientid: tesi-app
+  feingress: http://localhost:7080
+  oidcaddr: https://192.168.252.214:32493/auth
