@@ -1,24 +1,14 @@
 package com.fabrizio.tesi.gateway.dto;
 
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.experimental.FieldDefaults;
+
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class CallbackRequest {
-	private String code;
-	private String state;
-
-	public String getCode() {
-		return code;
-	}
-
-	public void setCode(String code) {
-		this.code = code;
-	}
-
-	public String getState() {
-		return state;
-	}
-
-	public void setState(String state) {
-		this.state = state;
-	}
+	@Getter
+	String code;
+	String state;
 
 	@Override
 	public String toString() {
