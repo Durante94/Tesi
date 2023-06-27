@@ -42,6 +42,48 @@ public class ConfigControllerTest {
 	}
 
 	@Test
+	void destroySessionWithBlankTokenTest() {
+		MockServerHttpResponse response = new MockServerHttpResponse();
+		MockServerWebExchange exchange = MockServerWebExchange.from(MockServerHttpRequest.get("/"));
+		DefaultWebSessionManager sessionManager = new DefaultWebSessionManager();
+		WebSession session = sessionManager.getSession(exchange).block();
+		session.getAttributes().put("RefreshAuth", "");
+
+		controller.destroySession(session, response);
+
+		assertEquals(HttpStatus.FOUND, response.getStatusCode());
+		assertTrue(session.getAttributes().isEmpty());
+	}
+
+	@Test
+	void destroySessionWithBrokenTokenTest() {
+		MockServerHttpResponse response = new MockServerHttpResponse();
+		MockServerWebExchange exchange = MockServerWebExchange.from(MockServerHttpRequest.get("/"));
+		DefaultWebSessionManager sessionManager = new DefaultWebSessionManager();
+		WebSession session = sessionManager.getSession(exchange).block();
+		session.getAttributes().put("RefreshAuth", "cacellami");
+
+		controller.destroySession(session, response);
+
+		assertEquals(HttpStatus.FOUND, response.getStatusCode());
+		assertTrue(session.getAttributes().isEmpty());
+	}
+
+	@Test
+	void destroySessionWithInvalidTokenNoOauthResponseTest() {
+		MockServerHttpResponse response = new MockServerHttpResponse();
+		MockServerWebExchange exchange = MockServerWebExchange.from(MockServerHttpRequest.get("/"));
+		DefaultWebSessionManager sessionManager = new DefaultWebSessionManager();
+		WebSession session = sessionManager.getSession(exchange).block();
+		session.getAttributes().put("RefreshAuth", "cacellami.cacellami.cacellami");
+
+		controller.destroySession(session, response);
+
+		assertEquals(HttpStatus.FOUND, response.getStatusCode());
+		assertTrue(session.getAttributes().isEmpty());
+	}
+
+	@Test
 	void authenticatedTest() {
 		MockServerWebExchange exchange = MockServerWebExchange.from(MockServerHttpRequest.get("/"));
 		DefaultWebSessionManager sessionManager = new DefaultWebSessionManager();

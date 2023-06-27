@@ -15,15 +15,18 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.WebSession;
 
+import com.auth0.jwt.exceptions.JWTDecodeException;
 import com.fabrizio.tesi.gateway.auth.exception.WamsAuthenticationException;
 import com.fabrizio.tesi.gateway.dto.CallbackRequest;
 
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 
 @RequestMapping(value = { "/gateway" })
 @RestController
 @FieldDefaults(level = AccessLevel.PRIVATE)
+@Slf4j
 public class ConfigController {
 
 	@Autowired
@@ -40,6 +43,9 @@ public class ConfigController {
 		} catch (WamsAuthenticationException e) {
 			if (e.isMissingRoles())
 				location = "/index.html";
+		} catch (NullPointerException | JWTDecodeException e) {
+			log.error("Invalid response from OAuth provider", e);
+			location = "/index.html";
 		}
 		redirect(response, location);
 	}

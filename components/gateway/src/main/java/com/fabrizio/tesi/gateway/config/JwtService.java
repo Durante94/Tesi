@@ -149,7 +149,7 @@ public class JwtService {
 			response = handler.getToken(value);
 		} catch (IOException e) {
 			log.error(e.getMessage());
-			throw new WamsAuthenticationException();
+			throw new WamsAuthenticationException(true);
 		}
 
 		if (showJWT)
@@ -164,11 +164,10 @@ public class JwtService {
 		List<String> roles;
 
 		try {
-			roles = gson
-					.fromJson(accessTokenClaims.get("resource_access").asMap().get(clientId).toString(),
-							JsonObject.class)
-					.get("roles").getAsJsonArray().asList().stream().map(JsonElement::getAsString)
-					.collect(Collectors.toList());
+			roles = List
+					.of(gson.fromJson(accessTokenClaims.get("resource_access").asMap().get(clientId).toString(),
+							JsonObject.class).get("roles").getAsJsonArray())
+					.stream().map(JsonElement::getAsString).collect(Collectors.toList());
 		} catch (Exception e) {
 			throw new WamsAuthenticationException(true);
 
