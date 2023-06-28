@@ -1,19 +1,18 @@
 package com.fabrizio.tesi.gateway.config;
 
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.net.URI;
+import java.util.Map;
 
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.mock.http.server.reactive.MockServerHttpRequest;
 import org.springframework.mock.http.server.reactive.MockServerHttpResponse;
 import org.springframework.mock.web.server.MockServerWebExchange;
@@ -161,21 +160,49 @@ class ConfigControllerMockServerTest {
                         + "\"access_token\":\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyLCJyZXNvdXJjZV9hY2Nlc3MiOnsidGVzaS1hcHAiOiJ7XCJyb2xlc1wiOltcInNjZW1vXCJdfSJ9fQ.QRvb0jER0iGlPFLX0mLWCR2j1Ix_s1pFB_kQXZfeAa0\","
                         + "\"refresh_token\":\"\""
                         + "}",
-                "{"
+                "{"//ACCESSO SENZA RUOLI
                         + "\"access_token\":\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyLCJyZXNvdXJjZV9hY2Nlc3MiOnsidGVzaS1hcHAiOiJ7XCJyb2xlc1wiOltcInNjZW1vXCJdfSJ9fQ.QRvb0jER0iGlPFLX0mLWCR2j1Ix_s1pFB_kQXZfeAa0\","
+                        + "\"refresh_token\":\"\","
+                        + "\"id_token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE1MTYyMzkwMjIsImV4cCI6MTUxNjIzOTAyMn0.BA8MjTQQmXNtRSOhTvnibDjbtx7M5KO8M4XLQu-Oizg\","
+                        + "\"expires_in\": 1505468754"
+                        + "}",
+                "{"//ACCESSO COME ANALIST
+                        + "\"access_token\":\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyLCJyZXNvdXJjZV9hY2Nlc3MiOnsidGVzaS1hcHAiOiJ7XCJyb2xlc1wiOltcImFuYWxpc3RcIl19In19.WKw5MNE2JatWp_O0cFMTdaxdl5PhOGh_oKfysrn8yT8\","
+                        + "\"refresh_token\":\"\","
+                        + "\"id_token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE1MTYyMzkwMjIsImV4cCI6MTUxNjIzOTAyMn0.BA8MjTQQmXNtRSOhTvnibDjbtx7M5KO8M4XLQu-Oizg\","
+                        + "\"expires_in\": 1505468754"
+                        + "}",
+                "{"//ACCESSO COME ADMIN
+                        + "\"access_token\":\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyLCJyZXNvdXJjZV9hY2Nlc3MiOnsidGVzaS1hcHAiOiJ7XCJyb2xlc1wiOltcImFkbWluXCJdfSJ9fQ.KhQi_7r8YXfC3SfSyAEEVxGHz5mS4GIg49-fo0RK1-s\","
                         + "\"refresh_token\":\"\","
                         + "\"id_token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE1MTYyMzkwMjIsImV4cCI6MTUxNjIzOTAyMn0.BA8MjTQQmXNtRSOhTvnibDjbtx7M5KO8M4XLQu-Oizg\","
                         + "\"expires_in\": 1505468754"
                         + "}"
         };
 
-        for (String body : bodies) {
-            mockBackEnd.enqueue(new MockResponse().setResponseCode(HttpStatus.OK.value()).setBody(body));
+        for (int i = 0; i < bodies.length; i++) {
+            mockBackEnd.enqueue(new MockResponse().setResponseCode(HttpStatus.OK.value()).setBody(bodies[i]));
 
             controller.getAuth(session, dto, response);
             assertEquals(HttpStatus.MOVED_PERMANENTLY, response.getStatusCode());
-            assertEquals(URI.create(entryPoint + "/index.html"), response.getHeaders().getLocation());
+            if (i == bodies.length - 2) {
+                assertEquals(URI.create(entryPoint + "/web/"), response.getHeaders().getLocation());
+                assertNotNull(session.getAttributes().get("Authorization"));
+            } else
+                assertEquals(URI.create(entryPoint + "/index.html"), response.getHeaders().getLocation());
         }
     }
 
+    @Test
+    void refreshJWTTest() {
+        Map<String, String>[] sessionAttribute = new Map[]{
+                Map.of(),
+                Map.of("RefreshAuth", "")
+        };
+
+        for (int i = 0; i < sessionAttribute.length; i++) {
+            ResponseEntity<Integer> resp = controller.refreshJwt(session, null, response);
+            assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, resp.getStatusCode());
+        }
+    }
 }
