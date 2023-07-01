@@ -6,12 +6,7 @@ import lombok.experimental.FieldDefaults;
 
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class CallbackRequest {
-	@Getter
-	String code;
-	String state;
-
-	@Override
-	public String toString() {
-		return "{code=" + code + ", state=" + state + "}";
-	}
+    @Getter
+    String code;
+    String state;
 }

@@ -60,6 +60,9 @@ public class ConfigController {
 				return new ResponseEntity<>(0, HttpStatus.UNAUTHORIZED);
 			}
 			return new ResponseEntity<>(0, HttpStatus.INTERNAL_SERVER_ERROR);
+		}catch (NullPointerException | JWTDecodeException e) {
+			log.error("Invalid response from OAuth provider", e);
+			return new ResponseEntity<>(0, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
 
