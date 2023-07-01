@@ -1,27 +1,20 @@
 package com.fabrizio.tesi.gateway.config;
 
-import java.net.URI;
-
+import com.auth0.jwt.exceptions.JWTDecodeException;
+import com.fabrizio.tesi.gateway.auth.exception.WamsAuthenticationException;
+import com.fabrizio.tesi.gateway.dto.CallbackRequest;
+import lombok.AccessLevel;
+import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.http.server.reactive.ServerHttpResponse;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.WebSession;
 
-import com.auth0.jwt.exceptions.JWTDecodeException;
-import com.fabrizio.tesi.gateway.auth.exception.WamsAuthenticationException;
-import com.fabrizio.tesi.gateway.dto.CallbackRequest;
-
-import lombok.AccessLevel;
-import lombok.experimental.FieldDefaults;
-import lombok.extern.slf4j.Slf4j;
+import java.net.URI;
 
 @RequestMapping(value = { "/gateway" })
 @RestController
