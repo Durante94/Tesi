@@ -209,7 +209,7 @@ class ConfigControllerMockServerTest {
                     session.getAttributes().clear();
                     session.getAttributes().putAll(sessionAttribute[i]);
 
-                    ResponseEntity<Integer> resp = controller.refreshJwt(session, null, response);
+                    ResponseEntity<Integer> resp = controller.refreshJwt(session);
                     if (j >= bodies.length - 2)
                         assertEquals(HttpStatus.OK, resp.getStatusCode());
                     else if (j == 3)
@@ -221,7 +221,7 @@ class ConfigControllerMockServerTest {
             } else {
                 session.getAttributes().clear();
                 session.getAttributes().putAll(sessionAttribute[i]);
-                ResponseEntity<Integer> resp = controller.refreshJwt(session, null, response);
+                ResponseEntity<Integer> resp = controller.refreshJwt(session);
                 assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, resp.getStatusCode());
             }
         }

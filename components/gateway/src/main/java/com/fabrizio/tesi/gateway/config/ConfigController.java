@@ -51,8 +51,7 @@ public class ConfigController {
 	}
 
 	@GetMapping("/auth/refresh")
-	public ResponseEntity<Integer> refreshJwt(WebSession session, ServerHttpRequest request,
-			ServerHttpResponse response) {
+	public ResponseEntity<Integer> refreshJwt(WebSession session) {
 		try {
 			return jwtService.refresh(session);
 		} catch (WamsAuthenticationException e) {
