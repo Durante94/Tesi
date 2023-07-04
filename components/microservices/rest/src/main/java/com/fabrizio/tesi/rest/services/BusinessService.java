@@ -35,7 +35,7 @@ public class BusinessService {
         client = WebClient.builder().baseUrl(managerUrl).build();
     }
 
-    @Scheduled(fixedDelayString = "${businness.manager.updatedelay}")
+    @Scheduled(fixedDelayString = "${businness.manager.updatedelay}", initialDelayString = "${businness.manager.initialdelay:0}")
     @CachePut(value = "agents", key = "#root.target.agentCacheKey")
     public List<String> agentsList() {
         log.debug("Scheduled agent task");

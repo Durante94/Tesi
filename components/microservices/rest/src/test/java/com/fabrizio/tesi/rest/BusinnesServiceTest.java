@@ -18,7 +18,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@SpringBootTest(properties = {"businness.manager.url=http://localhost:50000"})
+@SpringBootTest(properties = {"businness.manager.url=http://localhost:50000", "businness.manager.initialdelay=999999999"})
 @ActiveProfiles("dev")
 @FieldDefaults(level = AccessLevel.PRIVATE)
 class BusinnesServiceTest {
@@ -39,20 +39,26 @@ class BusinnesServiceTest {
     }
 
     @Test
-    void responseTest() {
-        MockResponse[] responses = new MockResponse[]{
-                new MockResponse().setResponseCode(HttpStatus.INTERNAL_SERVER_ERROR.value()),
-                new MockResponse().setResponseCode(HttpStatus.OK.value()).setBody("[]"),
-                new MockResponse().setResponseCode(HttpStatus.OK.value()).setBody("[\"test\"]")
-        };
-        for (int i = 0; i < responses.length; i++) {
-            mockBackEnd.enqueue(responses[i]);
+    void responseErrorTest() {
+        mockBackEnd.enqueue(new MockResponse().setResponseCode(HttpStatus.INTERNAL_SERVER_ERROR.value()));
 
-            List<String> agents = service.agentsList();
-            if (i == responses.length - 1)
-                assertFalse(agents.isEmpty());
-            else
-                assertTrue(agents.isEmpty());
-        }
+        List<String> agents = service.agentsList();
+        assertTrue(agents.isEmpty());
+    }
+
+    @Test
+    void responseEmptyTest() {
+        mockBackEnd.enqueue(new MockResponse().setResponseCode(HttpStatus.OK.value()).setBody("[]").addHeader("Content-Type", "application/json"));
+
+        List<String> agents = service.agentsList();
+        assertTrue(agents.isEmpty());
+    }
+
+    @Test
+    void responseValidTest() {
+        mockBackEnd.enqueue(new MockResponse().setResponseCode(HttpStatus.OK.value()).setBody("[\"test\"]").addHeader("Content-Type", "application/json"));
+
+        List<String> agents = service.agentsList();
+        assertFalse(agents.isEmpty());
     }
 }
