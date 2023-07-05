@@ -22,43 +22,35 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @ActiveProfiles("dev")
 @FieldDefaults(level = AccessLevel.PRIVATE)
 class BusinnesServiceTest {
-    static MockWebServer mockBackEnd;
+	static MockWebServer mockBackEnd;
 
-    @Autowired
-    BusinessService service;
+	@Autowired
+	BusinessService service;
 
-    @BeforeAll
-    static void setUpBeforeClass() throws Exception {
-        mockBackEnd = new MockWebServer();
-        mockBackEnd.start(50000);
-    }
+	@BeforeAll
+	static void setUpBeforeClass() throws Exception {
+		mockBackEnd = new MockWebServer();
+		mockBackEnd.start(50000);
+	}
 
-    @AfterAll
-    static void tearDownAfterClass() throws Exception {
-        mockBackEnd.shutdown();
-    }
+	@AfterAll
+	static void tearDownAfterClass() throws Exception {
+		mockBackEnd.shutdown();
+	}
 
-    @Test
-    void responseErrorTest() {
-        mockBackEnd.enqueue(new MockResponse().setResponseCode(HttpStatus.INTERNAL_SERVER_ERROR.value()));
+	@Test
+	void responseTest() {
+		String[] responses = new String[] { "", "[\"test\"]" };
+		int statusCodes[] = new int[] { HttpStatus.INTERNAL_SERVER_ERROR.value(), HttpStatus.OK.value() };
 
-        List<String> agents = service.agentsList();
-        assertTrue(agents.isEmpty());
-    }
-
-    @Test
-    void responseEmptyTest() {
-        mockBackEnd.enqueue(new MockResponse().setResponseCode(HttpStatus.OK.value()).setBody("[]").addHeader("Content-Type", "application/json"));
-
-        List<String> agents = service.agentsList();
-        assertTrue(agents.isEmpty());
-    }
-
-    @Test
-    void responseValidTest() {
-        mockBackEnd.enqueue(new MockResponse().setResponseCode(HttpStatus.OK.value()).setBody("[\"test\"]").addHeader("Content-Type", "application/json"));
-
-        List<String> agents = service.agentsList();
-        assertFalse(agents.isEmpty());
-    }
+		for (int i = 0; i < responses.length; i++) {
+			mockBackEnd.enqueue(new MockResponse().setResponseCode(statusCodes[i])
+					.addHeader("Content-Type", "application/json").setBody(responses[i]));
+			List<String> agents = service.agentsList();
+			if (i == responses.length - 1)
+				assertFalse(agents.isEmpty());
+			else
+				assertTrue(agents.isEmpty());
+		}
+	}
 }
