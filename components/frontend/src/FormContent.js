@@ -12,7 +12,7 @@ const initialState = {
     reducer = (state, action) => {
         if (action.type === "form")
             return { initialValues: action.payload, loading: false };
-        else if (action.type == "agent")
+        else if (action.type === "agent")
             return { initialValues: { ...state.initialValues, ...action.payload }, loading: false };
         else
             return { ...state, loading: action.payload };
@@ -68,13 +68,13 @@ export const FormContent = ({ edit, id, dispatch, configResp }) => {
 
     const fieldsProps = [
         { name: "id", hidden: true, noStyle: true, type: "" },
-        { name: "name", type: "text", label: "Name", required: true, rules: [{ required: true }] },
-        { name: "description", type: "text", label: "Description" },
-        { name: "agentId", type: "select", label: "Adapter", required: true, rules: [{ required: true }], inputProps: { width: "100%", fetchOptions, optionLabelProp: "value", fieldNames: { value: "value", label: "value" } } },
-        { name: "amplitude", type: "number", label: "Configured Amplitude", required: true, rules: [{ required: true }], inputProps: { style: { width: "100%" }, disabled: true } },
-        { name: "frequency", type: "number", label: "Configured Frequency", required: true, rules: [{ required: true }], inputProps: { style: { width: "100%" }, disabled: true } },
-        { name: "function", type: "number", label: "Configured Function", required: true, rules: [{ required: true }], inputProps: { style: { width: "100%" }, disabled: true } },
-        { name: "enable", type: "boolean", label: "Enable", required: true, rules: [{ required: true }], valuePropName: "checked", initialValue: false }
+        { name: "name", type: "text", label: "Name", required: true, rules: [{ required: true }], inputProps: { className: "cp-name" } },
+        { name: "description", type: "text", label: "Description", inputProps: { className: "cp-description" } },
+        { name: "agentId", type: "select", label: "Adapter", required: true, rules: [{ required: true }], inputProps: { width: "100%", fetchOptions, optionLabelProp: "value", fieldNames: { value: "value", label: "value" } }, className: "cp-agent" },
+        { name: "amplitude", type: "number", label: "Configured Amplitude", required: true, rules: [{ required: true }], inputProps: { style: { width: "100%" }, disabled: true }, className: "cp-amplitude" },
+        { name: "frequency", type: "number", label: "Configured Frequency", required: true, rules: [{ required: true }], inputProps: { style: { width: "100%" }, disabled: true }, className: "cp-frequency" },
+        { name: "function", type: "number", label: "Configured Function", required: true, rules: [{ required: true }], inputProps: { style: { width: "100%" }, disabled: true }, className: "cp-function" },
+        { name: "enable", type: "boolean", label: "Enable", required: true, rules: [{ required: true }], valuePropName: "checked", initialValue: false, className: "cp-enable" }
     ]
 
     return <Form {...{ form, onFinish }}
@@ -114,14 +114,15 @@ export const FormContent = ({ edit, id, dispatch, configResp }) => {
                     text="Request Configuration"
                     width="auto"
                     disabled={!changedAgent || !edit}
+                    className="cp-config-req"
                     onClick={() => dispatch({ type: "config-req", payload: { id: form.getFieldValue("agentId") } })}
                 />
             </Col>
             <Col lg={{ offset: 15, span: 3 }} md={{ offset: 14, span: 3 }} sm={{ offset: 11, span: 4 }} xs={{ offset: 9, span: 5 }}>
-                <GenericButton text="Save" type="primary" htmlType="submit" disabled={!edit || (isFinite(parseInt(id)) && changedAgent !== initialValues.agentId)} />
+                <GenericButton text="Save" type="primary" htmlType="submit" disabled={!edit || (isFinite(parseInt(id)) && changedAgent !== initialValues.agentId)} className="cp-save" />
             </Col>
             <Col lg={{ span: 3 }} md={{ span: 3 }} sm={{ span: 4 }} xs={{ span: 5 }}>
-                <GenericButton text="Close" type="primary" danger onClick={close} />
+                <GenericButton text="Close" type="primary" danger onClick={close} className="cp-close" />
             </Col>
         </Row>
     </Form >;

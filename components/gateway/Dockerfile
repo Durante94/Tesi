@@ -4,7 +4,7 @@ WORKDIR /app
 COPY pom.xml .
 COPY src ./src
 
-RUN mvn clean package -Dmaven.test.skip
+RUN mvn clean package
 RUN mkdir target/extracted \
     && java -Djarmode=layertools -jar target/*.jar extract --destination target/extracted
 

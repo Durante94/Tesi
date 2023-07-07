@@ -16,7 +16,7 @@ spec:
         - name: docker-registry-secret
       containers:
       - name: "config-scheduler"
-        image: docker.io/fabrizio294/configuration-scheduler:0.0.1
+        image: docker.io/fabrizio294/configuration-scheduler:0.0.2
         ports:
         - containerPort: 8001
         env:
