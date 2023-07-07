@@ -12,7 +12,7 @@ const initialState = {
     reducer = (state, action) => {
         if (action.type === "form")
             return { initialValues: action.payload, loading: false };
-        else if (action.type == "agent")
+        else if (action.type === "agent")
             return { initialValues: { ...state.initialValues, ...action.payload }, loading: false };
         else
             return { ...state, loading: action.payload };
