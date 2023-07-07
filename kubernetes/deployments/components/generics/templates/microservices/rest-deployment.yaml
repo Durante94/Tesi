@@ -16,7 +16,7 @@ spec:
         - name: docker-registry-secret
       containers:
       - name: "rest"
-        image: docker.io/fabrizio294/rest-service:0.0.10
+        image: docker.io/fabrizio294/rest-service:0.0.11
         ports:
         - containerPort: 8000
         env:
