@@ -69,6 +69,7 @@ function App() {
       <Header className="header">
         My IOT Device Handler
         <LogoutOutlined
+          className="cp-logout"
           style={{ fontSize: 30, lineHeight: "64px" }}
           title={"Logout"}
           onClick={() => axios.post("/gateway/auth/logout").finally(() => window.location.reload())}
@@ -88,17 +89,18 @@ function App() {
             text="Alarms"
             disabled={alarms.size === 0}
             danger
+            className="cp-show-alarm"
             onClick={() => Modal.info({
               title: "Active Alarms",
               content: <>
                 {[...alarms.entries()].map((pair, key) => <p {...{ key }}>
-                  <b>Agent {pair[0]}</b>: {formatAlarm(pair[1])}
+                  <b>Agent {pair[0]}</b>: <span style={{ marginRight: 5 }}>{formatAlarm(pair[1])}</span>
                   <Delete danger={true} onClick={() => dispatch({ type: "toggle-alarm", payload: pair[0] })} />
                 </p>)}
               </>,
               closable: true,
               centered: true,
-              width: "60vw"
+              width: "60vw",
             })
             }
           />

@@ -24,6 +24,12 @@ export const TableContent = ({ viewState = {}, editEnable = false, dispatch = ()
             rowKey="id"
             rowName="name"
         />
-        <GenericButton text="Add Device" type="primary" width="auto" disabled={!editEnable} onClick={() => dispatch({ type: "detail", payload: { detail: true, edit: true, id: null } })} />
+        <GenericButton
+            text="Add Device"
+            type="primary"
+            width="auto"
+            disabled={!editEnable}
+            className="cp-add-dev"
+            onClick={() => dispatch({ type: "detail", payload: { detail: true, edit: true, id: null } })} />
     </Space>
 }
