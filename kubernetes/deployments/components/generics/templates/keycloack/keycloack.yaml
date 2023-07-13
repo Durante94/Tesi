@@ -33,7 +33,7 @@ spec:
     spec:
       containers:
       - name: keycloak
-        image: quay.io/keycloak/keycloak:21.1.1
+        image: quay.io/keycloak/keycloak:22.0.0
         args: ["start-dev", "--import-realm", "--db=${DB_VENDOR}", "--db-url=\"${KEYCLOAK_DB_URL}\"", "--db-username=\"${KEYCLOAK_DB_USER}\"", "--db-password=\"${KEYCLOAK_DB_PASSWORD}\""] # SOSTITUISCI "start-dev" IN PROD CON "start"
         volumeMounts:
         - name: keycloak-config
