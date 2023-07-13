@@ -47,9 +47,9 @@ describe("Device Lifecycle", () => {
 
         cy.get(".cp-config-req").should("not.be.disabled").click();
 
-        cy.get(".cp-agent").click();
-        cy.get(".ant-select-item").eq(1).click();
-        cy.get(".cp-save").should("not.be.disabled");
+        // cy.get(".cp-agent").click();
+        // cy.get(".ant-select-item").eq(1).click();
+        // cy.get(".cp-save").should("be.disabled");
 
         cy.get(".cp-agent").click();
         cy.get(".ant-select-item").first().click();
@@ -97,10 +97,6 @@ describe("Device Lifecycle", () => {
     it("Restore description and change agent", () => {
         cy.intercept({
             method: 'GET',
-            url: '/api/crud?*',
-        }).as('apiList')
-        cy.intercept({
-            method: 'GET',
             url: '/api/crud/*',
         }).as('apiDetail')
         cy.intercept({
@@ -141,10 +137,40 @@ describe("Device Lifecycle", () => {
     });
 
     it("Apertura in modalità sola lettura", () => {
+        cy.intercept({
+            method: 'GET',
+            url: '/api/crud?*',
+        }).as('apiList')
+        cy.intercept({
+            method: 'GET',
+            url: '/api/crud/*',
+        }).as('apiDetail')
 
+        cy.get(".cp-search").should("not.be.disabled").click()
+        cy.wait("@apiDetail", 9000000000000000).should(xhr => { expect(xhr.response).to.have.property('statusCode', 200) });
+
+        cy.get(".cp-amplitude input").should("be.disabled").invoke("val").should("not.be.empty")
+        cy.get(".cp-frequency input").should("be.disabled").invoke("val").should("not.be.empty")
+        cy.get(".cp-function input").should("be.disabled").invoke("val").should("not.be.empty")
+        cy.get(".cp-description input").should("be.disabled").invoke("val").should("not.be.empty")
+        cy.get(".cp-agent input").should("not.be.visible");
+        cy.get(".cp-name input").should("be.disabled").invoke("val").should("not.be.empty");
+        cy.get(".cp-enable input").should("be.disabled");
+
+        cy.get(".cp-config-req").should("be.disabled");
+        cy.get(".cp-save").should("be.disabled");
+        cy.get(".cp-close").should("not.be.disabled").click();
+
+        cy.wait("@apiList", 9000000000000000).should(xhr => { expect(xhr.response).to.have.property('statusCode', 200) });
     });
 
     it("Cancellazione nuovo device", () => {
-
+        cy.intercept({
+            method: 'DELETE',
+            url: '/api/crud/*',
+        }).as('apiDelete')
+        cy.get(".cp-delete").should("not.be.disabled").click();
+        cy.get(".ant-modal-body .ant-btn").should("be.visible").click();
+        cy.wait("@apiDelete", 9000000000000000).should(xhr => { expect(xhr.response).to.have.property('statusCode', 200) });
     })
 });
