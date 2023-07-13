@@ -55,13 +55,19 @@ const addSearchInCol = (dataIndex, colLabel, colType, options = {}, multi = fals
 export const adapterColumns = (tableName, rowKeyName, columns, data, onCheck, sort = {}, filters = {}) =>
   columns.map((cl, i) => {
     const searchProps = cl.search ? addSearchInCol(cl.dataIndex, cl.title, cl.type, cl.options || cl.optionMap, cl.multi) : {};
+    const appliedFilter = [];
+    if (filters[cl.dataIndex])
+      if (cl.multi)
+        appliedFilter.concat(filters[cl.dataIndex]);
+      else
+        appliedFilter.push(filters[cl.dataIndex]);
 
     return {
       title: <TitleRenderer {...{ data, ...cl, filters, tableName, onCheck }} />,
       dataIndex: cl.dataIndex,
       key: cl.key,
       sorter: cl.sorter,
-      filteredValue: filters[cl.dataIndex] || [],
+      filteredValue: appliedFilter,
       width: cl.width,
       type: cl.type,
       fixed: columnFixer(cl.key, rowKeyName, cl.symbol === "rhombus" || cl.symbol === "tag" || cl.symbol === "circle" || cl.fixed),
