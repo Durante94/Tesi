@@ -32,6 +32,7 @@ public class ConfigController {
 	public void getAuth(WebSession session, @ModelAttribute CallbackRequest reqCallBack, ServerHttpResponse response) {
 		String location = "/web/";
 		try {
+			log.debug("Response from keycloack: {}", reqCallBack.getCode());
 			jwtService.auth(session, reqCallBack.getCode());
 		} catch (WamsAuthenticationException e) {
 			if (e.isMissingRoles())
