@@ -53,7 +53,6 @@ const initialState = {
     default:
       break;
   }
-  console.log(msg);
   return msg;
 };
 
