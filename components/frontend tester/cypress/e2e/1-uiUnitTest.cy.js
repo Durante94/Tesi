@@ -169,7 +169,7 @@ describe("Device Lifecycle", () => {
             method: 'DELETE',
             url: '/api/crud/*',
         }).as('apiDelete')
-        cy.get(".cp-delete").should("not.be.disabled").click();
+        cy.get(".cp-delete button").should("not.be.disabled").click();
         cy.get(".ant-modal-body .ant-btn").should("be.visible").click();
         cy.wait("@apiDelete", 9000000000000000).should(xhr => { expect(xhr.response).to.have.property('statusCode', 200) });
     })

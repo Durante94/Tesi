@@ -9,6 +9,8 @@ module.exports = defineConfig({
     keycloack_host: "http://192.168.230.129:30090",
     username: "fabrizio",
     password: "fabrizio",
+    usernameNoAdmin: "andrea",
+    passwordNoAdmin: "andrea",
     doLogin: true
   },
   viewportWidth: 1920,

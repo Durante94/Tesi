@@ -13,7 +13,7 @@ describe("Device Enabling from table view", () => {
         cy.wait('@userAdmin', 9000000000000000).should(xhr => { expect(xhr.response).to.have.property('statusCode', 200) });
     })
 
-    it("Check on header", () => {
+    it("Check on first checkox in table body", () => {
         cy.intercept({
             method: 'POST',
             url: '/api/crud/enable/*',
@@ -22,21 +22,20 @@ describe("Device Enabling from table view", () => {
             method: 'GET',
             url: '/api/crud?*',
         }).as('apiList')
-
-        cy.get("th .ant-checkbox-input").should("exist").invoke("attr", "checked").then(val => {
+        cy.get("tbody tr:eq(1) .ant-checkbox-input").should("exist").invoke("attr", "checked").then(val => {
             let prefix = '';
             cy.log(val)
             if (val === "checked") {
                 prefix = "not."
-                cy.get("th .ant-checkbox-input").uncheck();
+                cy.get("tbody tr:eq(1) .ant-checkbox-input").uncheck();
             }
-            else
-                cy.get("th .ant-checkbox-input").check();
+            else {
+                cy.get("tbody tr:eq(1) .ant-checkbox-input").check();
+            }
             cy.wait("@apiCheck", 9000000000000000).should(xhr => { expect(xhr.response).to.have.property('statusCode', 200) });
             cy.wait("@apiList", 9000000000000000).should(xhr => { expect(xhr.response).to.have.property('statusCode', 200) });
 
-            cy.get("thead .ant-checkbox-input").should(prefix + "be.checked");
-            cy.get("tbody .ant-checkbox-input").should(prefix + "be.checked");
+            cy.get("tbody tr:eq(1) .ant-checkbox-input").first().should(prefix + "be.checked");
         });
     });
 });
