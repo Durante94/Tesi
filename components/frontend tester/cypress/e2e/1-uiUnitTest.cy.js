@@ -152,7 +152,7 @@ describe("Device Lifecycle", () => {
         cy.get(".cp-amplitude input").should("be.disabled").invoke("val").should("not.be.empty")
         cy.get(".cp-frequency input").should("be.disabled").invoke("val").should("not.be.empty")
         cy.get(".cp-function input").should("be.disabled").invoke("val").should("not.be.empty")
-        cy.get(".cp-description input").should("be.disabled").invoke("val").should("not.be.empty")
+        cy.get(".cp-description input").should("be.disabled").invoke("val").should("not.be.empty").should("be.equals", devDescr);
         cy.get(".cp-agent input").should("not.be.visible");
         cy.get(".cp-name input").should("be.disabled").invoke("val").should("not.be.empty");
         cy.get(".cp-enable input").should("be.disabled");
