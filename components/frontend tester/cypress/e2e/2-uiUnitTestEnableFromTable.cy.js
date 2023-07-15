@@ -1,5 +1,3 @@
-import { openDropdown } from "./commonMenuFunctions";
-
 describe("Device Enabling from table view", () => {
     before(() => {
         if (Cypress.env('doLogin'))

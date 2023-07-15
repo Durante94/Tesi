@@ -115,7 +115,7 @@ describe("Device Lifecycle", () => {
         cy.get(".cp-frequency input").should("be.disabled").invoke("val").should("not.be.empty").then(val => cy.wrap(val).as("frequency"));
         cy.get(".cp-function input").should("be.disabled").invoke("val").should("not.be.empty").then(val => cy.wrap(val).as("function"));
         cy.get(".cp-description input").invoke("val").then(val => expect(val).to.be.equals(devDescr + " Edit"));
-        cy.get(".cp-description").type(`{selectAll}{backSpace}${devDescr}`);
+        cy.get(".cp-description input").type(`{selectAll}{backSpace}${devDescr}`);
 
         cy.get(".cp-agent").click();
         cy.wait("@apiAgent", 9000000000000000).should(xhr => { expect(xhr.response).to.have.property('statusCode', 200) });
