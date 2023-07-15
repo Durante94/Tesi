@@ -59,7 +59,7 @@ export const FormContent = ({ edit, id, dispatch, configResp }) => {
 
     useEffect(() => {
         if (configResp && changedAgent === configResp.agentId) {
-            dispatchForm({ type: "agent", payload: configResp })
+            dispatchForm({ type: "agent", payload: { ...form.getFieldValues(), ...configResp } })
             dispatch({ type: "config-resp", payload: null })
         }
     }, [dispatch, form, configResp, changedAgent])
