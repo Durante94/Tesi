@@ -119,7 +119,7 @@ export const FormContent = ({ edit, id, dispatch, configResp }) => {
                 />
             </Col>
             <Col lg={{ offset: 15, span: 3 }} md={{ offset: 14, span: 3 }} sm={{ offset: 11, span: 4 }} xs={{ offset: 9, span: 5 }}>
-                <GenericButton text="Save" type="primary" htmlType="submit" disabled={!edit || (isFinite(parseInt(id)) && changedAgent !== initialValues.agentId)} className="cp-save" />
+                <GenericButton text="Save" type="primary" htmlType="submit" disabled={!edit || changedAgent !== initialValues.agentId} className="cp-save" />
             </Col>
             <Col lg={{ span: 3 }} md={{ span: 3 }} sm={{ span: 4 }} xs={{ span: 5 }}>
                 <GenericButton text="Close" type="primary" danger onClick={close} className="cp-close" />

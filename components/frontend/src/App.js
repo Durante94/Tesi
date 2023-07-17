@@ -1,14 +1,14 @@
 import { useEffect, useReducer } from "react";
-import { Badge, Layout, Modal } from "antd";
+import { Layout } from "antd";
 import { LogoutOutlined } from "@ant-design/icons";
 import axios from "axios";
 import { TableContent } from "./TableContent";
 import { FormContent } from "./FormContent";
 import './App.css';
 import { WebSocket } from "./WebSocket";
-import { GenericButton, Delete } from "./buttons/buttons";
 import { AuthenticationRetainer } from "./AuthenticationRetainer"
 import { canEdit } from "./rest/crud";
+import { ModalAlarms } from "./ModalAlarms";
 
 const initialState = {
   viewState: {},
@@ -43,17 +43,6 @@ const initialState = {
     default:
       return state;
   }
-}, formatAlarm = obj => {
-  const formatOpt = { year: "numeric", month: "numeric", day: "numeric", hour: "numeric", minute: "numeric", second: "numeric" };
-  let msg = '';
-  switch (obj.type) {
-    case "connection":
-      msg += `Connection lost at ${new Date(obj.time).toLocaleString("it-IT", formatOpt)}, last seen at ${new Date(obj.lastHB).toLocaleString("it-IT", formatOpt)}`;
-      break;
-    default:
-      break;
-  }
-  return msg;
 };
 
 function App() {
@@ -83,27 +72,7 @@ function App() {
         }
       </Content>
       <Footer className="footer">
-        <Badge count={alarms.size}>
-          <GenericButton
-            text="Alarms"
-            disabled={alarms.size === 0}
-            danger
-            className="cp-show-alarm"
-            onClick={() => Modal.info({
-              title: "Active Alarms",
-              content: <>
-                {[...alarms.entries()].map((pair, key) => <p {...{ key }}>
-                  <b>Agent {pair[0]}</b>: <span style={{ marginRight: 5 }}>{formatAlarm(pair[1])}</span>
-                  <Delete danger={true} onClick={() => dispatch({ type: "toggle-alarm", payload: pair[0] })} />
-                </p>)}
-              </>,
-              closable: true,
-              centered: true,
-              width: "60vw",
-            })
-            }
-          />
-        </Badge>
+        <ModalAlarms alarmList={[...alarms.entries()]} {...{ dispatch }} />
       </Footer>
       <WebSocket {...{ dispatch }} request={configReq} />
       <AuthenticationRetainer />
