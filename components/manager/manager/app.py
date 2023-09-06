@@ -17,7 +17,7 @@ class List:
         self.agentDict = agentDict
 
     def on_get(self, req, resp):
-        resp.text = json.dumps(self.agentDict.keys())
+        resp.text = json.dumps(list(self.agentDict.keys()))
         resp.status = falcon.HTTP_200
 
 
@@ -29,7 +29,7 @@ def acked(err, msg):
     #     logging.debug("Message produced: %s" % (str(msg)))
 
 
-def agent_check(agentDict, execute, kafka, hbVal, hbTol):
+def agent_check(agentDict, execute, kafka, hbVal, hbTol, test=False):
     time.sleep(10)
     producer = Producer({"bootstrap.servers": kafka,
                         "client.id": socket.gethostname()})
@@ -42,8 +42,6 @@ def agent_check(agentDict, execute, kafka, hbVal, hbTol):
         except BrokenPipeError as e:
             logging.error(e)
             iterated_dict = {}
-            time.sleep(hbVal)
-            continue
 
         for id in iterated_dict.keys():
             if now - iterated_dict[id] > hbVal + hbTol:
@@ -64,24 +62,22 @@ def agent_check(agentDict, execute, kafka, hbVal, hbTol):
                     alarmSended[id] = True
         for id in keys_to_remove:
             del agentDict[id]
+        producer.flush()
         time.sleep(hbVal)
+        if test:
+            break
     logging.debug("Agent check process closed")
 
 
-def heartbeat_ckeck(agentDict, execute, kafka):
-    while True:
-        try:
-            consumer = Consumer(
-                {
-                    "bootstrap.servers": kafka,
-                    "group.id": os.getenv("KAFKA_GROUP"),
-                    "auto.offset.reset": "latest",
-                }
-            )
-            break
-        except Exception as e:
-            logging.warn("%%Consumer error: %s" % e)
-            continue
+def heartbeat_ckeck(agentDict, execute, kafka, test=False):
+    consumer = Consumer(
+        {
+            "bootstrap.servers": kafka,
+            "group.id": os.getenv("KAFKA_GROUP"),
+            "auto.offset.reset": "latest",
+        }
+    )
+
     logging.debug("Consumer connected")
     consumer.subscribe(["heartbeat"])
     logging.debug("Consumer subscibed")
@@ -89,7 +85,10 @@ def heartbeat_ckeck(agentDict, execute, kafka):
         try:
             msg = consumer.poll(timeout=10.0)
             if msg is None:
-                continue
+                if test:
+                    break
+                else:
+                    continue
 
             if msg.error():
                 if msg.error().code() == KafkaError._PARTITION_EOF:
@@ -107,6 +106,8 @@ def heartbeat_ckeck(agentDict, execute, kafka):
             logging.error(e)
         except Exception as general:
             logging.error(general)
+        if test:
+            break
     consumer.close()
     logging.debug("Heartbeat process closed")
 
