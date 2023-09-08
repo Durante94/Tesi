@@ -69,39 +69,42 @@ def agent_check(agentDict, execute, kafka, hbVal, hbTol, test=False):
     logging.debug("Agent check process closed")
 
 
+def msg_elaboration(msg, agentDict):
+    if msg is None:
+        logging.debug("Messagge null")
+        return
+
+    if msg.error():
+        logging.debug("Messagge broken")
+        if msg.error().code() == KafkaError._PARTITION_EOF:
+            logging.info(
+                "%% %s [%d] reached end at offset %d\n"
+                % (msg.topic(), msg.partition(), msg.offset())
+            )
+        elif msg.error():
+            raise KafkaException(msg.error())
+    else:
+        logging.debug("Messagge consumed")
+        key = msg.key().decode("utf-8")
+        agentDict[key] = time.time()
+
+
 def heartbeat_ckeck(agentDict, execute, kafka, test=False):
     consumer = Consumer(
         {
             "bootstrap.servers": kafka,
             "group.id": os.getenv("KAFKA_GROUP"),
-            "auto.offset.reset": "latest",
+            "auto.offset.reset": os.getenv("COSUMER_CONF"),
         }
     )
-
     logging.debug("Consumer connected")
     consumer.subscribe(["heartbeat"])
-    logging.debug("Consumer subscibed")
+    logging.debug("Consumer subscribed")
     while execute:
         try:
             msg = consumer.poll(timeout=10.0)
-            if msg is None:
-                if test:
-                    break
-                else:
-                    continue
-
-            if msg.error():
-                if msg.error().code() == KafkaError._PARTITION_EOF:
-                    logging.info(
-                        "%% %s [%d] reached end at offset %d\n"
-                        % (msg.topic(), msg.partition(), msg.offset())
-                    )
-                elif msg.error():
-                    raise KafkaException(msg.error())
-            else:
-                logging.debug("Messagge consumed")
-                key = msg.key().decode("utf-8")
-                agentDict[key] = time.time()
+            logging.debug("Messagge consumed")
+            msg_elaboration(msg, agentDict)
         except KafkaException as e:
             logging.error(e)
         except Exception as general:
