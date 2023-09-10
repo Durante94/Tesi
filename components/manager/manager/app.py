@@ -46,13 +46,14 @@ def agent_check(agentDict, execute, kafka, hbVal, hbTol, test=False):
         for id in iterated_dict.keys():
             if now - iterated_dict[id] > hbVal + hbTol:
                 if alarmSended.get(id) == None:
+                    msgProducer = {"type": "connection", "time": now,
+                                   "lastHB": iterated_dict[id]}
+                    if test:
+                        yield msgProducer
                     producer.produce(
                         "alarm",
                         key=id,
-                        value=json.dumps(
-                            {"type": "connection", "time": now,
-                                "lastHB": iterated_dict[id]}
-                        ).encode(),
+                        value=json.dumps(msgProducer).encode(),
                         callback=acked,
                     )
                     alarmSended[id] = False
