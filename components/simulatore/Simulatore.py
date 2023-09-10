@@ -10,10 +10,10 @@ import logging
 import random
 
 id = str(uuid.uuid4())
-print(id)
 
 # Set logging level: DEBUG, INFO, WARNING, ERROR, CRITICAL
 logging.basicConfig(level=logging.INFO)
+logging.info(id)
 
 
 def acked(err, msg):
@@ -24,7 +24,7 @@ def acked(err, msg):
         logging.debug("Message produced: %s" % (str(msg)))
 
 
-def producer_task(conf, flag, transmit, function, amplitude, frequency, currentId):
+def producer_task(conf, flag, transmit, function, amplitude, frequency, currentId, test=False):
     producer = Producer(conf)
     math_func = getattr(np, function)
     t = 1
@@ -34,6 +34,7 @@ def producer_task(conf, flag, transmit, function, amplitude, frequency, currentI
         value = np.array2string(
             amplitude * math_func(t + np.pi / frequency))
         logging.debug(value)
+        yield value
         producer.produce("data",
                          key=currentId,
                          value=json.dumps(
@@ -41,10 +42,12 @@ def producer_task(conf, flag, transmit, function, amplitude, frequency, currentI
                          callback=acked)
         producer.poll(2)
         t = t + 1
+        if test:
+            break
 
 
 def heartbeat_task(conf, flag, sleepTime, currentId):
-    time.sleep(random.randint(1,10))
+    time.sleep(random.randint(1, 10))
     producer = Producer(conf)
     logging.debug("Heartbeat task started")
     while flag:
@@ -53,6 +56,52 @@ def heartbeat_task(conf, flag, sleepTime, currentId):
                          key=currentId,
                          callback=acked)
         logging.debug("Heartbeat produced %s" % currentId)
+
+
+def msg_elaboration(msg, producer, current_data_task, conf, exit_flag, transmit_flag, function, amplitude, frequency, id, test=False):
+    if msg is None:
+        return None
+
+    if msg.error():
+        if msg.error().code() == KafkaError._PARTITION_EOF:
+            logging.warning('%% %s [%d] reached end at offset %d\n' %
+                            (msg.topic(), msg.partition(), msg.offset()))
+            return None
+        elif msg.error():
+            raise KafkaException(msg.error())
+    else:
+        try:
+            msgValue = json.loads(msg.value())
+        except Exception as e:
+            logging.error("Error during deserialization: %s" % e)
+            return None
+
+        if msgValue.get('id') != id:
+            return None
+
+        match msg.key():
+            case b'request':
+                producedDict = {
+                    'function': function,
+                    'amplitude': amplitude,
+                    'frequency': frequency
+                }
+                if test:
+                    yield producedDict
+                producer.produce('config-response',
+                                 key=id,
+                                 value=json.dumps(producedDict).encode(),
+                                 callback=acked)
+            case b'toggle':
+                if eval(str(msgValue["payload"]).capitalize()):
+                    transmit_flag.set(True)
+                    data_task = Process(target=producer_task, args=(
+                        conf, exit_flag, transmit_flag, function, amplitude, frequency, id))
+                    yield data_task
+                    data_task.start()
+                else:
+                    transmit_flag.set(False)
+                    current_data_task.terminate()
 
 
 manager = Manager()
@@ -69,7 +118,7 @@ consumer = Consumer({'bootstrap.servers': os.getenv("KAFKA_HOST"),
                     'group.id': os.getenv("KAFKA_GROUP"),
                      'auto.offset.reset': 'latest'})
 
-time.sleep(random.randint(1,10))
+time.sleep(random.randint(1, 10))
 
 producer = Producer(conf)
 function = os.getenv("MATH_FUN")
@@ -79,14 +128,9 @@ hb_rate = int(os.getenv("HB_RATE"))
 
 heartbeat_process = Process(target=heartbeat_task,
                             args=(conf.copy(), exit_flag, hb_rate, id))
+data_task = None
 heartbeat_process.start()
-while True:
-    try:
-        consumer.subscribe(['config-request'])
-        break
-    except Exception as e:
-        logging.warn("%%Consumer error: %s" % e)
-        continue
+consumer.subscribe(['config-request'])
 
 try:
     logging.info("Started")
@@ -94,44 +138,8 @@ try:
         try:
             msg = consumer.poll(timeout=10.0)
             logging.debug("Message consumed: %s" % str(msg))
-            if msg is None:
-                continue
-
-            if msg.error():
-                if msg.error().code() == KafkaError._PARTITION_EOF:
-                    logging.warning('%% %s [%d] reached end at offset %d\n' %
-                                    (msg.topic(), msg.partition(), msg.offset()))
-                elif msg.error():
-                    raise KafkaException(msg.error())
-            else:
-                try:
-                    msgValue = json.loads(msg.value())
-                except Exception as e:
-                    logging.error("Error during deserialization: %s" % e)
-                    continue
-
-                if msgValue.get('id') != id:
-                    continue
-
-                match msg.key():
-                    case b'request':
-                        producer.produce('config-response',
-                                         key=id,
-                                         value=json.dumps({
-                                             'function': function,
-                                             'amplitude': amplitude,
-                                             'frequency': frequency
-                                         }).encode(),
-                                         callback=acked)
-                    case b'toggle':
-                        if eval(str(msgValue["payload"]).capitalize()):
-                            transmit_flag.set(True)
-                            data_task = Process(target=producer_task, args=(
-                                conf.copy(), exit_flag, transmit_flag, function, amplitude, frequency, id))
-                            data_task.start()
-                        else:
-                            transmit_flag.set(False)
-                            data_task.terminate()
+            data_task = msg_elaboration(msg, producer, data_task, conf.copy(
+            ), exit_flag, transmit_flag, function, amplitude, frequency, id)
         except KafkaException as e:
             logging.error("KafkaException: %s" % e)
 finally:
@@ -139,5 +147,5 @@ finally:
     exit_flag.set(False)
     transmit_flag.set(False)
     heartbeat_process.terminate()
-    if data_task.is_alive():
+    if data_task and data_task.is_alive():
         data_task.terminate()
