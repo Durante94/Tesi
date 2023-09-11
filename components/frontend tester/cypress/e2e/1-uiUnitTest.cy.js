@@ -129,8 +129,6 @@ describe("Device Lifecycle", () => {
             .then(val => cy.get("@amplitude").should("not.be.equals", val));
         cy.get(".cp-frequency input").should("be.disabled").invoke("val").should("not.be.empty")
             .then(val => cy.get("@frequency").should("not.be.equals", val));
-        // cy.get(".cp-function input").should("be.disabled").invoke("val").should("not.be.empty")
-        //     .then(val => cy.get("@function").should("not.be.equals", val));
 
         cy.get(".cp-save").should("not.be.disabled").click();
         cy.wait("@apiSave", 9000000000000000).should(xhr => { expect(xhr.response).to.have.property('statusCode', 200) });
