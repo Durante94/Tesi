@@ -17,7 +17,7 @@ class List:
         self.agentDict = agentDict
 
     def on_get(self, req, resp):
-        resp.text = json.dumps(self.agentDict.keys())
+        resp.text = json.dumps(list(self.agentDict.keys()))
         resp.status = falcon.HTTP_200
 
 
@@ -29,12 +29,12 @@ def acked(err, msg):
     #     logging.debug("Message produced: %s" % (str(msg)))
 
 
-def agent_check(agentDict, execute, kafka, hbVal, hbTol):
+def agent_check(agentDict, execute, kafka, hbVal, hbTol, test=False):
     time.sleep(10)
     producer = Producer({"bootstrap.servers": kafka,
                         "client.id": socket.gethostname()})
     alarmSended = {}
-    while execute:
+    while execute.get():
         keys_to_remove = []
         now = time.time()
         try:
@@ -42,19 +42,18 @@ def agent_check(agentDict, execute, kafka, hbVal, hbTol):
         except BrokenPipeError as e:
             logging.error(e)
             iterated_dict = {}
-            time.sleep(hbVal)
-            continue
 
         for id in iterated_dict.keys():
             if now - iterated_dict[id] > hbVal + hbTol:
                 if alarmSended.get(id) == None:
+                    msgProducer = {"type": "connection", "time": now,
+                                   "lastHB": iterated_dict[id]}
+                    if test:
+                        yield msgProducer
                     producer.produce(
                         "alarm",
                         key=id,
-                        value=json.dumps(
-                            {"type": "connection", "time": now,
-                                "lastHB": iterated_dict[id]}
-                        ).encode(),
+                        value=json.dumps(msgProducer).encode(),
                         callback=acked,
                     )
                     alarmSended[id] = False
@@ -64,49 +63,55 @@ def agent_check(agentDict, execute, kafka, hbVal, hbTol):
                     alarmSended[id] = True
         for id in keys_to_remove:
             del agentDict[id]
+        producer.flush()
         time.sleep(hbVal)
+        if test:
+            break
     logging.debug("Agent check process closed")
 
 
-def heartbeat_ckeck(agentDict, execute, kafka):
-    while True:
-        try:
-            consumer = Consumer(
-                {
-                    "bootstrap.servers": kafka,
-                    "group.id": os.getenv("KAFKA_GROUP"),
-                    "auto.offset.reset": "latest",
-                }
+def msg_elaboration(msg, agentDict):
+    if msg is None:
+        logging.debug("Messagge null")
+        return
+
+    if msg.error():
+        logging.debug("Messagge broken")
+        if msg.error().code() == KafkaError._PARTITION_EOF:
+            logging.info(
+                "%% %s [%d] reached end at offset %d\n"
+                % (msg.topic(), msg.partition(), msg.offset())
             )
-            break
-        except Exception as e:
-            logging.warn("%%Consumer error: %s" % e)
-            continue
+        elif msg.error():
+            raise KafkaException(msg.error())
+    else:
+        logging.debug("Messagge consumed")
+        key = msg.key().decode("utf-8")
+        agentDict[key] = time.time()
+
+
+def heartbeat_ckeck(agentDict, execute, kafka, test=False):
+    consumer = Consumer(
+        {
+            "bootstrap.servers": kafka,
+            "group.id": os.getenv("KAFKA_GROUP"),
+            "auto.offset.reset": os.getenv("COSUMER_CONF"),
+        }
+    )
     logging.debug("Consumer connected")
     consumer.subscribe(["heartbeat"])
-    logging.debug("Consumer subscibed")
-    while execute:
+    logging.debug("Consumer subscribed")
+    while execute.get():
         try:
             msg = consumer.poll(timeout=10.0)
-            if msg is None:
-                continue
-
-            if msg.error():
-                if msg.error().code() == KafkaError._PARTITION_EOF:
-                    logging.info(
-                        "%% %s [%d] reached end at offset %d\n"
-                        % (msg.topic(), msg.partition(), msg.offset())
-                    )
-                elif msg.error():
-                    raise KafkaException(msg.error())
-            else:
-                logging.debug("Messagge consumed")
-                key = msg.key().decode("utf-8")
-                agentDict[key] = time.time()
+            logging.debug("Messagge consumed")
+            msg_elaboration(msg, agentDict)
         except KafkaException as e:
             logging.error(e)
         except Exception as general:
             logging.error(general)
+        if test:
+            break
     consumer.close()
     logging.debug("Heartbeat process closed")
 
