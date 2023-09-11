@@ -63,7 +63,7 @@ class TestAgentCheck(unittest.TestCase):
         past = future-100000000
         agentDict = {"test": future, "test2": past}
         msgVal = next(agent_check(
-            agentDict, True, os.getenv("KAFKA_HOST"), 5, 5, True))
+            agentDict, Manager().Value('i', True), os.getenv("KAFKA_HOST"), 5, 5, True))
         self.assertEqual(past, msgVal["lastHB"])
         self.assertEqual("connection", msgVal["type"])
 

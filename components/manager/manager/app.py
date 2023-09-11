@@ -34,7 +34,7 @@ def agent_check(agentDict, execute, kafka, hbVal, hbTol, test=False):
     producer = Producer({"bootstrap.servers": kafka,
                         "client.id": socket.gethostname()})
     alarmSended = {}
-    while execute:
+    while execute.get():
         keys_to_remove = []
         now = time.time()
         try:
@@ -101,7 +101,7 @@ def heartbeat_ckeck(agentDict, execute, kafka, test=False):
     logging.debug("Consumer connected")
     consumer.subscribe(["heartbeat"])
     logging.debug("Consumer subscribed")
-    while execute:
+    while execute.get():
         try:
             msg = consumer.poll(timeout=10.0)
             logging.debug("Messagge consumed")
