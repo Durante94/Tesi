@@ -29,29 +29,30 @@ def producer_task(conf, flag, transmit, function, amplitude, frequency, currentI
     math_func = getattr(np, function)
     t = 1
     logging.debug("Data task started")
-    while flag and transmit:
+    while flag.get() and transmit.get():
         time.sleep(1)
         value = np.array2string(
             amplitude * math_func(t + np.pi / frequency))
         logging.debug(value)
-        yield value
+        resDict = {"value": value, "agent": currentId}
+        if test:
+            return resDict
         producer.produce("data",
                          key=currentId,
-                         value=json.dumps(
-                             {"value": value, "agent": id}) .encode('utf-8'),
+                         value=json.dumps(resDict) .encode('utf-8'),
                          callback=acked)
         producer.poll(2)
         t = t + 1
-        if test:
-            break
 
 
-def heartbeat_task(conf, flag, sleepTime, currentId):
+def heartbeat_task(conf, flag, sleepTime, currentId, test=False):
     time.sleep(random.randint(1, 10))
     producer = Producer(conf)
     logging.debug("Heartbeat task started")
-    while flag:
+    while flag.get():
         time.sleep(sleepTime)
+        if test:
+            return currentId
         producer.produce("heartbeat",
                          key=currentId,
                          callback=acked)
@@ -87,19 +88,21 @@ def msg_elaboration(msg, producer, current_data_task, conf, exit_flag, transmit_
                     'frequency': frequency
                 }
                 if test:
-                    yield producedDict
+                    return producedDict
                 producer.produce('config-response',
                                  key=id,
                                  value=json.dumps(producedDict).encode(),
                                  callback=acked)
             case b'toggle':
                 if eval(str(msgValue["payload"]).capitalize()):
+                    logging.debug("Data task start")
                     transmit_flag.set(True)
                     data_task = Process(target=producer_task, args=(
                         conf, exit_flag, transmit_flag, function, amplitude, frequency, id))
-                    yield data_task
                     data_task.start()
+                    return data_task
                 else:
+                    logging.debug("Data task stop")
                     transmit_flag.set(False)
                     current_data_task.terminate()
 
@@ -134,7 +137,7 @@ consumer.subscribe(['config-request'])
 
 try:
     logging.info("Started")
-    while True:
+    while not eval(os.getenv("TEST")):
         try:
             msg = consumer.poll(timeout=10.0)
             logging.debug("Message consumed: %s" % str(msg))
