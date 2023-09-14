@@ -1,13 +1,16 @@
 package com.fabrizio.tesi.gateway.config;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.net.URI;
 import java.util.Map;
 
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -51,27 +54,27 @@ class ConfigControllerMockServerTest {
                     + "\"refresh_token\":\"\""
                     + "}",
             "{"//RISPOSTA SENZA RUOLI
-                    + "\"access_token\":\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyLCJyZXNvdXJjZV9hY2Nlc3MiOnsidGVzaS1hcHAiOiJ7XCJyb2xlc1wiOltdfSJ9fQ.nJqNQ8yWhu1_nMvYoffw2bUpE9EyI1jwsMFxssm6COA\","
+                    + "\"access_token\":\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyLCJyZXNvdXJjZV9hY2Nlc3MiOnsidGVzaS1jbGllbnQiOiJ7XCJyb2xlc1wiOltdfSJ9fQ.chIu_Tknhx20DlTMxH8TH_XbfZCkAbpbZqpYj_6F_Uc\","
                     + "\"refresh_token\":\"\""
                     + "}",
             "{"//ACCESSO SENZA RUOLI VALIDI
-                    + "\"access_token\":\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyLCJyZXNvdXJjZV9hY2Nlc3MiOnsidGVzaS1hcHAiOiJ7XCJyb2xlc1wiOltcInNjZW1vXCJdfSJ9fQ.QRvb0jER0iGlPFLX0mLWCR2j1Ix_s1pFB_kQXZfeAa0\","
+                    + "\"access_token\":\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyLCJyZXNvdXJjZV9hY2Nlc3MiOnsidGVzaS1jbGllbnQiOiJ7XCJyb2xlc1wiOltcInNjZW1vXCJdfSJ9fQ.vOpZe-6y78ppNJfFCJ-8fqnhnxt3EYmYZNYqM-ipccc\","
                     + "\"refresh_token\":\"\""
                     + "}",
             "{"//ACCESSO SENZA RUOLI VALIDI
-                    + "\"access_token\":\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyLCJyZXNvdXJjZV9hY2Nlc3MiOnsidGVzaS1hcHAiOiJ7XCJyb2xlc1wiOltcInNjZW1vXCJdfSJ9fQ.QRvb0jER0iGlPFLX0mLWCR2j1Ix_s1pFB_kQXZfeAa0\","
+                    + "\"access_token\":\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyLCJyZXNvdXJjZV9hY2Nlc3MiOnsidGVzaS1jbGllbnQiOiJ7XCJyb2xlc1wiOltcInNjZW1vXCJdfSJ9fQ.vOpZe-6y78ppNJfFCJ-8fqnhnxt3EYmYZNYqM-ipccc\","
                     + "\"refresh_token\":\"\","
                     + "\"id_token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE1MTYyMzkwMjIsImV4cCI6MTUxNjIzOTAyMn0.BA8MjTQQmXNtRSOhTvnibDjbtx7M5KO8M4XLQu-Oizg\","
                     + "\"expires_in\": 1505468754"
                     + "}",
             "{"//ACCESSO COME ANALIST
-                    + "\"access_token\":\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyLCJyZXNvdXJjZV9hY2Nlc3MiOnsidGVzaS1hcHAiOiJ7XCJyb2xlc1wiOltcImFuYWxpc3RcIl19In19.WKw5MNE2JatWp_O0cFMTdaxdl5PhOGh_oKfysrn8yT8\","
+                    + "\"access_token\":\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyLCJyZXNvdXJjZV9hY2Nlc3MiOnsidGVzaS1jbGllbnQiOiJ7XCJyb2xlc1wiOltcImFuYWxpc3RcIl19In19.f4N_LLTX2ENUO6cp435P15Lmt9izqQa671eXmKXsTfI\","
                     + "\"refresh_token\":\"\","
                     + "\"id_token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE1MTYyMzkwMjIsImV4cCI6MTUxNjIzOTAyMn0.BA8MjTQQmXNtRSOhTvnibDjbtx7M5KO8M4XLQu-Oizg\","
                     + "\"expires_in\": 1505468754"
                     + "}",
             "{"//ACCESSO COME ADMIN
-                    + "\"access_token\":\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyLCJyZXNvdXJjZV9hY2Nlc3MiOnsidGVzaS1hcHAiOiJ7XCJyb2xlc1wiOltcImFkbWluXCJdfSJ9fQ.KhQi_7r8YXfC3SfSyAEEVxGHz5mS4GIg49-fo0RK1-s\","
+                    + "\"access_token\":\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyLCJyZXNvdXJjZV9hY2Nlc3MiOnsidGVzaS1jbGllbnQiOiJ7XCJyb2xlc1wiOltcImFkbWluXCJdfSJ9fQ.BSKQ0XBlA_5raJX8nIXu1yWGzbh4wjChDMWdUvf2F8Y\","
                     + "\"refresh_token\":\"\","
                     + "\"id_token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE1MTYyMzkwMjIsImV4cCI6MTUxNjIzOTAyMn0.BA8MjTQQmXNtRSOhTvnibDjbtx7M5KO8M4XLQu-Oizg\","
                     + "\"expires_in\": 1505468754"

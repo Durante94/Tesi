@@ -1,4 +1,4 @@
-virtualenv
-gunicorn
-falcon
-confluent_kafka
+virtualenv~=20.24.4
+gunicorn~=21.2.0
+falcon~=3.1.1
+confluent_kafka~=2.2.0

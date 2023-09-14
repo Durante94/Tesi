@@ -9,11 +9,11 @@ import uuid
 import logging
 import random
 
-id = str(uuid.uuid4())
+idEmulator = str(uuid.uuid4())
 
 # Set logging level: DEBUG, INFO, WARNING, ERROR, CRITICAL
 logging.basicConfig(level=logging.INFO)
-logging.info(id)
+logging.info(idEmulator)
 
 
 def acked(err, msg):
@@ -112,7 +112,7 @@ exit_flag = manager.Value('i', True)
 transmit_flag = manager.Value('i', True)
 conf = {
     'bootstrap.servers': os.getenv("KAFKA_HOST"),
-    'client.id': "simulatore-"+id
+    'client.id': "simulatore-" + idEmulator
 }
 logging.debug("Kafka configuration: %s" % conf)
 logging.debug("KAFKA_HOST: %s" % os.getenv("KAFKA_HOST"))
@@ -130,7 +130,7 @@ frequency = float(os.getenv('FREQUENCY'))
 hb_rate = int(os.getenv("HB_RATE"))
 
 heartbeat_process = Process(target=heartbeat_task,
-                            args=(conf.copy(), exit_flag, hb_rate, id))
+                            args=(conf.copy(), exit_flag, hb_rate, idEmulator))
 data_task = None
 heartbeat_process.start()
 consumer.subscribe(['config-request'])
@@ -142,7 +142,7 @@ try:
             msg = consumer.poll(timeout=10.0)
             logging.debug("Message consumed: %s" % str(msg))
             data_task = msg_elaboration(msg, producer, data_task, conf.copy(
-            ), exit_flag, transmit_flag, function, amplitude, frequency, id)
+            ), exit_flag, transmit_flag, function, amplitude, frequency, idEmulator)
         except KafkaException as e:
             logging.error("KafkaException: %s" % e)
 finally:

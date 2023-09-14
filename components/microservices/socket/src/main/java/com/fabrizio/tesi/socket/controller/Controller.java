@@ -10,10 +10,8 @@ import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
 
 import com.fabrizio.tesi.socket.dto.AlarmDTO;
 import com.fabrizio.tesi.socket.dto.AlarmPayload;
@@ -24,7 +22,7 @@ import com.fabrizio.tesi.socket.dto.ConfigRespPayload;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
 
-@RestController
+@Component
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class Controller {
     @Autowired
@@ -33,7 +31,6 @@ public class Controller {
     @Autowired
     KafkaTemplate<String, ConfigReqDTO> kafkaTemplate;
 
-    @PostMapping
     @KafkaListener(topics = "config-response", containerFactory = "kafkaListenerContainerConfigFactory")
     public ResponseEntity<Void> sendConfig(@RequestBody ConfigRespPayload message,
             @Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String id) {
@@ -42,9 +39,8 @@ public class Controller {
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping("/alarms/{id}")
     @KafkaListener(topics = "alarm", containerFactory = "kafkaListenerContainerAlarmFactory")
-    public ResponseEntity<Void> sendAlarm(@PathVariable("id") @Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String id,
+    public ResponseEntity<Void> sendAlarm(@Header(KafkaHeaders.RECEIVED_MESSAGE_KEY) String id,
             @RequestBody AlarmPayload message) {
         message.setId(id);
         socketTemplate.convertAndSend("/topic/alarm", new AlarmDTO(message));

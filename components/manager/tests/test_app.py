@@ -1,23 +1,27 @@
-import unittest
-import falcon
-import time
+import json
 import os
-from unittest.mock import MagicMock
-from manager.app import List, acked, agent_check, msg_elaboration, heartbeat_controller_task, agent_controller_task
-from confluent_kafka import KafkaError, Message
+import time
+import unittest
 from multiprocessing import Manager
+from unittest.mock import MagicMock
+
+import falcon
+from falcon import testing
+from confluent_kafka import Message
 from confluent_kafka.cimpl import KafkaException, KafkaError
+
+from manager.app import app, List, acked, agent_check, msg_elaboration, heartbeat_controller_task, agent_controller_task
 
 
 class TestListEndpoint(unittest.TestCase):
     def setUp(self) -> None:
         heartbeat_controller_task.terminate()
         agent_controller_task.terminate()
+        # Create a List instance with a mock agentDict
+        self.agentDict = {"agent1": 123, "agent2": 456}
 
     def test_on_get(self):
-        # Create a List instance with a mock agentDict
-        agentDict = {"agent1": 123, "agent2": 456}
-        list_endpoint = List(agentDict)
+        list_endpoint = List(self.agentDict)
         # Create mock Falcon request and response objects
         req = MagicMock()
         resp = MagicMock()
@@ -26,8 +30,14 @@ class TestListEndpoint(unittest.TestCase):
         list_endpoint.on_get(req, resp)
 
         # Check if the response is as expected
-        self.assertEqual(resp.text, '["agent1", "agent2"]')
+        self.assertEqual(resp.text, json.dumps(list(self.agentDict.keys())))
         self.assertEqual(resp.status, falcon.HTTP_200)
+
+    def test_list_endpoint(self):
+        # Simulate a GET request
+        result = testing.simulate_get(app, '/')
+        self.assertEqual(result.status, falcon.HTTP_200)
+        self.assertEqual(result.json, [])
 
 
 class TestAcked(unittest.TestCase):
@@ -59,8 +69,8 @@ class TestAgentCheck(unittest.TestCase):
         agent_controller_task.terminate()
 
     def test_agent_check(self):
-        future = time.time()+10
-        past = future-100000000
+        future = time.time() + 10
+        past = future - 100000000
         agentDict = {"test": future, "test2": past}
         msgVal = next(agent_check(
             agentDict, Manager().Value('i', True), os.getenv("KAFKA_HOST"), 5, 5, True))

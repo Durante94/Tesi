@@ -1,7 +1,11 @@
 package com.fabrizio.tesi.gateway.filters;
 
-import com.auth0.jwt.exceptions.JWTDecodeException;
-import com.fabrizio.tesi.gateway.filter.CheckAuth;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
+import javax.annotation.PostConstruct;
+
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,9 +18,8 @@ import org.springframework.mock.http.server.reactive.MockServerHttpRequest;
 import org.springframework.mock.web.server.MockServerWebExchange;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import javax.annotation.PostConstruct;
-
-import static org.junit.jupiter.api.Assertions.*;
+import com.auth0.jwt.exceptions.JWTDecodeException;
+import com.fabrizio.tesi.gateway.filter.CheckAuth;
 
 @SpringBootTest(properties = {"auth.enable=true"})
 public class CheckAuthAuthEnableTest {

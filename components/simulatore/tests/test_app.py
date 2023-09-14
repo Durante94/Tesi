@@ -5,7 +5,7 @@ import numpy as np
 from unittest.mock import MagicMock
 from confluent_kafka import KafkaError, Message
 from confluent_kafka.cimpl import KafkaException, KafkaError
-from Simulatore import acked, id, msg_elaboration, heartbeat_task, producer_task, heartbeat_process, conf
+from Simulatore import acked, idEmulator, msg_elaboration, heartbeat_task, producer_task, heartbeat_process, conf
 from multiprocessing import Process, Manager
 
 
@@ -32,6 +32,10 @@ class TestAcked(unittest.TestCase):
 
         self.assertEqual("Test", err.return_value)
         self.assertEqual("Test", msg.return_value)
+
+
+def mockFuncTask():
+    time.sleep(2)
 
 
 class TestMsgElaboration(unittest.TestCase):
@@ -74,6 +78,17 @@ class TestMsgElaboration(unittest.TestCase):
         except KafkaException as ke:
             self.assertIsNotNone(ke)
 
+    def test_get_invalid_msg(self):
+        msg = MagicMock(spec=Message)
+        msg.value.return_value = b'__'
+        msg.error.return_value = False
+
+        # Call the heartbeat_check function
+        res = msg_elaboration(msg, self.mockProducer, None,
+                              None, True, False, '', '', '', idEmulator, True)
+
+        self.assertIsNone(res)
+
     def test_get_valid_msg_id_not_valid(self):
         msg = MagicMock(spec=Message)
         msg.value.return_value = b'{}'
@@ -81,7 +96,7 @@ class TestMsgElaboration(unittest.TestCase):
 
         # Call the heartbeat_check function
         res = msg_elaboration(msg, self.mockProducer, None,
-                              None, True, False, '', '', '', id, True)
+                              None, True, False, '', '', '', idEmulator, True)
 
         self.assertIsNone(res)
 
@@ -90,13 +105,13 @@ class TestMsgElaboration(unittest.TestCase):
 
         # Call the heartbeat_check function
         res = msg_elaboration(msg, self.mockProducer, None,
-                              None, True, False, '', '', '', id, True)
+                              None, True, False, '', '', '', idEmulator, True)
 
         self.assertIsNone(res)
 
     def test_get_config_request(self):
         msg = MagicMock(spec=Message)
-        msg.value.return_value = b'{"id": "'+id.encode()+b'"}'
+        msg.value.return_value = b'{"id": "' + idEmulator.encode() + b'"}'
         msg.error.return_value = False
         msg.key.return_value = b'request'
 
@@ -108,7 +123,8 @@ class TestMsgElaboration(unittest.TestCase):
 
         # Call the heartbeat_check function
         res = msg_elaboration(msg, self.mockProducer, None, None, True, False,
-                              expected_dict['function'], expected_dict['amplitude'], expected_dict['frequency'], id, True)
+                              expected_dict['function'], expected_dict['amplitude'], expected_dict['frequency'], idEmulator,
+                              True)
 
         self.assertDictEqual(expected_dict, res)
         self.assertEqual(expected_dict['function'], res['function'])
@@ -118,7 +134,7 @@ class TestMsgElaboration(unittest.TestCase):
     def test_toggle_create_task(self):
         msg = MagicMock(spec=Message)
         msg.value.return_value = b'{"id": "' + \
-            id.encode()+b'", "payload": "True"}'
+                                 idEmulator.encode() + b'", "payload": "True"}'
         msg.error.return_value = False
         msg.key.return_value = b'toggle'
 
@@ -126,7 +142,7 @@ class TestMsgElaboration(unittest.TestCase):
 
         # Call the heartbeat_check function
         res = msg_elaboration(msg, self.mockProducer, None,
-                              None, True, flag, '', '', '', id, True)
+                              None, True, flag, '', '', '', idEmulator, True)
 
         self.assertIsNotNone(res)
         self.assertIsInstance(res, Process)
@@ -136,17 +152,17 @@ class TestMsgElaboration(unittest.TestCase):
     def test_toggle_stop_task(self):
         msg = MagicMock(spec=Message)
         msg.value.return_value = b'{"id": "' + \
-            id.encode()+b'", "payload": "False"}'
+                                 idEmulator.encode() + b'", "payload": "False"}'
         msg.error.return_value = False
         msg.key.return_value = b'toggle'
 
         flag = Manager().Value('i', True)
-        test_p = Process(target=lambda: time.sleep(2))
+        test_p = Process(target=mockFuncTask)
         test_p.start()
 
         # Call the heartbeat_check function
         res = msg_elaboration(msg, self.mockProducer, test_p,
-                              None, True, flag, '', '', '', id, True)
+                              None, True, flag, '', '', '', idEmulator, True)
         test_p.join()
 
         self.assertIsNone(res)

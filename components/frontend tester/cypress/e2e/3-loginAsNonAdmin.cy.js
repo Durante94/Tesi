@@ -1,5 +1,3 @@
-import { openDropdown } from "./commonMenuFunctions";
-
 describe("Check all disable", () => {
     before(() => {
         if (Cypress.env('doLogin'))

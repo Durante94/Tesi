@@ -1,6 +1,5 @@
 package com.fabrizio.tesi.rest.cache;
 
-import java.util.Arrays;
 import java.util.List;
 
 import org.springframework.cache.CacheManager;

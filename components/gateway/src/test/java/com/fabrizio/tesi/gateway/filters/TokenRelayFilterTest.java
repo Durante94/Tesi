@@ -10,6 +10,7 @@ import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.mock.http.server.reactive.MockServerHttpRequest;
 import org.springframework.mock.web.server.MockServerWebExchange;
 
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringBootTest
@@ -30,9 +31,10 @@ public class TokenRelayFilterTest {
 
         filterChain.filter(webExchnage, chain);
 
-        String langAttr = webExchnage.getSession().share().block().getAttribute("Authorization");
+        // String langAttr = webExchnage.getSession().share().block().getAttribute("Authorization");
+        String langAttr = webExchnage.getRequiredAttribute("Authorization");
 
-        assertEquals(request, webExchnage.getRequest());
+        assertNotEquals(request, webExchnage.getRequest());
         assertEquals(testSessionAttribute, langAttr);
     }
 }

@@ -1,11 +1,9 @@
 package com.fabrizio.tesi.gateway.config;
 
-import com.fabrizio.tesi.gateway.dto.CallbackRequest;
-import lombok.AccessLevel;
-import lombok.experimental.FieldDefaults;
-import okhttp3.mockwebserver.MockResponse;
-import okhttp3.mockwebserver.MockWebServer;
-import okio.Buffer;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import java.net.URI;
+
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -20,9 +18,12 @@ import org.springframework.mock.web.server.MockServerWebExchange;
 import org.springframework.web.server.WebSession;
 import org.springframework.web.server.session.DefaultWebSessionManager;
 
-import java.net.URI;
+import com.fabrizio.tesi.gateway.dto.CallbackRequest;
 
-import static org.junit.jupiter.api.Assertions.*;
+import lombok.AccessLevel;
+import lombok.experimental.FieldDefaults;
+import okhttp3.mockwebserver.MockResponse;
+import okhttp3.mockwebserver.MockWebServer;
 
 @SpringBootTest(properties = {"keycloack.oidcaddr=http://localhost:50000/auth", "auth.secret="})
 @FieldDefaults(level = AccessLevel.PRIVATE)
@@ -62,7 +63,7 @@ class ConfigControllerMockServerInvalidSecretTest {
         CallbackRequest dto = new CallbackRequest();
         String[] bodies = new String[]{
                 "{"
-                        + "\"access_token\":\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyLCJyZXNvdXJjZV9hY2Nlc3MiOnsidGVzaS1hcHAiOiJ7XCJyb2xlc1wiOltcImFuYWxpc3RcIl19In19.WKw5MNE2JatWp_O0cFMTdaxdl5PhOGh_oKfysrn8yT8\","
+                        + "\"access_token\":\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyLCJyZXNvdXJjZV9hY2Nlc3MiOnsidGVzaS1jbGllbnQiOiJ7XCJyb2xlc1wiOltcImFuYWxpc3RcIl19In19.f4N_LLTX2ENUO6cp435P15Lmt9izqQa671eXmKXsTfI\","
                         + "\"refresh_token\":\"\","
                         + "\"id_token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE1MTYyMzkwMjIsImV4cCI6MTUxNjIzOTAyMn0.BA8MjTQQmXNtRSOhTvnibDjbtx7M5KO8M4XLQu-Oizg\","
                         + "\"expires_in\": 1505468754"
