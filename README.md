@@ -89,9 +89,18 @@ helm repo add strimzi https://strimzi.io/charts/
 ## Deploy Strimzi, Kafka and Zookeper
 ```
 helm install -f /path/to/deploy/file1.yaml -f /path/to/deploy/file2.yaml <deploy name> /deploy/folder
-```
-```
 helm install strimzi strimzi/strimzi-kafka-operator --version=<version>  -n <namespace>
+```
+## Install Prometheus Operator
+```
+helm repo add prometheus-community https://prometheus-community.github.io/helm-charts;
+helm repo update;
+kc create namespace monitoring; # optional if namespace already exist
+helm install prometheus prometheus-community/kube-prometheus-stack -n monitoring;
+```
+If there are other configurations for the operator:
+```
+kc apply -n monitoring -f path/to/file/yaml -f path/to/file/yaml
 ```
 ## Update Deployment 
 Use the same path file as `helm install` command
@@ -109,8 +118,8 @@ kc apply -f databases/templates/influxdb/influx.yaml -n influx
 ```
 ## Deploy Telegraf
 Follow the [official guide](https://github.com/influxdata/helm-charts/tree/master/charts/telegraf)
-## Restart pod per modifiche
-Quando modifichiamo config-map o pvc, riavviamo i pod
+## Restart pod
+When modify config-map o pvc, restart the pod
 ```
 kc delete po <pod-name> -n <namespace>
 ```

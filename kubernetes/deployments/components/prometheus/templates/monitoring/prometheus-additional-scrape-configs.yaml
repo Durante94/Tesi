@@ -1,0 +1,8 @@
+apiVersion: v1
+data:
+  prometheus-additional-sources.yaml: LSBqb2JfbmFtZTogImthZmthLWV4cG9ydGVyIgogIHNjcmFwZV9pbnRlcnZhbDogNXMKICBzY3JhcGVfdGltZW91dDogMTBzCiAgc3RhdGljX2NvbmZpZ3M6CiAgLSB0YXJnZXRzOiBbImthZmthLWV4cG9ydGVyLXNlcnZpY2Uua2Fma2Euc3ZjOjk0MDQiXQ==
+kind: Secret
+metadata:
+  creationTimestamp: null
+  name: prometheus-additional-scrape-configs
+  namespace: monitoring

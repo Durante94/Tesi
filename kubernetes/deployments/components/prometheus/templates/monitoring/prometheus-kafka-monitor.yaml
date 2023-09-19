@@ -1,0 +1,12 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: strimzi-exporter-monitor
+  namespace: monitoring
+spec:
+  endpoints:
+  - port: exporter-metrics
+    interval: 10s
+  selector:
+    matchLabels:
+      app: strimzi-exporter-monitor

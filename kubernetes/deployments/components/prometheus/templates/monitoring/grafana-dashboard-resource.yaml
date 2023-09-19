@@ -1,0 +1,8 @@
+apiVersion: integreatly.org/v1alpha1
+kind: GrafanaDashboard
+metadata:
+  name: custom-dashboard
+  namespace: monitoring
+spec:
+  json: configmap:grafana-dashboard
+  folderId: Custom
