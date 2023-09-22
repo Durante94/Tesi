@@ -24,22 +24,46 @@ def acked(err, msg):
         logging.debug("Message produced: %s" % (str(msg)))
 
 
+def generate_solar_irradiance(time):
+    period=24*60*60
+    amplitude = 500
+    mean_irradiance = 1000
+    irradiance = mean_irradiance + amplitude * np.sin(2 * np.pi / period * time)
+    return { "value":irradiance, "measure_unit": "W/m^2"}
+
+def generate_wind_speed(prev):
+    mean_wind_speed = 5 
+    std_deviation = 2
+
+    wind_speed = np.maximum(prev + np.random.normal(0, std_deviation),0)
+    wind_speed += mean_wind_speed
+    return { "value": wind_speed, "measure_unit": "m/s"}
+
+def generate_rainfall():
+    mean_rainfall = 2
+    variation = 1
+    num_points = 1
+    rainfall = np.random.normal(mean_rainfall, variation, num_points)
+    # Ensure rainfall values are non-negative
+    rainfall = np.maximum(rainfall, 0)
+    return { "value": rainfall, "measure_unit": "mm"}
+
 def producer_task(conf, flag, transmit, function, amplitude, frequency, currentId, test=False):
     producer = Producer(conf)
-    math_func = getattr(np, function)
+    func = None
     t = 1
     logging.debug("Data task started")
     while flag.get() and transmit.get():
         time.sleep(1)
-        value = np.array2string(
-            amplitude * math_func(t + np.pi / frequency))
+        
+        
         logging.debug(value)
-        resDict = {"value": value, "agent": currentId}
+        res_dict = {"value": value, "agent": currentId}
         if test:
-            return resDict
+            return res_dict
         producer.produce("data",
                          key=currentId,
-                         value=json.dumps(resDict) .encode('utf-8'),
+                         value=json.dumps(res_dict) .encode('utf-8'),
                          callback=acked)
         producer.poll(2)
         t = t + 1
@@ -124,9 +148,7 @@ consumer = Consumer({'bootstrap.servers': os.getenv("KAFKA_HOST"),
 time.sleep(random.randint(1, 10))
 
 producer = Producer(conf)
-function = os.getenv("MATH_FUN")
-amplitude = float(os.getenv("AMPLITUDE"))
-frequency = float(os.getenv('FREQUENCY'))
+type_emulator = os.getenv("TYPE")
 hb_rate = int(os.getenv("HB_RATE"))
 
 heartbeat_process = Process(target=heartbeat_task,
