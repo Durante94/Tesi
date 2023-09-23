@@ -1,11 +1,10 @@
 import unittest
 import time
 import os
-import numpy as np
 from unittest.mock import MagicMock
 from confluent_kafka import KafkaError, Message
 from confluent_kafka.cimpl import KafkaException, KafkaError
-from Simulatore import acked, idEmulator, msg_elaboration, heartbeat_task, producer_task, heartbeat_process, conf
+from Simulatore import acked, idEmulator, msg_elaboration, heartbeat_task, producer_task, heartbeat_process, conf, generate_solar_irradiance
 from multiprocessing import Process, Manager
 
 
@@ -47,7 +46,7 @@ class TestMsgElaboration(unittest.TestCase):
     def test_no_msg(self):
         # Call the heartbeat_check function
         res = msg_elaboration(None, self.mockProducer,
-                              None, None, True, False, '', '', '', '', True)
+                              None, None, True, False, '', '', '', True)
 
         self.assertIsNone(res)
 
@@ -60,7 +59,7 @@ class TestMsgElaboration(unittest.TestCase):
 
         # Call the heartbeat_check function
         res = msg_elaboration(msg, self.mockProducer, None,
-                              None, True, False, '', '', '', '', True)
+                              None, True, False, '', '', '', True)
 
         self.assertIsNone(res)
 
@@ -73,7 +72,7 @@ class TestMsgElaboration(unittest.TestCase):
 
         try:
             msg_elaboration(msg, self.mockProducer, None, None,
-                            True, False, '', '', '', '', True)
+                            True, False, '', '', '', True)
             self.fail("Exception expected")
         except KafkaException as ke:
             self.assertIsNotNone(ke)
@@ -85,7 +84,7 @@ class TestMsgElaboration(unittest.TestCase):
 
         # Call the heartbeat_check function
         res = msg_elaboration(msg, self.mockProducer, None,
-                              None, True, False, '', '', '', idEmulator, True)
+                              None, True, False, '', '', idEmulator, True)
 
         self.assertIsNone(res)
 
@@ -96,7 +95,7 @@ class TestMsgElaboration(unittest.TestCase):
 
         # Call the heartbeat_check function
         res = msg_elaboration(msg, self.mockProducer, None,
-                              None, True, False, '', '', '', idEmulator, True)
+                              None, True, False, '', '', idEmulator, True)
 
         self.assertIsNone(res)
 
@@ -105,7 +104,7 @@ class TestMsgElaboration(unittest.TestCase):
 
         # Call the heartbeat_check function
         res = msg_elaboration(msg, self.mockProducer, None,
-                              None, True, False, '', '', '', idEmulator, True)
+                              None, True, False, '', '', idEmulator, True)
 
         self.assertIsNone(res)
 
@@ -118,18 +117,13 @@ class TestMsgElaboration(unittest.TestCase):
         expected_dict = {
             'function': 'Test',
             'amplitude': 'Test',
-            'frequency': 'Test'
         }
 
         # Call the heartbeat_check function
         res = msg_elaboration(msg, self.mockProducer, None, None, True, False,
-                              expected_dict['function'], expected_dict['amplitude'], expected_dict['frequency'], idEmulator,
-                              True)
+                              expected_dict['function'], expected_dict['amplitude'], idEmulator, True)
 
-        self.assertDictEqual(expected_dict, res)
         self.assertEqual(expected_dict['function'], res['function'])
-        self.assertEqual(expected_dict['amplitude'], res['amplitude'])
-        self.assertEqual(expected_dict['frequency'], res['frequency'])
 
     def test_toggle_create_task(self):
         msg = MagicMock(spec=Message)
@@ -142,7 +136,7 @@ class TestMsgElaboration(unittest.TestCase):
 
         # Call the heartbeat_check function
         res = msg_elaboration(msg, self.mockProducer, None,
-                              None, True, flag, '', '', '', idEmulator, True)
+                              None, True, flag, '', '', idEmulator, True)
 
         self.assertIsNotNone(res)
         self.assertIsInstance(res, Process)
@@ -162,7 +156,7 @@ class TestMsgElaboration(unittest.TestCase):
 
         # Call the heartbeat_check function
         res = msg_elaboration(msg, self.mockProducer, test_p,
-                              None, True, flag, '', '', '', idEmulator, True)
+                              None, True, flag, '', '', idEmulator, True)
         test_p.join()
 
         self.assertIsNone(res)
@@ -185,17 +179,48 @@ class TestProducer(unittest.TestCase):
     def setUp(self) -> None:
         heartbeat_process.terminate()
 
-    def test_producer_task(self):
-        math_func = getattr(np, os.getenv("MATH_FUN"))
+    def test_producer_task_solar(self):
         testId = 'test'
-        testVal = np.array2string(float(
-            os.getenv("AMPLITUDE")) * math_func(1 + np.pi / float(os.getenv("FREQUENCY"))))
+        testVal = generate_solar_irradiance(1, float(os.getenv("AMPLITUDE")))
 
-        res = producer_task(conf, Manager().Value('i', True), Manager().Value('i', True), os.getenv(
-            "MATH_FUN"), float(os.getenv("AMPLITUDE")), float(os.getenv("FREQUENCY")), testId, True)
+        res = producer_task(conf, Manager().Value('i', True), Manager().Value('i', True), "solar", float(
+            os.getenv("AMPLITUDE")), testId, True)
 
-        self.assertEqual(testVal, res["value"])
+        self.assertEqual(testVal["value"], res["value"])
         self.assertEqual(testId, res["agent"])
+        self.assertEqual("W/m^2", res["measure_unit"])
+
+    def test_producer_task_wind(self):
+        testId = 'test'
+
+        res = producer_task(conf, Manager().Value('i', True), Manager().Value(
+            'i', True), "wind", float(os.getenv("AMPLITUDE")), testId, True)
+
+        self.assertGreaterEqual(res["value"], 0)
+        self.assertEqual(testId, res["agent"])
+        self.assertEqual("m/s", res["measure_unit"])
+
+    def test_producer_task_rain(self):
+        testId = 'test'
+
+        res = producer_task(conf, Manager().Value('i', True), Manager().Value(
+            'i', True), "rain", float(os.getenv("AMPLITUDE")), testId, True)
+
+        self.assertGreaterEqual(res["value"], 0)
+        self.assertEqual(testId, res["agent"])
+        self.assertEqual("mm", res["measure_unit"])
+
+    def test_producer_task_invalid(self):
+        testId = 'test'
+
+        try:
+            producer_task(conf, Manager().Value('i', True), Manager().Value(
+                'i', True), "", float(os.getenv("AMPLITUDE")), testId, True)
+        except Exception as e:
+            self.assertIsNotNone(e)
+            return
+
+        self.fail("Unexpected behaviour")
 
 
 if __name__ == '__main__':

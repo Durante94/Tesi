@@ -24,46 +24,53 @@ def acked(err, msg):
         logging.debug("Message produced: %s" % (str(msg)))
 
 
-def generate_solar_irradiance(time):
-    period=24*60*60
-    amplitude = 500
+def generate_solar_irradiance(time, amplitude, **args):
+    period = 24*60*60
     mean_irradiance = 1000
-    irradiance = mean_irradiance + amplitude * np.sin(2 * np.pi / period * time)
-    return { "value":irradiance, "measure_unit": "W/m^2"}
+    irradiance = mean_irradiance + amplitude * \
+        np.sin(2 * np.pi / period * time)
+    return {"value": irradiance, "measure_unit": "W/m^2"}
 
-def generate_wind_speed(prev):
-    mean_wind_speed = 5 
-    std_deviation = 2
 
-    wind_speed = np.maximum(prev + np.random.normal(0, std_deviation),0)
-    wind_speed += mean_wind_speed
-    return { "value": wind_speed, "measure_unit": "m/s"}
+def generate_wind_speed(prev, amplitude, **args):
+    mean_wind_speed = 5
 
-def generate_rainfall():
+    wind_speed = mean_wind_speed + \
+        np.maximum(prev + np.random.normal(0, amplitude), 0)
+    return {"value": wind_speed, "measure_unit": "m/s"}
+
+
+def generate_rainfall(amplitude, **args):
     mean_rainfall = 2
-    variation = 1
-    num_points = 1
-    rainfall = np.random.normal(mean_rainfall, variation, num_points)
-    # Ensure rainfall values are non-negative
-    rainfall = np.maximum(rainfall, 0)
-    return { "value": rainfall, "measure_unit": "mm"}
 
-def producer_task(conf, flag, transmit, function, amplitude, frequency, currentId, test=False):
+    rainfall = np.maximum(np.random.normal(mean_rainfall, amplitude), 0)
+    return {"value": rainfall, "measure_unit": "mm"}
+
+
+def producer_task(conf, flag, transmit, function, amplitude, currentId, test=False):
     producer = Producer(conf)
-    func = None
+    match function:
+        case "solar":
+            func = generate_solar_irradiance
+        case "wind":
+            func = generate_wind_speed
+        case "rain":
+            func = generate_rainfall
+        case _:
+            raise Exception()
+    value = {"value": 0}
     t = 1
     logging.debug("Data task started")
     while flag.get() and transmit.get():
         time.sleep(1)
-        
-        
+        value = func(time=t, prev=value["value"], amplitude=amplitude)
         logging.debug(value)
-        res_dict = {"value": value, "agent": currentId}
+        value["agent"] = currentId
         if test:
-            return res_dict
+            return value
         producer.produce("data",
                          key=currentId,
-                         value=json.dumps(res_dict) .encode('utf-8'),
+                         value=json.dumps(value) .encode('utf-8'),
                          callback=acked)
         producer.poll(2)
         t = t + 1
@@ -83,7 +90,7 @@ def heartbeat_task(conf, flag, sleepTime, currentId, test=False):
         logging.debug("Heartbeat produced %s" % currentId)
 
 
-def msg_elaboration(msg, producer, current_data_task, conf, exit_flag, transmit_flag, function, amplitude, frequency, id, test=False):
+def msg_elaboration(msg, producer, current_data_task, conf, exit_flag, transmit_flag, function, amplitude, id, test=False):
     if msg is None:
         return None
 
@@ -107,9 +114,7 @@ def msg_elaboration(msg, producer, current_data_task, conf, exit_flag, transmit_
         match msg.key():
             case b'request':
                 producedDict = {
-                    'function': function,
-                    'amplitude': amplitude,
-                    'frequency': frequency
+                    'function': function
                 }
                 if test:
                     return producedDict
@@ -122,7 +127,7 @@ def msg_elaboration(msg, producer, current_data_task, conf, exit_flag, transmit_
                     logging.debug("Data task start")
                     transmit_flag.set(True)
                     data_task = Process(target=producer_task, args=(
-                        conf, exit_flag, transmit_flag, function, amplitude, frequency, id))
+                        conf, exit_flag, transmit_flag, function, amplitude, id))
                     data_task.start()
                     return data_task
                 else:
@@ -149,6 +154,7 @@ time.sleep(random.randint(1, 10))
 
 producer = Producer(conf)
 type_emulator = os.getenv("TYPE")
+amplitude = float(os.getenv("AMPLITUDE"))
 hb_rate = int(os.getenv("HB_RATE"))
 
 heartbeat_process = Process(target=heartbeat_task,
@@ -164,7 +170,7 @@ try:
             msg = consumer.poll(timeout=10.0)
             logging.debug("Message consumed: %s" % str(msg))
             data_task = msg_elaboration(msg, producer, data_task, conf.copy(
-            ), exit_flag, transmit_flag, function, amplitude, frequency, idEmulator)
+            ), exit_flag, transmit_flag, type_emulator, amplitude, idEmulator)
         except KafkaException as e:
             logging.error("KafkaException: %s" % e)
 finally:
