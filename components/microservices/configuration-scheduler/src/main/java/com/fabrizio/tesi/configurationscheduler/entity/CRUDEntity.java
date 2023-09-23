@@ -20,8 +20,6 @@ public class CRUDEntity {
     String name;
     @EqualsAndHashCode.Exclude
     String description;
-    double amplitude;
-    double frequency;
     String function;
     boolean enable;
     @Column(name = "agent_id")

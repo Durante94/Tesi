@@ -15,8 +15,6 @@ public class CRUDDTO {
     String name;
     @EqualsAndHashCode.Exclude
     String description;
-    double amplitude;
-    double frequency;
     String function;
     boolean enable;
     String agentId;
