@@ -40,32 +40,6 @@ public class CRUDSpecification extends SpecificationPath<CRUDEntity, TableReques
                     )
             ));
         }
-        if (filter.getAmplitude() != 0) {
-			String queryParam = filter.getAmplitude() % 1 == 0 
-					?
-						Long.toString((long) filter.getAmplitude())
-					: 
-						Double.toString(filter.getAmplitude());
-          p.getExpressions().add(criteriaBuilder.and(
-                criteriaBuilder.like(
-                    root.get("amplitude").as(String.class),
-                    "%" + queryParam + "%"
-                ) 
-            ));
-        }
-        if (filter.getFrequency() != 0) {
-			String queryParam = filter.getFrequency() % 1 == 0 
-					?
-						Long.toString((long) filter.getFrequency())
-					: 
-						Double.toString(filter.getFrequency());
-            p.getExpressions().add(criteriaBuilder.and(
-                criteriaBuilder.like(
-                    root.get("frequency").as(String.class),
-                    "%" + queryParam + "%"
-                ) 
-            ));
-        }
         if (StringUtils.isNotBlank(filter.getFunction())) {
             p.getExpressions().add(criteriaBuilder.and(
                     criteriaBuilder.like(

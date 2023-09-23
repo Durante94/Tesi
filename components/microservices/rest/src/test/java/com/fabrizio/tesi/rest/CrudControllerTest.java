@@ -86,8 +86,6 @@ class CrudControllerTest {
 		String json="{"
 				+ "    \"name\": \"pro\","
 				+ "    \"description\": \"desc\","
-				+ "    \"amplitude\": 1,"
-				+ "    \"frequency\": 9,"
 				+ "    \"function\": \"sin\","
 				+ "    \"agentId\": \"a\""
 				+ "}";
@@ -107,43 +105,13 @@ class CrudControllerTest {
 			assertTrue(data.isDelete());
 		}
 	}
-	
-	@Test
-	@Order(5)
-	void getListFiltereWithFloatingPointNumdAsAdmin() {
-		String json="{"
-				+ "    \"name\": \"\","
-				+ "    \"description\": \"\","
-				+ "    \"amplitude\": 5.6,"
-				+ "    \"frequency\": 4.3,"
-				+ "    \"function\": \"\","
-				+ "    \"agentId\": \"\""
-				+ "}";
-		ResponseTable<TableResponseDTO> list = controller.listElem(json, Map.of("role", "admin"));
-		assertNotNull(list);
-		assertEquals(list.getTotal(), 1);
-		assertNotNull(list.getPageSizeOptions());
-		assertFalse(list.getPageSizeOptions().isEmpty());
-		assertNotNull(list.getData());
-		assertFalse(list.getData().isEmpty());
-		for (TableResponseDTO data : list.getData()) {
-			assertNotNull(data);
-			assertEquals(data.getId(), 4);
-			assertFalse(data.isReadOnly());
-			assertTrue(data.isView());
-			assertTrue(data.isEdit());
-			assertTrue(data.isDelete());
-		}
-	}
-	
+		
 	@Test
 	@Order(6)
 	void getListSortedAscendAsAdmin() {
 		String json="{"
 				+ "    \"name\": \"\","
 				+ "    \"description\": \"\","
-				+ "    \"amplitude\": 0,"
-				+ "    \"frequency\": 0,"
 				+ "    \"function\": \"\","
 				+ "    \"agentId\": \"\","
 				+ "    \"sort\": {\"name\": \"ascend\"}"
@@ -170,8 +138,6 @@ class CrudControllerTest {
 		String json="{"
 				+ "    \"name\": \"\","
 				+ "    \"description\": \"\","
-				+ "    \"amplitude\": 0,"
-				+ "    \"frequency\": 0,"
 				+ "    \"function\": \"\","
 				+ "    \"agentId\": \"\","
 				+ "    \"sort\": {\"name\": \"descend\"}"
@@ -198,8 +164,6 @@ class CrudControllerTest {
 		String json="{"
 				+ "    \"name\": \"\","
 				+ "    \"description\": \"\","
-				+ "    \"amplitude\": 0,"
-				+ "    \"frequency\": 0,"
 				+ "    \"function\": \"\","
 				+ "    \"agentId\": \"\","
 				+ "    \"sort\": {\"name\": \"\"}"
@@ -281,8 +245,6 @@ class CrudControllerTest {
 		test.setId(1);
 		test.setName("prova 2");
 		test.setDescription("test");
-		test.setAmplitude(-50);
-		test.setFrequency(32.9);
 		test.setFunction("tan");
 		test.setAgentId("jfdmbm");
 		ResponseEntity<TableResponseDTO> response = controller.saveElem(test, Map.of("role", "admin"));
@@ -292,9 +254,7 @@ class CrudControllerTest {
 		assertEquals(test.getId(), response.getBody().getId());
 		assertEquals(test.getDescription(), response.getBody().getDescription());
 		assertEquals(test.getName(), response.getBody().getName());
-		assertEquals(test.getAmplitude(), response.getBody().getAmplitude());
 		assertEquals(test.getAgentId(), response.getBody().getAgentId());
-		assertEquals(test.getFrequency(), response.getBody().getFrequency());
 		assertEquals(test.getFunction(), response.getBody().getFunction());
 	}
 
@@ -305,8 +265,6 @@ class CrudControllerTest {
 		test.setId(-1);
 		test.setName("prova 1");
 		test.setDescription("test");
-		test.setAmplitude(-50);
-		test.setFrequency(32.9);
 		test.setFunction("tan");
 		test.setAgentId("jfdmbm");
 		ResponseEntity<TableResponseDTO> response = controller.saveElem(test, Map.of("role", "admin"));
@@ -324,8 +282,6 @@ class CrudControllerTest {
 		test.setId(-1);
 		test.setName("prova 10");
 		test.setDescription("test");
-		test.setAmplitude(-50);
-		test.setFrequency(32.9);
 		test.setFunction("tan");
 		test.setAgentId("a");
 		ResponseEntity<TableResponseDTO> response = controller.saveElem(test, Map.of("role", "admin"));
@@ -342,8 +298,6 @@ class CrudControllerTest {
 		test.setId(-1);
 		test.setName("prova 10");
 		test.setDescription("test");
-		test.setAmplitude(-50);
-		test.setFrequency(32.9);
 		test.setFunction("tan");
 		test.setAgentId("ab");
 		ResponseEntity<TableResponseDTO> response = controller.saveElem(test, Map.of("role", "admin"));
@@ -353,9 +307,7 @@ class CrudControllerTest {
 		assertNotEquals(test.getId(), response.getBody().getId());
 		assertEquals(test.getDescription(), response.getBody().getDescription());
 		assertEquals(test.getName(), response.getBody().getName());
-		assertEquals(test.getAmplitude(), response.getBody().getAmplitude());
 		assertEquals(test.getAgentId(), response.getBody().getAgentId());
-		assertEquals(test.getFrequency(), response.getBody().getFrequency());
 		assertEquals(test.getFunction(), response.getBody().getFunction());
 	}
 
@@ -424,8 +376,6 @@ class CrudControllerTest {
 		String json="{"
 				+ "    \"name\": \"prova 2\","
 				+ "    \"description\": \"\","
-				+ "    \"amplitude\": 0,"
-				+ "    \"frequency\": 0,"
 				+ "    \"function\": \"\","
 				+ "    \"agentId\": \"\""
 				+ "}";

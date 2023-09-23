@@ -24,8 +24,6 @@ public class CRUDEntity {
     Long id;
     String name;
     String description;
-    double amplitude;
-    double frequency;
     String function;
     boolean enable;
     String agentId;

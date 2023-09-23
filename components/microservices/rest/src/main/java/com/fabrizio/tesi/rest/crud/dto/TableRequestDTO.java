@@ -15,8 +15,6 @@ import lombok.experimental.FieldDefaults;
 public class TableRequestDTO extends RequestTable {
     String name;
     String description;
-    double amplitude;
-    double frequency;
     String function;
     boolean enable;
     String agentId;
