@@ -71,8 +71,6 @@ export const FormContent = ({ edit, id, dispatch, configResp }) => {
         { name: "name", type: "text", label: "Name", required: true, rules: [{ required: true }], inputProps: { className: "cp-name" } },
         { name: "description", type: "text", label: "Description", inputProps: { className: "cp-description" } },
         { name: "agentId", type: "select", label: "Adapter", required: true, rules: [{ required: true }], inputProps: { width: "100%", fetchOptions, optionLabelProp: "value", fieldNames: { value: "value", label: "value" }, className: "cp-agent" } },
-        { name: "amplitude", type: "number", label: "Configured Amplitude", required: true, rules: [{ required: true }], inputProps: { style: { width: "100%" }, disabled: true, className: "cp-amplitude" } },
-        { name: "frequency", type: "number", label: "Configured Frequency", required: true, rules: [{ required: true }], inputProps: { style: { width: "100%" }, disabled: true, className: "cp-frequency" } },
         { name: "function", type: "number", label: "Configured Function", required: true, rules: [{ required: true }], inputProps: { style: { width: "100%" }, disabled: true, className: "cp-function" } },
         { name: "enable", type: "boolean", label: "Enable", required: true, rules: [{ required: true }], valuePropName: "checked", initialValue: false, inputProps: { className: "cp-enable" } }
     ]

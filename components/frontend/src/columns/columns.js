@@ -29,24 +29,6 @@ export const crudColumns = () => ({
             search: true
         },
         {
-            title: 'Ampiezza',
-            key: "amplitude",
-            dataIndex: 'amplitude',
-            type: "number",
-            symbol: "none",
-            sorter: true,
-            search: true
-        },
-        {
-            title: 'Frequenza',
-            key: "frequency",
-            dataIndex: 'frequency',
-            type: "number",
-            symbol: "none",
-            sorter: true,
-            search: true
-        },
-        {
             title: 'Abilitato',
             key: "enable",
             dataIndex: 'enable',
