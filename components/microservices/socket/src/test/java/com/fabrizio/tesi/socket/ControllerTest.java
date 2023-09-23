@@ -30,13 +30,8 @@ public class ControllerTest {
 
     @Test
     void sendConfigTest() throws JsonProcessingException {
-        int amplitude = 51, frequency = 28;
         String function = "tan", headerValue = "test";
-        String json = String.format("{\n" +
-                "\t\"amplitude\": %d,\n" +
-                "\t\"frequency\": %d,\n" +
-                "\t\"function\": \"%s\"\n" +
-                "}", amplitude, frequency, function);
+        String json = String.format("{ \"function\": \"%s\" }", function);
 
         Mockito.doAnswer(invocation -> {
             String arg0 = invocation.getArgument(0, String.class);
@@ -46,8 +41,6 @@ public class ControllerTest {
             assertNotNull(arg1);
             assertNotNull(arg1.getPayload());
             assertEquals(headerValue, arg1.getPayload().getAgentId());
-            assertEquals(amplitude, arg1.getPayload().getAmplitude());
-            assertEquals(frequency, arg1.getPayload().getFrequency());
             assertEquals(function, arg1.getPayload().getFunction());
             return null;
         }).when(socketTemplate).convertAndSend(Mockito.anyString(), Mockito.any(ConfigRespDTO.class));
@@ -84,21 +77,15 @@ public class ControllerTest {
 
     @Test
     void broadcastConfigTest() throws JsonProcessingException {
-        int amplitude = 51, frequency = 28;
         String function = "tan";
-        String json = String.format("{\n" +
-                "\t\"amplitude\": %d,\n" +
-                "\t\"frequency\": %d,\n" +
-                "\t\"function\": \"%s\"\n" +
-                "}", amplitude, frequency, function);
+        String json = String.format("{ \"function\": \"%s\" }", function);
 
-        ConfigRespDTO test = controller.broadcastConfig(new ConfigRespDTO(objectMapper.readValue(json, ConfigRespPayload.class)));
+        ConfigRespDTO test = controller
+                .broadcastConfig(new ConfigRespDTO(objectMapper.readValue(json, ConfigRespPayload.class)));
 
         assertNotNull(test);
         assertEquals("config-resp", test.getType());
         assertNotNull(test.getPayload());
-        assertEquals(amplitude, test.getPayload().getAmplitude());
-        assertEquals(frequency, test.getPayload().getFrequency());
         assertEquals(function, test.getPayload().getFunction());
     }
 

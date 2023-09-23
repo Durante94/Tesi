@@ -10,7 +10,5 @@ import lombok.experimental.FieldDefaults;
 public class ConfigRespPayload {
     @Setter
     String agentId;
-    float amplitude;
-    float frequency;
     String function;
 }
