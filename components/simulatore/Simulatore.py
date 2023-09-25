@@ -165,7 +165,7 @@ consumer.subscribe(['config-request'])
 
 try:
     logging.info("Started")
-    while not eval(os.getenv("TEST")):
+    while not eval(str(os.getenv("TEST")).capitalize()):
         try:
             msg = consumer.poll(timeout=10.0)
             logging.debug("Message consumed: %s" % str(msg))
