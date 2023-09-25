@@ -99,7 +99,7 @@ data:
     [[inputs.kafka_consumer]]
       brokers = ["{{ .Values.global.internalKafkaFqdn }}:{{ .Values.global.internalKafkaPort }}"]
       topics = ["data"]
-      json_string_fields = ["value", "agent"]
+      json_string_fields = ["value", "agent", "measure_unit"]
       version = "2.8.0"
       consumer_group = "_telegraf_InfluxDBv1.8_consumers"
       offset = "newest"
