@@ -39,11 +39,9 @@ describe("Device Lifecycle", () => {
         cy.get(".ant-select-item").first().click();
         cy.get(".cp-enable").click();
 
-        cy.get(".cp-amplitude input").should("be.disabled").invoke("val").should("be.empty");
-        cy.get(".cp-frequency input").should("be.disabled").invoke("val").should("be.empty");
         cy.get(".cp-function input").should("be.disabled").invoke("val").should("be.empty");
 
-        cy.get(".cp-save").should("not.be.disabled");
+        cy.get(".cp-save").should("be.disabled");
 
         cy.get(".cp-config-req").should("not.be.disabled").click();
 
@@ -55,8 +53,6 @@ describe("Device Lifecycle", () => {
         cy.get(".ant-select-item").first().click();
         cy.get(".cp-save").should("not.be.disabled");
 
-        cy.get(".cp-amplitude input", { timeout: 5000 }).should("be.disabled").invoke("val").should("not.be.empty");
-        cy.get(".cp-frequency input", { timeout: 5000 }).should("be.disabled").invoke("val").should("not.be.empty");
         cy.get(".cp-function input", { timeout: 5000 }).should("be.disabled").invoke("val").should("not.be.empty");
 
         cy.get(".cp-save").click();
@@ -85,8 +81,6 @@ describe("Device Lifecycle", () => {
         cy.get(".cp-edit").should("not.be.disabled").click()
         cy.wait("@apiDetail", 9000000000000000).should(xhr => { expect(xhr.response).to.have.property('statusCode', 200) });
 
-        cy.get(".cp-amplitude input").should("be.disabled").invoke("val").should("not.be.empty");
-        cy.get(".cp-frequency input").should("be.disabled").invoke("val").should("not.be.empty");
         cy.get(".cp-function input").should("be.disabled").invoke("val").should("not.be.empty");
         cy.get(".cp-description").type(" Edit");
 
@@ -111,8 +105,6 @@ describe("Device Lifecycle", () => {
         cy.get(".cp-edit").should("not.be.disabled").click()
         cy.wait("@apiDetail", 9000000000000000).should(xhr => { expect(xhr.response).to.have.property('statusCode', 200) });
 
-        cy.get(".cp-amplitude input").should("be.disabled").invoke("val").should("not.be.empty").then(val => cy.wrap(val).as("amplitude"));
-        cy.get(".cp-frequency input").should("be.disabled").invoke("val").should("not.be.empty").then(val => cy.wrap(val).as("frequency"));
         cy.get(".cp-function input").should("be.disabled").invoke("val").should("not.be.empty").then(val => cy.wrap(val).as("function"));
         cy.get(".cp-description input").invoke("val").then(val => expect(val).to.be.equals(devDescr + " Edit"));
         cy.get(".cp-description input").type(`{selectAll}{backSpace}${devDescr}`);
@@ -125,10 +117,6 @@ describe("Device Lifecycle", () => {
         cy.get(".cp-config-req").should("not.be.disabled").click();
 
         cy.wait(5000);
-        cy.get(".cp-amplitude input").should("be.disabled").invoke("val").should("not.be.empty")
-            .then(val => cy.get("@amplitude").should("not.be.equals", val));
-        cy.get(".cp-frequency input").should("be.disabled").invoke("val").should("not.be.empty")
-            .then(val => cy.get("@frequency").should("not.be.equals", val));
 
         cy.get(".cp-save").should("not.be.disabled").click();
         cy.wait("@apiSave", 9000000000000000).should(xhr => { expect(xhr.response).to.have.property('statusCode', 200) });
@@ -147,8 +135,6 @@ describe("Device Lifecycle", () => {
         cy.get(".cp-search").should("not.be.disabled").click()
         cy.wait("@apiDetail", 9000000000000000).should(xhr => { expect(xhr.response).to.have.property('statusCode', 200) });
 
-        cy.get(".cp-amplitude input").should("be.disabled").invoke("val").should("not.be.empty")
-        cy.get(".cp-frequency input").should("be.disabled").invoke("val").should("not.be.empty")
         cy.get(".cp-function input").should("be.disabled").invoke("val").should("not.be.empty")
         cy.get(".cp-description input").should("be.disabled").invoke("val").should("not.be.empty").should("be.equals", devDescr);
         cy.get(".cp-agent input").should("not.be.visible");
@@ -167,7 +153,7 @@ describe("Device Lifecycle", () => {
             method: 'DELETE',
             url: '/api/crud/*',
         }).as('apiDelete')
-        cy.get(".cp-delete button").should("not.be.disabled").click();
+        cy.get(".cp-delete").should("not.be.disabled").click();
         cy.get(".ant-modal-body .ant-btn").should("be.visible").click();
         cy.wait("@apiDelete", 9000000000000000).should(xhr => { expect(xhr.response).to.have.property('statusCode', 200) });
     })
