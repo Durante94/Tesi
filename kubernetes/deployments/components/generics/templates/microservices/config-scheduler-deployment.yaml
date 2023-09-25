@@ -16,12 +16,10 @@ spec:
         - name: docker-registry-secret
       containers:
       - name: "config-scheduler"
-        image: docker.io/fabrizio294/configuration-scheduler:0.0.2
+        image: docker.io/fabrizio294/configuration-scheduler:0.1.0
         ports:
         - containerPort: 8001
         env:
-        - name: "BUSINNESS_MANAGER_URL"
-          value: "http://{{ .Values.global.manager.dns }}:{{ .Values.global.manager.port }}"
         - name: "KAFKA_BOOTSTRAP-SERVERS"
           value: "{{ .Values.global.internalKafkaFqdn }}:{{ .Values.global.internalKafkaPort }}"
         - name: "SPRING_PROFILES_ACTIVE"

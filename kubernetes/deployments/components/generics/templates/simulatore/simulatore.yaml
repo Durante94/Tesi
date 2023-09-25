@@ -20,15 +20,13 @@ spec:
       containers:
       {{ range  $i, $e := untilStep 0 (int ($simReplicas)) 1 }} 
       - name: "{{- printf "%s%d" "simulatore" $i -}}"
-        image: docker.io/fabrizio294/simulatore:0.0.14
+        image: docker.io/fabrizio294/simulatore:0.1.0
         env:
         - name: "KAFKA_HOST"
           value: "local-cluster-kafka-bootstrap.kafka.svc:9092"
-        - name: "MATH_FUN"
-          value: "{{ if eq (mod $i 2) 0}}sin{{ else }}cos{{ end }}"
+        - name: "TYPE"
+          value: "{{ if eq (mod $i 3) 0}}solar{{ else if eq (mod $i 3) 1 }}wind{{ else }}rain{{ end }}"
         - name: "AMPLITUDE"
-          value: "{{- add $i 1 -}}"
-        - name: "FREQUENCY"
           value: "{{- add $i 1 -}}"
         - name: "KAFKA_GROUP"
           value: "{{- printf "%s%d" "tesi" $i -}}"

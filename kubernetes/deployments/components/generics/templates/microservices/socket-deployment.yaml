@@ -16,7 +16,7 @@ spec:
         - name: docker-registry-secret
       containers:
       - name: "socket"
-        image: docker.io/fabrizio294/socket-service:0.0.6
+        image: docker.io/fabrizio294/socket-service:0.1.1
         ports:
         - containerPort: 8000
         env:
