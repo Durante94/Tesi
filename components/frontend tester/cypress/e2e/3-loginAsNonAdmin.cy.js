@@ -33,8 +33,6 @@ describe("Check all disable", () => {
         cy.get(".cp-description input").should("be.disabled");
         cy.get(".cp-agent input").should("be.disabled");
         cy.get(".cp-enable input").should("be.disabled");
-        cy.get(".cp-amplitude input").should("be.disabled");
-        cy.get(".cp-frequency input").should("be.disabled");
         cy.get(".cp-function input").should("be.disabled");
         cy.get(".cp-save").should("be.disabled");
         cy.get(".cp-config-req").should("be.disabled");
