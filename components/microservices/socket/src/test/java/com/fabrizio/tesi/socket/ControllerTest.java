@@ -1,6 +1,6 @@
 package com.fabrizio.tesi.socket;
 
-import com.fabrizio.tesi.socket.controller.Controller;
+import com.fabrizio.tesi.socket.controller.SocketController;
 import com.fabrizio.tesi.socket.dto.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -24,7 +24,7 @@ public class ControllerTest {
     KafkaTemplate<String, ConfigReqDTO> kafkaTemplate;
 
     @Autowired
-    Controller controller;
+    SocketController controller;
 
     ObjectMapper objectMapper = new ObjectMapper();
 
